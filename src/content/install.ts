@@ -101,7 +101,7 @@ sudo dd if=LevitateOS.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
 				{
 					type: "text",
 					content:
-						"LevitateOS features a natural language installer powered by SmolLM3-3B running locally. Just type what you want in plain English.",
+						"LevitateOS features a natural language installer powered by SmolLM3-3B running locally. Run `levitate-installer` and type what you want in plain English.",
 				},
 			],
 		},
@@ -152,36 +152,24 @@ sudo dd if=LevitateOS.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
 			content: [],
 		},
 		{
-			title: "Install Desktop Environment",
+			title: "Install Packages",
 			level: 3,
 			content: [
 				{
 					type: "text",
-					content: "After booting into your new system, install the Sway Wayland desktop:",
+					content: "After booting into your new system, use `recipe` to install packages:",
 				},
-				{ type: "code", language: "bash", content: "levitate desktop" },
-				{
-					type: "text",
-					content:
-						"This installs the complete Sway stack: wayland, wlroots, sway, foot terminal, waybar, wofi launcher, and mako notifications.",
-				},
-			],
-		},
-		{
-			title: "Install Additional Packages",
-			level: 3,
-			content: [
 				{
 					type: "code",
 					language: "bash",
-					content: `# Search for packages
-levitate search firefox
+					content: `# List available packages
+recipe list
 
 # Install a package
-levitate install firefox
+recipe install firefox
 
 # View package info
-levitate info ripgrep`,
+recipe info ripgrep`,
 				},
 			],
 		},

@@ -11,8 +11,8 @@ export const docsNav: NavSection[] = [
 	{
 		title: "Package Manager",
 		items: [
+			{ title: "CLI Reference", href: "/docs/recipe" },
 			{ title: "Recipe Format", href: "/docs/recipes" },
-			{ title: "CLI Reference", href: "/docs/levitate" },
 		],
 	},
 ]
