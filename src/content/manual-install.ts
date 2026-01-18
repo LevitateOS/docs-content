@@ -277,10 +277,35 @@ hwclock --systohc`,
 			title: "11. Set Locale",
 			content: [
 				{
+					type: "text",
+					content: "Enable and generate your locale:",
+				},
+				{
 					type: "code",
 					language: "bash",
-					content: `# Set system locale
+					content: `# Uncomment en_US.UTF-8 (or your preferred locale)
+sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+
+# Generate locales
+locale-gen
+
+# Set system locale
 echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
+				},
+				{
+					type: "text",
+					content:
+						"For other locales, edit `/etc/locale.gen` with nano and uncomment the lines you need before running `locale-gen`.",
+				},
+				{
+					type: "text",
+					content: "Set the console keymap (optional, for non-US keyboards):",
+				},
+				{
+					type: "code",
+					language: "bash",
+					content: `# Skip this if using US keyboard layout
+echo "KEYMAP=us" > /etc/vconsole.conf`,
 				},
 			],
 		},
@@ -426,7 +451,8 @@ editor no`,
 				},
 				{
 					type: "text",
-					content: "Add the following, replacing the UUID and adjusting kernel filenames if needed:",
+					content:
+						"Add the following, **using the exact filenames from the `ls` command above**. The example below shows common names, but yours may differ (e.g., `vmlinuz-6.12.0-levitate`):",
 				},
 				{
 					type: "file",
@@ -436,6 +462,11 @@ linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
 options root=UUID=your-root-uuid-here rw quiet`,
 				},
+				{
+					type: "text",
+					content:
+						"**Important:** If your kernel files have different names, use those exact names. For Intel CPUs, add microcode: `initrd /intel-ucode.img` before the initramfs line. For AMD: `initrd /amd-ucode.img`.",
+				},
 			],
 		},
 		{
@@ -444,7 +475,10 @@ options root=UUID=your-root-uuid-here rw quiet`,
 				{
 					type: "code",
 					language: "bash",
-					content: `# Enable networking
+					content: `# Initialize machine ID (required by systemd)
+systemd-machine-id-setup
+
+# Enable networking
 systemctl enable NetworkManager`,
 				},
 			],
@@ -516,11 +550,13 @@ mount /dev/sda1 /mnt/boot
 cat /mnt/etc/fstab
 blkid
 
-# Re-enter chroot
+# Re-enter chroot (all bind mounts needed)
 mount --bind /dev /mnt/dev
+mount --bind /dev/pts /mnt/dev/pts
 mount --bind /proc /mnt/proc
 mount --bind /sys /mnt/sys
 mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
+mount --bind /run /mnt/run
 chroot /mnt /bin/bash
 
 # Reinstall bootloader
