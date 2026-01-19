@@ -24,8 +24,6 @@ export type ContentBlock =
 	| TableBlock
 	| ListBlock
 	| ConversationBlock
-	| LinkBlock
-	| InlineCodeBlock
 	| InteractiveBlock
 	| CommandBlock
 
@@ -77,17 +75,6 @@ export interface ConversationMessage {
 	text: string
 	/** Optional list items shown after the text */
 	list?: string[]
-}
-
-export interface LinkBlock {
-	type: "link"
-	text: string
-	href: string
-}
-
-export interface InlineCodeBlock {
-	type: "inline-code"
-	content: string
 }
 
 export interface InteractiveBlock {
