@@ -1,6 +1,6 @@
-import type { DocsContent } from "../types"
+import type { DocsContent } from "../../types"
 
-export const recipesContent: DocsContent = {
+export const recipeFormatContent: DocsContent = {
 	title: "Recipe Format",
 	sections: [
 		{

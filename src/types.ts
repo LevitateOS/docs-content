@@ -94,4 +94,12 @@ export interface NavSection {
 export interface NavItem {
 	title: string
 	href: string
+	/** Sections within the page (for table of contents) */
+	sections?: NavItemSection[]
+}
+
+export interface NavItemSection {
+	title: string
+	anchor: string
+	level: 2 | 3
 }

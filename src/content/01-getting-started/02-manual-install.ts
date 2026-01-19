@@ -1,4 +1,4 @@
-import type { DocsContent } from "../types"
+import type { DocsContent } from "../../types"
 
 export const manualInstallContent: DocsContent = {
 	title: "Manual Installation Guide",
