@@ -213,7 +213,7 @@ fn install() {
 				},
 				{
 					type: "text",
-					content: "See [Helper Functions](/docs/helper-functions) for `download()`, `extract()`, `install_bin()`, etc.",
+					content: "See [Helper Functions](/docs/helpers-overview) for `download()`, `extract()`, `install_bin()`, etc.",
 				},
 			],
 		},
@@ -358,7 +358,7 @@ fn install() {
 					type: "list",
 					items: [
 						"[CLI Reference](/docs/cli-reference) - Commands for installing and managing packages",
-						"[Helper Functions](/docs/helper-functions) - All available functions for recipes",
+						"[Helper Functions](/docs/helpers-overview) - All available functions for recipes",
 					],
 				},
 			],

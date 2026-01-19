@@ -469,7 +469,7 @@ fn check_update() {
 					type: "list",
 					items: [
 						"[Recipe Format](/docs/recipe-format) - Full specification for writing recipes",
-						"[Helper Functions](/docs/helper-functions) - All available functions for recipes",
+						"[Helper Functions](/docs/helpers-overview) - All available functions for recipes",
 					],
 				},
 			],

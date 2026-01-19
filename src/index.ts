@@ -12,7 +12,14 @@ export {
 	installationContent,
 	cliReferenceContent,
 	recipeFormatContent,
-	helperFunctionsContent,
+	helpersOverviewContent,
+	helpersAcquireContent,
+	helpersBuildContent,
+	helpersInstallContent,
+	helpersFilesystemContent,
+	helpersEnvironmentContent,
+	helpersCommandsContent,
+	helpersHttpContent,
 } from "./navigation"
 
 export type { DocsContent } from "./types"

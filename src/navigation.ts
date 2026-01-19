@@ -5,7 +5,14 @@ import { gettingStartedContent } from "./content/01-getting-started/01-getting-s
 import { installationContent } from "./content/01-getting-started/02-installation"
 import { cliReferenceContent } from "./content/02-package-manager/01-cli-reference"
 import { recipeFormatContent } from "./content/02-package-manager/02-recipe-format"
-import { helperFunctionsContent } from "./content/02-package-manager/03-helper-functions"
+import { helpersOverviewContent } from "./content/03-helpers/01-overview"
+import { helpersAcquireContent } from "./content/03-helpers/02-acquire"
+import { helpersBuildContent } from "./content/03-helpers/03-build"
+import { helpersInstallContent } from "./content/03-helpers/04-install"
+import { helpersFilesystemContent } from "./content/03-helpers/05-filesystem"
+import { helpersEnvironmentContent } from "./content/03-helpers/06-environment"
+import { helpersCommandsContent } from "./content/03-helpers/07-commands"
+import { helpersHttpContent } from "./content/03-helpers/08-http"
 
 // Content organized by structure (mirrors folder layout)
 const structure = {
@@ -16,7 +23,16 @@ const structure = {
 	"Package Manager": {
 		"cli-reference": cliReferenceContent,
 		"recipe-format": recipeFormatContent,
-		"helper-functions": helperFunctionsContent,
+	},
+	"Helpers": {
+		"helpers-overview": helpersOverviewContent,
+		"helpers-acquire": helpersAcquireContent,
+		"helpers-build": helpersBuildContent,
+		"helpers-install": helpersInstallContent,
+		"helpers-filesystem": helpersFilesystemContent,
+		"helpers-environment": helpersEnvironmentContent,
+		"helpers-commands": helpersCommandsContent,
+		"helpers-http": helpersHttpContent,
 	},
 } as const
 
@@ -44,5 +60,12 @@ export {
 	installationContent,
 	cliReferenceContent,
 	recipeFormatContent,
-	helperFunctionsContent,
+	helpersOverviewContent,
+	helpersAcquireContent,
+	helpersBuildContent,
+	helpersInstallContent,
+	helpersFilesystemContent,
+	helpersEnvironmentContent,
+	helpersCommandsContent,
+	helpersHttpContent,
 }
