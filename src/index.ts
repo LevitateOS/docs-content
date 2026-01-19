@@ -8,8 +8,8 @@ export { useCopyToClipboard } from "./hooks/useCopyToClipboard"
 export {
 	docsNav,
 	contentBySlug,
-	installContent,
-	manualInstallContent,
+	gettingStartedContent,
+	installationContent,
 	cliReferenceContent,
 	recipeFormatContent,
 	helperFunctionsContent,

@@ -1,8 +1,8 @@
 import type { DocsContent } from "../../types"
 
-export const manualInstallContent: DocsContent = {
-	title: "Manual Installation Guide",
-	intro: "This guide walks through installing LevitateOS by hand. Use this if you prefer full control or are installing without the AI assistant.",
+export const installationContent: DocsContent = {
+	title: "Installation",
+	intro: "Step-by-step guide to installing LevitateOS from the live environment.",
 	sections: [
 		{
 			title: "Overview",
@@ -10,7 +10,7 @@ export const manualInstallContent: DocsContent = {
 				{
 					type: "text",
 					content:
-						"Installing LevitateOS manually follows the same process as other Linux distributions like Arch or Gentoo. You'll boot from a live environment, prepare your disk, install the base system, and configure it before rebooting into your new installation.",
+						"Installing LevitateOS follows the same process as other Linux distributions like Arch or Gentoo. You'll boot from a live environment, prepare your disk, install the base system, and configure it before rebooting.",
 				},
 			],
 		},
@@ -30,36 +30,12 @@ export const manualInstallContent: DocsContent = {
 			],
 		},
 		{
-			title: "Time Required",
-			content: [
-				{
-					type: "text",
-					content:
-						"A typical installation takes 15-30 minutes depending on your hardware and familiarity with the process.",
-				},
-			],
-		},
-		{
-			title: "Prerequisites",
-			content: [
-				{
-					type: "list",
-					items: [
-						"**Architecture:** x86_64",
-						"**Disk:** 8GB minimum (20GB recommended)",
-						"**RAM:** 512MB minimum (2GB recommended)",
-						"**Boot mode:** UEFI (this guide assumes UEFI)",
-					],
-				},
-			],
-		},
-		{
 			title: "1. Boot the Live Environment",
 			content: [
 				{
 					type: "text",
 					content:
-						"Boot from the LevitateOS ISO. You'll be dropped into a root shell with the `recipe` package manager available.",
+						"Boot from the LevitateOS ISO (see [Getting Started](/docs/getting-started)). You'll be dropped into a root shell with the `recipe` package manager available.",
 				},
 				{
 					type: "code",
@@ -189,7 +165,7 @@ mount /dev/sda1 /mnt/boot`,
 			content: [
 				{
 					type: "text",
-					content: "Install the base system using `recipe bootstrap`. This is similar to Arch's `pacstrap`:",
+					content: "Install the base system using `recipe bootstrap`:",
 				},
 				{
 					type: "code",
@@ -207,17 +183,16 @@ mount /dev/sda1 /mnt/boot`,
 			content: [
 				{
 					type: "text",
-					content: "First, get the UUIDs for your partitions:",
+					content: "Get the UUIDs for your partitions:",
 				},
 				{
 					type: "code",
 					language: "bash",
-					content: `# Display partition UUIDs
-blkid /dev/sda1 /dev/sda2`,
+					content: `blkid /dev/sda1 /dev/sda2`,
 				},
 				{
 					type: "text",
-					content: "Create the fstab file (use nano or vim):",
+					content: "Create the fstab file:",
 				},
 				{
 					type: "code",
@@ -226,7 +201,7 @@ blkid /dev/sda1 /dev/sda2`,
 				},
 				{
 					type: "text",
-					content: "Add the following content, replacing the UUIDs with your actual values from `blkid`:",
+					content: "Add the following, replacing UUIDs with your values from `blkid`:",
 				},
 				{
 					type: "file",
@@ -295,17 +270,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 				{
 					type: "text",
 					content:
-						"For other locales, edit `/etc/locale.gen` with nano and uncomment the lines you need before running `locale-gen`.",
-				},
-				{
-					type: "text",
-					content: "Set the console keymap (optional, for non-US keyboards):",
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `# Skip this if using US keyboard layout
-echo "KEYMAP=us" > /etc/vconsole.conf`,
+						"For other locales, edit `/etc/locale.gen` and uncomment the lines you need before running `locale-gen`.",
 				},
 			],
 		},
@@ -323,16 +288,12 @@ echo "KEYMAP=us" > /etc/vconsole.conf`,
 				},
 				{
 					type: "text",
-					content: "Edit the hosts file:",
+					content: "Create the hosts file:",
 				},
 				{
 					type: "code",
 					language: "bash",
 					content: `nano /etc/hosts`,
-				},
-				{
-					type: "text",
-					content: "Add the following (use the same hostname you chose above):",
 				},
 				{
 					type: "file",
@@ -376,17 +337,9 @@ passwd yourname`,
 					content: `nano /etc/sudoers.d/wheel`,
 				},
 				{
-					type: "text",
-					content: "Add this single line:",
-				},
-				{
 					type: "file",
 					filename: "/etc/sudoers.d/wheel",
 					content: `%wheel ALL=(ALL:ALL) ALL`,
-				},
-				{
-					type: "text",
-					content: "Save and set correct permissions:",
 				},
 				{
 					type: "code",
@@ -400,7 +353,7 @@ passwd yourname`,
 			content: [
 				{
 					type: "text",
-					content: "Install systemd-boot and check kernel files:",
+					content: "Install systemd-boot:",
 				},
 				{
 					type: "code",
@@ -421,10 +374,6 @@ ls /boot/vmlinuz* /boot/initramfs*`,
 					content: `nano /boot/loader/loader.conf`,
 				},
 				{
-					type: "text",
-					content: "Add:",
-				},
-				{
 					type: "file",
 					filename: "/boot/loader/loader.conf",
 					content: `default levitate.conf
@@ -433,26 +382,13 @@ editor no`,
 				},
 				{
 					type: "text",
-					content: "Get your root partition UUID:",
+					content: "Get your root partition UUID and create the boot entry:",
 				},
 				{
 					type: "code",
 					language: "bash",
-					content: `blkid /dev/sda2`,
-				},
-				{
-					type: "text",
-					content: "Create the boot entry:",
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `nano /boot/loader/entries/levitate.conf`,
-				},
-				{
-					type: "text",
-					content:
-						"Add the following, **using the exact filenames from the `ls` command above**. The example below shows common names, but yours may differ (e.g., `vmlinuz-6.12.0-levitate`):",
+					content: `blkid /dev/sda2
+nano /boot/loader/entries/levitate.conf`,
 				},
 				{
 					type: "file",
@@ -465,7 +401,7 @@ options root=UUID=your-root-uuid-here rw quiet`,
 				{
 					type: "text",
 					content:
-						"**Important:** If your kernel files have different names, use those exact names. For Intel CPUs, add microcode: `initrd /intel-ucode.img` before the initramfs line. For AMD: `initrd /amd-ucode.img`.",
+						"Use the exact kernel filenames from the `ls` command. For Intel CPUs, add `initrd /intel-ucode.img` before initramfs. For AMD: `initrd /amd-ucode.img`.",
 				},
 			],
 		},
@@ -510,19 +446,18 @@ reboot`,
 				{
 					type: "text",
 					content:
-						"Log in with your user account and install additional packages:",
+						"Log in with your user account and install packages:",
 				},
 				{
 					type: "code",
 					language: "bash",
-					content: `# List available recipes
-recipe list
-
-# Install a package
-recipe install ripgrep
-
-# View package info
-recipe info firefox`,
+					content: `recipe list           # List available packages
+recipe install ripgrep # Install a package
+recipe info firefox    # View package info`,
+				},
+				{
+					type: "text",
+					content: "See the [CLI Reference](/docs/cli-reference) for all available commands.",
 				},
 			],
 		},
@@ -550,7 +485,7 @@ mount /dev/sda1 /mnt/boot
 cat /mnt/etc/fstab
 blkid
 
-# Re-enter chroot (all bind mounts needed)
+# Re-enter chroot
 mount --bind /dev /mnt/dev
 mount --bind /dev/pts /mnt/dev/pts
 mount --bind /proc /mnt/proc

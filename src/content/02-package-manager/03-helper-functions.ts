@@ -2,7 +2,7 @@ import type { DocsContent } from "../../types"
 
 export const helperFunctionsContent: DocsContent = {
 	title: "Helper Functions",
-	intro: "Complete reference for all helper functions available in recipe scripts. These functions handle source acquisition, building, installation, filesystem operations, and more.",
+	intro: "Reference for all helper functions available in [recipe scripts](/docs/recipe-format).",
 	sections: [
 		{
 			title: "Overview",
@@ -10,15 +10,13 @@ export const helperFunctionsContent: DocsContent = {
 				{
 					type: "text",
 					content:
-						"Recipe scripts have access to a rich set of helper functions organized into categories. These functions manage implicit state (like the last downloaded file) to enable clean, declarative recipes.",
+						"Helper functions are organized into categories. They manage implicit state (like the last downloaded file) to enable declarative recipes.",
 				},
 				{
 					type: "code",
-					language: "javascript",
-					content: `// Typical recipe flow
-fn acquire() {
+					language: "rhai",
+					content: `fn acquire() {
     download("https://example.com/foo-1.0.tar.gz");
-    verify_sha256("abc123...");
 }
 
 fn build() {
@@ -55,7 +53,7 @@ fn install() {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `download("https://example.com/foo-1.0.tar.gz");
 // Downloads to BUILD_DIR/foo-1.0.tar.gz`,
 				},
@@ -71,7 +69,7 @@ fn install() {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `copy("./local-sources/*.tar.gz");
 copy("/path/to/patches/*");`,
 				},
@@ -87,9 +85,9 @@ copy("/path/to/patches/*");`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `download("https://example.com/foo-1.0.tar.gz");
-verify_sha256("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");`,
+verify_sha256("...");`,
 				},
 			],
 		},
@@ -124,7 +122,7 @@ verify_sha256("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `download("https://example.com/foo-1.0.tar.xz");
 extract("tar.xz");`,
 				},
@@ -140,7 +138,7 @@ extract("tar.xz");`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `extract("tar.gz");
 cd("foo-1.0");        // Now in BUILD_DIR/foo-1.0
 run("./configure");   // Runs in that directory
@@ -169,7 +167,7 @@ cd("/tmp/other");     // Absolute paths work too`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `run("./configure --prefix=$PREFIX");
 run("make -j4");
 run("make install");
@@ -199,9 +197,9 @@ shell("make test");`,
 				},
 				{
 					type: "code",
-					language: "javascript",
-					content: `install_bin("myapp");           // Single file
-install_bin("target/release/*"); // Glob pattern`,
+					language: "rhai",
+					content: `install_bin("myapp");
+install_bin("target/release/*");  // glob patterns work`,
 				},
 			],
 		},
@@ -215,7 +213,7 @@ install_bin("target/release/*"); // Glob pattern`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `install_lib("libfoo.so");
 install_lib("*.a");`,
 				},
@@ -231,7 +229,7 @@ install_lib("*.a");`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `install_man("doc/*.1");    // Section 1 (commands)
 install_man("config.5");   // Section 5 (config files)
 install_man("api.3");      // Section 3 (library functions)`,
@@ -248,7 +246,7 @@ install_man("api.3");      // Section 3 (library functions)`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `// Without mode (preserves source permissions)
 install_to_dir("docs/*", "share/doc/myapp");
 
@@ -267,13 +265,13 @@ install_to_dir("scripts/*", "libexec/myapp", 0o755);`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `fn acquire() {
     download("https://mirror.example.com/package-1.0.x86_64.rpm");
 }
 
 fn install() {
-    rpm_install();  // Extracts RPM contents to PREFIX
+    rpm_install();  // extracts to PREFIX
 }`,
 				},
 			],
@@ -297,13 +295,13 @@ fn install() {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `if exists("/usr/bin/gcc") {
     run("make CC=gcc");
 }
 
 if file_exists("config.toml") {
-    // Use existing config
+    // ...
 }
 
 if dir_exists("vendor") {
@@ -318,11 +316,11 @@ if dir_exists("vendor") {
 			content: [
 				{
 					type: "text",
-					content: "Create a directory and all parent directories (like `mkdir -p`).",
+					content: "Create a directory and all parent directories.",
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `mkdir("/opt/myapp/data");`,
 				},
 			],
@@ -337,7 +335,7 @@ if dir_exists("vendor") {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `rm("*.tmp");
 rm("build/cache/*");`,
 				},
@@ -353,7 +351,7 @@ rm("build/cache/*");`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `mv("config.example", "config.toml");`,
 				},
 			],
@@ -364,11 +362,11 @@ rm("build/cache/*");`,
 			content: [
 				{
 					type: "text",
-					content: "Create a symbolic link (Unix only).",
+					content: "Create a symbolic link.",
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `ln("myapp-1.0", "myapp");  // myapp -> myapp-1.0`,
 				},
 			],
@@ -379,11 +377,11 @@ rm("build/cache/*");`,
 			content: [
 				{
 					type: "text",
-					content: "Change file permissions (Unix only). Takes octal mode.",
+					content: "Change file permissions. Takes octal mode.",
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `chmod("script.sh", 0o755);   // rwxr-xr-x
 chmod("secret.key", 0o600);  // rw-------`,
 				},
@@ -408,10 +406,10 @@ chmod("secret.key", 0o600);  // rw-------`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let config = read_file("config.toml");
 if config.contains("debug = true") {
-    // Handle debug mode
+    // ...
 }`,
 				},
 			],
@@ -426,7 +424,7 @@ if config.contains("debug = true") {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let sources = glob_list("src/*.c");
 for file in sources {
     print(file);
@@ -453,7 +451,7 @@ for file in sources {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let home = env("HOME");
 let cc = env("CC");
 if cc == "" {
@@ -472,7 +470,7 @@ if cc == "" {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `set_env("CFLAGS", "-O2 -march=native");
 set_env("CC", "clang");
 run("make");`,
@@ -498,7 +496,7 @@ run("make");`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let version = run_output("git describe --tags");
 let arch = run_output("uname -m").trim();`,
 				},
@@ -514,7 +512,7 @@ let arch = run_output("uname -m").trim();`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let status = run_status("which clang");
 if status == 0 {
     set_env("CC", "clang");
@@ -537,11 +535,11 @@ if status == 0 {
 			content: [
 				{
 					type: "text",
-					content: "Fetch content from a URL (GET request). Returns the response body as a string.",
+					content: "Fetch content from a URL. Returns the response body as a string.",
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let page = http_get("https://api.example.com/version");`,
 				},
 			],
@@ -556,7 +554,7 @@ if status == 0 {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `fn check_update() {
     let latest = github_latest_release("BurntSushi/ripgrep");
     // Returns "14.1.0" (not "v14.1.0")
@@ -575,11 +573,11 @@ if status == 0 {
 			content: [
 				{
 					type: "text",
-					content: "Get the latest tag from a GitHub repository. For repos without releases. Strips the `v` prefix automatically.",
+					content: "Get the latest tag from a GitHub repository. Strips the `v` prefix automatically.",
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let latest = github_latest_tag("torvalds/linux");
 // Returns "6.7" for tag "v6.7"`,
 				},
@@ -595,7 +593,7 @@ if status == 0 {
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `parse_version("v1.0.0");        // "1.0.0"
 parse_version("release-2.0");   // "2.0"
 parse_version("version-3.1");   // "3.1"`,
@@ -621,7 +619,7 @@ parse_version("version-3.1");   // "3.1"`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let code = exec("git", ["clone", "--depth", "1", url]);`,
 				},
 			],
@@ -636,7 +634,7 @@ parse_version("version-3.1");   // "3.1"`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `let output = exec_output("rustc", ["--version"]);`,
 				},
 			],
@@ -672,7 +670,7 @@ parse_version("version-3.1");   // "3.1"`,
 				{
 					type: "file",
 					filename: "ripgrep.rhai",
-					language: "javascript",
+					language: "rhai",
 					content: `let name = "ripgrep";
 let version = "14.1.0";
 let description = "Fast line-oriented search tool";
@@ -681,7 +679,7 @@ let installed = false;
 fn acquire() {
     let url = \`https://github.com/BurntSushi/ripgrep/releases/download/\${version}/ripgrep-\${version}-\${ARCH}-unknown-linux-musl.tar.gz\`;
     download(url);
-    verify_sha256("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+    verify_sha256("...");  // from GitHub release page
 }
 
 fn build() {
@@ -708,6 +706,18 @@ fn check_update() {
         ()
     }
 }`,
+				},
+			],
+		},
+		{
+			title: "See Also",
+			content: [
+				{
+					type: "list",
+					items: [
+						"[Recipe Format](/docs/recipe-format) - Recipe structure and lifecycle",
+						"[CLI Reference](/docs/cli-reference) - Commands for installing and managing packages",
+					],
 				},
 			],
 		},

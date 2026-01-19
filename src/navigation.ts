@@ -1,8 +1,8 @@
 import type { NavSection, DocsContent } from "./types"
 
 // Import all content directly
-import { installContent } from "./content/01-getting-started/01-install"
-import { manualInstallContent } from "./content/01-getting-started/02-manual-install"
+import { gettingStartedContent } from "./content/01-getting-started/01-getting-started"
+import { installationContent } from "./content/01-getting-started/02-installation"
 import { cliReferenceContent } from "./content/02-package-manager/01-cli-reference"
 import { recipeFormatContent } from "./content/02-package-manager/02-recipe-format"
 import { helperFunctionsContent } from "./content/02-package-manager/03-helper-functions"
@@ -10,8 +10,8 @@ import { helperFunctionsContent } from "./content/02-package-manager/03-helper-f
 // Content organized by structure (mirrors folder layout)
 const structure = {
 	"Getting Started": {
-		install: installContent,
-		"manual-install": manualInstallContent,
+		"getting-started": gettingStartedContent,
+		"installation": installationContent,
 	},
 	"Package Manager": {
 		"cli-reference": cliReferenceContent,
@@ -40,8 +40,8 @@ export const contentBySlug: Record<string, DocsContent> = Object.fromEntries(
 
 // Re-export all content
 export {
-	installContent,
-	manualInstallContent,
+	gettingStartedContent,
+	installationContent,
 	cliReferenceContent,
 	recipeFormatContent,
 	helperFunctionsContent,

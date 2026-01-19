@@ -105,7 +105,7 @@ recipe update <package>    # Check specific package`,
 				},
 				{
 					type: "code",
-					language: "javascript",
+					language: "rhai",
 					content: `fn check_update() {
     let latest = github_latest_release("owner/repo");
     if latest != version {
@@ -250,7 +250,7 @@ recipe deps myapp --resolve
 			content: [
 				{
 					type: "text",
-					content: "Recipes are Rhai scripts (`.rhai` files) that define package metadata and lifecycle functions.",
+					content: "Recipes are Rhai scripts (`.rhai` files) that define package metadata and lifecycle functions. See [Recipe Format](/docs/recipe-format) for the full specification.",
 				},
 			],
 		},
@@ -364,7 +364,7 @@ recipe deps myapp --resolve
 				{
 					type: "file",
 					filename: "hello.rhai",
-					language: "javascript",
+					language: "rhai",
 					content: `let name = "hello";
 let version = "1.0.0";
 let installed = false;
@@ -393,7 +393,7 @@ fn install() {
 				{
 					type: "file",
 					filename: "myapp.rhai",
-					language: "javascript",
+					language: "rhai",
 					content: `let name = "myapp";
 let version = "2.0.0";
 let description = "My application";
@@ -459,6 +459,18 @@ fn check_update() {
 				{
 					type: "text",
 					content: "Recipe state updates are atomic - the file is written to a temp file first, then renamed. This prevents corruption if the process is interrupted.",
+				},
+			],
+		},
+		{
+			title: "See Also",
+			content: [
+				{
+					type: "list",
+					items: [
+						"[Recipe Format](/docs/recipe-format) - Full specification for writing recipes",
+						"[Helper Functions](/docs/helper-functions) - All available functions for recipes",
+					],
 				},
 			],
 		},
