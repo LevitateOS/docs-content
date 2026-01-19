@@ -108,8 +108,8 @@ export interface CommandBlock {
 	type: "command"
 	/** Description shown above the command */
 	description: string
-	/** The command to run */
-	command: string
+	/** The command(s) to run - single string or array for multiple lines */
+	command: string | string[]
 	/** Optional expected output (shown dimmer, not copied) */
 	output?: string
 }

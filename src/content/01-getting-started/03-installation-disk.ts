@@ -66,13 +66,9 @@ nvme0n1     1T WD Black SN850X         nvme`,
 					],
 				},
 				{
-					type: "text",
-					content: "Start fdisk:",
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `fdisk /dev/sda`,
+					type: "command",
+					description: "Start fdisk",
+					command: "fdisk /dev/sda",
 				},
 				{
 					type: "text",
@@ -105,13 +101,14 @@ nvme0n1     1T WD Black SN850X         nvme`,
 			title: "4. Format Partitions",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: `# Format EFI partition
-mkfs.fat -F32 -n EFI /dev/sda1
-
-# Format root partition
-mkfs.ext4 -L root /dev/sda2`,
+					type: "command",
+					description: "Format EFI partition",
+					command: "mkfs.fat -F32 -n EFI /dev/sda1",
+				},
+				{
+					type: "command",
+					description: "Format root partition",
+					command: "mkfs.ext4 -L root /dev/sda2",
 				},
 			],
 		},
@@ -119,14 +116,14 @@ mkfs.ext4 -L root /dev/sda2`,
 			title: "5. Mount Filesystems",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: `# Mount root partition
-mount /dev/sda2 /mnt
-
-# Create mount point and mount EFI
-mkdir -p /mnt/boot
-mount /dev/sda1 /mnt/boot`,
+					type: "command",
+					description: "Mount root partition",
+					command: "mount /dev/sda2 /mnt",
+				},
+				{
+					type: "command",
+					description: "Create mount point and mount EFI",
+					command: ["mkdir -p /mnt/boot", "mount /dev/sda1 /mnt/boot"],
 				},
 				{
 					type: "text",
