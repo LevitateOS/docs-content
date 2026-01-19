@@ -10,7 +10,7 @@ export const installationContent: DocsContent = {
 				{
 					type: "text",
 					content:
-						"Installing LevitateOS follows the same process as other Linux distributions like Arch or Gentoo. You'll boot from a live environment, prepare your disk, install the base system, and configure it before rebooting.",
+						"Installing LevitateOS follows the same process as Gentoo. You'll boot from a live environment, prepare your disk, extract the stage3 tarball, and configure the system before rebooting. No network connection is required.",
 				},
 			],
 		},
@@ -20,9 +20,9 @@ export const installationContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						"**Prepare** - Boot the live ISO, connect to the internet",
+						"**Boot** - Boot the live ISO",
 						"**Partition** - Create EFI and root partitions on your disk",
-						"**Install** - Run `recipe bootstrap` to install the base system",
+						"**Extract** - Extract the stage3 tarball to install the base system",
 						"**Configure** - Set timezone, locale, hostname, users, and bootloader",
 						"**Reboot** - Boot into your new LevitateOS installation",
 					],
@@ -35,7 +35,7 @@ export const installationContent: DocsContent = {
 				{
 					type: "text",
 					content:
-						"Boot from the LevitateOS ISO (see [Getting Started](/docs/getting-started)). You'll be dropped into a root shell with the `recipe` package manager available.",
+						"Boot from the LevitateOS ISO (see [Getting Started](/docs/getting-started)). You'll be dropped into a root shell.",
 				},
 				{
 					type: "code",
@@ -57,28 +57,7 @@ timedatectl set-ntp true`,
 			],
 		},
 		{
-			title: "2. Connect to the Internet",
-			content: [
-				{
-					type: "text",
-					content: "Wired connections should work automatically. For WiFi:",
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `# List available networks
-nmcli device wifi list
-
-# Connect to WiFi
-nmcli device wifi connect "YourNetwork" password "YourPassword"
-
-# Verify connectivity
-ping -c 3 levitateos.org`,
-				},
-			],
-		},
-		{
-			title: "3. Identify Target Disk",
+			title: "2. Identify Target Disk",
 			content: [
 				{
 					type: "text",
@@ -102,7 +81,7 @@ ping -c 3 levitateos.org`,
 			],
 		},
 		{
-			title: "4. Partition the Disk",
+			title: "3. Partition the Disk",
 			content: [
 				{
 					type: "text",
@@ -132,7 +111,7 @@ lsblk /dev/sda`,
 			],
 		},
 		{
-			title: "5. Format Partitions",
+			title: "4. Format Partitions",
 			content: [
 				{
 					type: "code",
@@ -146,7 +125,7 @@ mkfs.ext4 -L root /dev/sda2`,
 			],
 		},
 		{
-			title: "6. Mount Filesystems",
+			title: "5. Mount Filesystems",
 			content: [
 				{
 					type: "code",
@@ -161,26 +140,30 @@ mount /dev/sda1 /mnt/boot`,
 			],
 		},
 		{
-			title: "7. Install Base System",
+			title: "6. Extract Stage3",
 			content: [
 				{
 					type: "text",
-					content: "Install the base system using `recipe bootstrap`:",
+					content: "Extract the stage3 tarball to install the base system:",
 				},
 				{
 					type: "code",
 					language: "bash",
-					content: `recipe bootstrap /mnt`,
+					content: `# Find the stage3 tarball on the ISO
+ls /run/media/*/levitateos-stage3.tar.xz
+
+# Extract to the mounted root (preserves permissions)
+tar xpf /run/media/*/levitateos-stage3.tar.xz -C /mnt`,
 				},
 				{
 					type: "text",
 					content:
-						"This installs the base system: kernel, systemd, coreutils, networking, and the `recipe` package manager itself.",
+						"This extracts the complete base system: kernel, systemd, coreutils, networking, and the `recipe` package manager.",
 				},
 			],
 		},
 		{
-			title: "8. Generate fstab",
+			title: "7. Generate fstab",
 			content: [
 				{
 					type: "text",
@@ -214,7 +197,7 @@ UUID=your-efi-uuid-here   /boot    vfat    defaults   0       2`,
 			],
 		},
 		{
-			title: "9. Enter the New System",
+			title: "8. Enter the New System",
 			content: [
 				{
 					type: "code",
@@ -233,7 +216,7 @@ chroot /mnt /bin/bash`,
 			],
 		},
 		{
-			title: "10. Set Timezone",
+			title: "9. Set Timezone",
 			content: [
 				{
 					type: "code",
@@ -250,7 +233,7 @@ hwclock --systohc`,
 			],
 		},
 		{
-			title: "11. Set Locale",
+			title: "10. Set Locale",
 			content: [
 				{
 					type: "text",
@@ -276,7 +259,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 			],
 		},
 		{
-			title: "12. Set Hostname",
+			title: "11. Set Hostname",
 			content: [
 				{
 					type: "text",
@@ -306,7 +289,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 			],
 		},
 		{
-			title: "13. Set Root Password",
+			title: "12. Set Root Password",
 			content: [
 				{
 					type: "code",
@@ -316,7 +299,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 			],
 		},
 		{
-			title: "14. Create User Account",
+			title: "13. Create User Account",
 			content: [
 				{
 					type: "text",
@@ -350,7 +333,7 @@ passwd yourname`,
 			],
 		},
 		{
-			title: "15. Install Bootloader",
+			title: "14. Install Bootloader",
 			content: [
 				{
 					type: "text",
@@ -407,7 +390,7 @@ options root=UUID=your-root-uuid-here rw quiet`,
 			],
 		},
 		{
-			title: "16. Enable Services",
+			title: "15. Enable Services",
 			content: [
 				{
 					type: "code",
@@ -421,7 +404,7 @@ systemctl enable NetworkManager`,
 			],
 		},
 		{
-			title: "17. Exit and Reboot",
+			title: "16. Exit and Reboot",
 			content: [
 				{
 					type: "code",
