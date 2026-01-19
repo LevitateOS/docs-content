@@ -5,9 +5,6 @@ export * from "./types"
 export { rich, link, bold, code, italic } from "./rich-text"
 export type { RichText, InlineNode, InlineLink, InlineBold, InlineCode, InlineItalic } from "./rich-text"
 
-// Hooks
-export { useCopyToClipboard } from "./hooks/useCopyToClipboard"
-
 // Navigation and content (auto-discovered)
 export { docsNav, contentBySlug } from "./discovery"
 
