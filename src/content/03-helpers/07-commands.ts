@@ -51,7 +51,8 @@ if status == 0 {
 			content: [
 				{
 					type: "text",
-					content: "Execute a command with an array of arguments (no shell interpretation). Returns the exit code.",
+					content:
+						"Execute a command with an array of arguments (no shell interpretation). Returns the exit code.",
 				},
 				{
 					type: "code",

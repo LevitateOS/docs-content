@@ -45,7 +45,8 @@ extract("tar.xz");`,
 			content: [
 				{
 					type: "text",
-					content: "Change the current working directory for subsequent `run()` calls. Relative paths are resolved from `BUILD_DIR`.",
+					content:
+						"Change the current working directory for subsequent `run()` calls. Relative paths are resolved from `BUILD_DIR`.",
 				},
 				{
 					type: "code",
@@ -62,7 +63,8 @@ cd("/tmp/other");     // Absolute paths work too`,
 			content: [
 				{
 					type: "text",
-					content: "Run a shell command in the current directory. Shows a spinner for long-running commands. `shell()` is an alias for `run()` - use it when your recipe defines its own `run()` function.",
+					content:
+						"Run a shell command in the current directory. Shows a spinner for long-running commands. `shell()` is an alias for `run()` - use it when your recipe defines its own `run()` function.",
 				},
 				{
 					type: "text",

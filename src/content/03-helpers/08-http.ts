@@ -33,7 +33,8 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Get the latest release version from a GitHub repository. Strips the `v` prefix automatically.",
+					content:
+						"Get the latest release version from a GitHub repository. Strips the `v` prefix automatically.",
 				},
 				{
 					type: "code",
@@ -55,7 +56,8 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Get the latest tag from a GitHub repository. Strips the `v` prefix automatically.",
+					content:
+						"Get the latest tag from a GitHub repository. Strips the `v` prefix automatically.",
 				},
 				{
 					type: "code",

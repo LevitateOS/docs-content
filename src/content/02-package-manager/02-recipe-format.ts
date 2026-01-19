@@ -2,7 +2,8 @@ import type { DocsContent } from "../../types"
 
 export const recipeFormatContent: DocsContent = {
 	title: "Recipe Format",
-	intro: "Recipes are [Rhai](https://rhai.rs) scripts that define how to acquire, build, and install packages. Each recipe declares metadata as variables and implements lifecycle functions.",
+	intro:
+		"Recipes are [Rhai](https://rhai.rs) scripts that define how to acquire, build, and install packages. Each recipe declares metadata as variables and implements lifecycle functions.",
 	sections: [
 		{
 			title: "Basic Structure",
@@ -60,7 +61,7 @@ fn install() {
 					headers: ["Variable", "Type", "Description"],
 					rows: [
 						["description", "String", "Human-readable description"],
-						["deps", "Array", "Dependencies: `let deps = [\"pkg1\", \"pkg2\"];`"],
+						["deps", "Array", 'Dependencies: `let deps = ["pkg1", "pkg2"];`'],
 					],
 					monospaceCol: 0,
 				},
@@ -110,7 +111,8 @@ fn install() {
 			content: [
 				{
 					type: "text",
-					content: "When you run `recipe install <package>`, the CLI executes these phases in order:",
+					content:
+						"When you run `recipe install <package>`, the CLI executes these phases in order:",
 				},
 				{
 					type: "list",
@@ -213,7 +215,8 @@ fn install() {
 				},
 				{
 					type: "text",
-					content: "See [Helper Functions](/docs/helpers-overview) for `download()`, `extract()`, `install_bin()`, etc.",
+					content:
+						"See [Helper Functions](/docs/helpers-overview) for `download()`, `extract()`, `install_bin()`, etc.",
 				},
 			],
 		},
@@ -286,7 +289,8 @@ fn install() {
 				},
 				{
 					type: "text",
-					content: "Install with `recipe install htop --deps` to resolve and install dependencies first.",
+					content:
+						"Install with `recipe install htop --deps` to resolve and install dependencies first.",
 				},
 			],
 		},
@@ -312,7 +316,8 @@ fn install() {
 				},
 				{
 					type: "text",
-					content: "When an update is found, `recipe upgrade` will remove the old version and install the new one.",
+					content:
+						"When an update is found, `recipe upgrade` will remove the old version and install the new one.",
 				},
 			],
 		},
@@ -334,7 +339,8 @@ fn install() {
 				},
 				{
 					type: "text",
-					content: "The default recipes directory is `~/.local/share/recipe/recipes/`. Override with `--recipes-path` or `RECIPE_PATH` environment variable.",
+					content:
+						"The default recipes directory is `~/.local/share/recipe/recipes/`. Override with `--recipes-path` or `RECIPE_PATH` environment variable.",
 				},
 			],
 		},
@@ -343,11 +349,13 @@ fn install() {
 			content: [
 				{
 					type: "text",
-					content: "After successful installation, the CLI updates the recipe file itself with installation metadata. This means recipes are self-contained - the file contains both the instructions and the current state.",
+					content:
+						"After successful installation, the CLI updates the recipe file itself with installation metadata. This means recipes are self-contained - the file contains both the instructions and the current state.",
 				},
 				{
 					type: "text",
-					content: "State updates are atomic: written to a temporary file first, then renamed to prevent corruption if interrupted.",
+					content:
+						"State updates are atomic: written to a temporary file first, then renamed to prevent corruption if interrupted.",
 				},
 			],
 		},

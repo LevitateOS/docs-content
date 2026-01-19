@@ -49,7 +49,8 @@ copy("/path/to/patches/*");`,
 			content: [
 				{
 					type: "text",
-					content: "Verify the SHA256 hash of the last downloaded or copied file. Fails if hash doesn't match.",
+					content:
+						"Verify the SHA256 hash of the last downloaded or copied file. Fails if hash doesn't match.",
 				},
 				{
 					type: "code",

@@ -11,7 +11,7 @@ export function useCopyToClipboard(timeout = 2000) {
 				setTimeout(() => setCopied(false), timeout)
 			}
 		},
-		[timeout]
+		[timeout],
 	)
 
 	return { copied, copy }

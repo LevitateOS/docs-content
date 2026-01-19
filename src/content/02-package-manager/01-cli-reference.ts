@@ -2,7 +2,8 @@ import type { DocsContent } from "../../types"
 
 export const cliReferenceContent: DocsContent = {
 	title: "recipe CLI Reference",
-	intro: "Complete reference for the recipe package manager CLI - a local-first package manager using Rhai scripts.",
+	intro:
+		"Complete reference for the recipe package manager CLI - a local-first package manager using Rhai scripts.",
 	sections: [
 		{
 			title: "Overview",
@@ -49,7 +50,8 @@ recipe install ./path/to/pkg.rhai  # From local file`,
 				},
 				{
 					type: "text",
-					content: "After successful install, the recipe is updated with `installed = true`, `installed_version`, `installed_at` (timestamp), and `installed_files` (list of installed paths).",
+					content:
+						"After successful install, the recipe is updated with `installed = true`, `installed_version`, `installed_at` (timestamp), and `installed_files` (list of installed paths).",
 				},
 			],
 		},
@@ -80,7 +82,8 @@ recipe install ./path/to/pkg.rhai  # From local file`,
 				},
 				{
 					type: "text",
-					content: "If any files fail to delete, the package state is preserved and you'll need to fix permissions before retrying.",
+					content:
+						"If any files fail to delete, the package state is preserved and you'll need to fix permissions before retrying.",
 				},
 			],
 		},
@@ -97,7 +100,8 @@ recipe update <package>    # Check specific package`,
 				},
 				{
 					type: "text",
-					content: "Calls the recipe's `check_update()` function if defined. This function should return a new version string if an update is available, or `()` if up to date. When an update is found, the recipe's `version` variable is updated.",
+					content:
+						"Calls the recipe's `check_update()` function if defined. This function should return a new version string if an update is available, or `()` if up to date. When an update is found, the recipe's `version` variable is updated.",
 				},
 				{
 					type: "text",
@@ -130,7 +134,8 @@ recipe upgrade <package>    # Upgrade specific package`,
 				},
 				{
 					type: "text",
-					content: "Compares the recipe's `version` against `installed_version`. Uses semantic versioning comparison when possible, falling back to string comparison. If an upgrade is needed, removes the old version and installs the new one.",
+					content:
+						"Compares the recipe's `version` against `installed_version`. Uses semantic versioning comparison when possible, falling back to string comparison. If an upgrade is needed, removes the old version and installs the new one.",
 				},
 			],
 		},
@@ -207,7 +212,8 @@ recipe deps <package> --resolve # Full install order`,
 				},
 				{
 					type: "text",
-					content: "Without `--resolve`, shows direct dependencies only. With `--resolve`, performs topological sort to show the full install order with cycle detection.",
+					content:
+						"Without `--resolve`, shows direct dependencies only. With `--resolve`, performs topological sort to show the full install order with cycle detection.",
 				},
 				{
 					type: "code",
@@ -250,7 +256,8 @@ recipe deps myapp --resolve
 			content: [
 				{
 					type: "text",
-					content: "Recipes are Rhai scripts (`.rhai` files) that define package metadata and lifecycle functions. See [Recipe Format](/docs/recipe-format) for the full specification.",
+					content:
+						"Recipes are Rhai scripts (`.rhai` files) that define package metadata and lifecycle functions. See [Recipe Format](/docs/recipe-format) for the full specification.",
 				},
 			],
 		},
@@ -440,7 +447,8 @@ fn check_update() {
 				},
 				{
 					type: "text",
-					content: "Package names must be alphanumeric with hyphens/underscores only. Path traversal (e.g., `../`) is rejected.",
+					content:
+						"Package names must be alphanumeric with hyphens/underscores only. Path traversal (e.g., `../`) is rejected.",
 				},
 			],
 		},
@@ -449,7 +457,8 @@ fn check_update() {
 			content: [
 				{
 					type: "text",
-					content: "The recipe CLI uses file locking to prevent concurrent operations on the same package. If a lock file exists from a crashed operation, delete it manually:",
+					content:
+						"The recipe CLI uses file locking to prevent concurrent operations on the same package. If a lock file exists from a crashed operation, delete it manually:",
 				},
 				{
 					type: "code",
@@ -458,7 +467,8 @@ fn check_update() {
 				},
 				{
 					type: "text",
-					content: "Recipe state updates are atomic - the file is written to a temp file first, then renamed. This prevents corruption if the process is interrupted.",
+					content:
+						"Recipe state updates are atomic - the file is written to a temp file first, then renamed. This prevents corruption if the process is interrupted.",
 				},
 			],
 		},

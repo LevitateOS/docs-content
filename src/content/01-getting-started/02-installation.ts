@@ -174,7 +174,8 @@ mount /dev/sda1 /mnt/boot`,
 				},
 				{
 					type: "text",
-					content: "This installs the base system: kernel, systemd, coreutils, networking, and the `recipe` package manager itself.",
+					content:
+						"This installs the base system: kernel, systemd, coreutils, networking, and the `recipe` package manager itself.",
 				},
 			],
 		},
@@ -445,8 +446,7 @@ reboot`,
 			content: [
 				{
 					type: "text",
-					content:
-						"Log in with your user account and install packages:",
+					content: "Log in with your user account and install packages:",
 				},
 				{
 					type: "code",
@@ -471,8 +471,7 @@ recipe info firefox    # View package info`,
 			content: [
 				{
 					type: "text",
-					content:
-						"Boot from the ISO again and verify your installation:",
+					content: "Boot from the ISO again and verify your installation:",
 				},
 				{
 					type: "code",

@@ -49,7 +49,8 @@ install_lib("*.a");`,
 			content: [
 				{
 					type: "text",
-					content: "Install man pages to `PREFIX/share/man/manN/`. The section number is auto-detected from the file extension (e.g., `foo.1` goes to `man1/`).",
+					content:
+						"Install man pages to `PREFIX/share/man/manN/`. The section number is auto-detected from the file extension (e.g., `foo.1` goes to `man1/`).",
 				},
 				{
 					type: "code",
@@ -65,7 +66,8 @@ install_man("api.3");      // Section 3 (library functions)`,
 			content: [
 				{
 					type: "text",
-					content: "Install files to a custom subdirectory of PREFIX. Optionally specify permissions.",
+					content:
+						"Install files to a custom subdirectory of PREFIX. Optionally specify permissions.",
 				},
 				{
 					type: "code",
@@ -83,7 +85,8 @@ install_to_dir("scripts/*", "libexec/myapp", 0o755);`,
 			content: [
 				{
 					type: "text",
-					content: "Extract all `.rpm` files in the build directory to PREFIX. Requires `rpm2cpio` and `cpio` in PATH. Useful for repackaging Fedora/RHEL packages.",
+					content:
+						"Extract all `.rpm` files in the build directory to PREFIX. Requires `rpm2cpio` and `cpio` in PATH. Useful for repackaging Fedora/RHEL packages.",
 				},
 				{
 					type: "code",
