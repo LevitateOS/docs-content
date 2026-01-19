@@ -26,6 +26,8 @@ export type ContentBlock =
 	| ConversationBlock
 	| LinkBlock
 	| InlineCodeBlock
+	| InteractiveBlock
+	| CommandBlock
 
 export interface TextBlock {
 	type: "text"
@@ -86,6 +88,30 @@ export interface LinkBlock {
 export interface InlineCodeBlock {
 	type: "inline-code"
 	content: string
+}
+
+export interface InteractiveBlock {
+	type: "interactive"
+	/** Optional intro text before the steps */
+	intro?: string
+	steps: InteractiveStep[]
+}
+
+export interface InteractiveStep {
+	/** The command to type */
+	command: string
+	/** Description of what this command does */
+	description: string
+}
+
+export interface CommandBlock {
+	type: "command"
+	/** Description shown above the command */
+	description: string
+	/** The command to run */
+	command: string
+	/** Optional expected output (shown dimmer, not copied) */
+	output?: string
 }
 
 /** Navigation section for docs sidebar */

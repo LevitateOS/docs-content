@@ -13,20 +13,23 @@ export const installationDiskContent: DocsContent = {
 					content: rich`Boot from the LevitateOS ISO (see ${link("Getting Started", "/docs/getting-started")}). You'll be dropped into a root shell.`,
 				},
 				{
-					type: "code",
-					language: "bash",
-					content: `# Verify you booted in UEFI mode
-ls /sys/firmware/efi/efivars
-
-# Set keyboard layout (optional, default is US)
-loadkeys us
-
-# Sync system clock
-timedatectl set-ntp true`,
+					type: "command",
+					description: "Verify you booted in UEFI mode",
+					command: "ls /sys/firmware/efi/efivars",
 				},
 				{
 					type: "text",
 					content: rich`If ${code("/sys/firmware/efi/efivars")} doesn't exist, you're in BIOS mode. Reboot and select UEFI boot in your firmware settings.`,
+				},
+				{
+					type: "command",
+					description: "Set keyboard layout (optional, default is US)",
+					command: "loadkeys us",
+				},
+				{
+					type: "command",
+					description: "Sync system clock",
+					command: "timedatectl set-ntp true",
 				},
 			],
 		},
@@ -34,18 +37,12 @@ timedatectl set-ntp true`,
 			title: "2. Identify Target Disk",
 			content: [
 				{
-					type: "text",
-					content: "List all disks and identify your installation target:",
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `lsblk -d -o NAME,SIZE,MODEL,TRAN
-
-# Example output:
-# NAME      SIZE MODEL                   TRAN
-# sda       500G Samsung SSD 860         sata
-# nvme0n1     1T WD Black SN850X         nvme`,
+					type: "command",
+					description: "List all disks and identify your installation target",
+					command: "lsblk -d -o NAME,SIZE,MODEL,TRAN",
+					output: `NAME      SIZE MODEL                   TRAN
+sda       500G Samsung SSD 860         sata
+nvme0n1     1T WD Black SN850X         nvme`,
 				},
 				{
 					type: "text",
@@ -58,27 +55,49 @@ timedatectl set-ntp true`,
 			content: [
 				{
 					type: "text",
-					content: rich`${bold("WARNING: This will erase all data on the disk.")} Create a 512MB EFI partition and use the rest for root:`,
+					content: rich`${bold("WARNING: This will erase all data on the disk.")} We'll create this layout:`,
+				},
+				{
+					type: "table",
+					headers: ["Partition", "Size", "Type", "Mount"],
+					rows: [
+						["/dev/sda1", "512 MB", "EFI System", "/boot"],
+						["/dev/sda2", "Remainder", "Linux filesystem", "/"],
+					],
+				},
+				{
+					type: "text",
+					content: "Start fdisk:",
 				},
 				{
 					type: "code",
 					language: "bash",
-					content: `# Wipe existing partition table (DESTROYS ALL DATA)
-wipefs -a /dev/sda
-
-# Create GPT partition table and partitions
-parted /dev/sda --script \\
-  mklabel gpt \\
-  mkpart "EFI" fat32 1MiB 513MiB \\
-  set 1 esp on \\
-  mkpart "root" ext4 513MiB 100%
-
-# Verify
-lsblk /dev/sda`,
+					content: `fdisk /dev/sda`,
 				},
 				{
 					type: "text",
-					content: rich`For NVMe drives, partitions are named ${code("/dev/nvme0n1p1")}, ${code("/dev/nvme0n1p2")}, etc.`,
+					content: "Inside fdisk, enter these commands:",
+				},
+				{
+					type: "interactive",
+					steps: [
+						{ command: "g", description: "Create new GPT partition table" },
+						{ command: "n", description: "New partition (EFI)" },
+						{ command: "1", description: "Partition number" },
+						{ command: "Enter", description: "Default first sector" },
+						{ command: "+512M", description: "Size" },
+						{ command: "t", description: "Change partition type" },
+						{ command: "1", description: "EFI System" },
+						{ command: "n", description: "New partition (root)" },
+						{ command: "2", description: "Partition number" },
+						{ command: "Enter", description: "Default first sector" },
+						{ command: "Enter", description: "Use remaining space" },
+						{ command: "w", description: "Write changes and exit" },
+					],
+				},
+				{
+					type: "text",
+					content: rich`Verify with ${code("lsblk /dev/sda")}. For NVMe drives, partitions are named ${code("/dev/nvme0n1p1")}, ${code("/dev/nvme0n1p2")}, etc.`,
 				},
 			],
 		},
