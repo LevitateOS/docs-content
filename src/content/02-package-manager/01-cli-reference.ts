@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const cliReferenceContent: DocsContent = {
 	title: "recipe CLI Reference",
@@ -10,8 +11,7 @@ export const cliReferenceContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"`recipe` is the local-first package manager for LevitateOS. It executes Rhai scripts that define how to acquire, build, and install packages.",
+					content: rich`${code("recipe")} is the local-first package manager for LevitateOS. It executes Rhai scripts that define how to acquire, build, and install packages.`,
 				},
 				{ type: "code", language: "bash", content: "recipe <command> [options] [arguments]" },
 			],
@@ -34,24 +34,23 @@ recipe install ./path/to/pkg.rhai  # From local file`,
 				},
 				{
 					type: "text",
-					content: "**Lifecycle phases:**",
+					content: rich`${bold("Lifecycle phases:")}`,
 				},
 				{
 					type: "list",
 					ordered: true,
 					items: [
-						"`is_installed()` - Skip if already installed (optional)",
-						"`acquire()` - Download/copy source materials (required)",
-						"`build()` - Compile or transform (optional)",
-						"`pre_install()` - Pre-install hook (optional)",
-						"`install()` - Copy files to PREFIX (required)",
-						"`post_install()` - Post-install hook (optional)",
+						rich`${code("is_installed()")} - Skip if already installed (optional)`,
+						rich`${code("acquire()")} - Download/copy source materials (required)`,
+						rich`${code("build()")} - Compile or transform (optional)`,
+						rich`${code("pre_install()")} - Pre-install hook (optional)`,
+						rich`${code("install()")} - Copy files to PREFIX (required)`,
+						rich`${code("post_install()")} - Post-install hook (optional)`,
 					],
 				},
 				{
 					type: "text",
-					content:
-						"After successful install, the recipe is updated with `installed = true`, `installed_version`, `installed_at` (timestamp), and `installed_files` (list of installed paths).",
+					content: rich`After successful install, the recipe is updated with ${code("installed = true")}, ${code("installed_version")}, ${code("installed_at")} (timestamp), and ${code("installed_files")} (list of installed paths).`,
 				},
 			],
 		},
@@ -67,17 +66,17 @@ recipe install ./path/to/pkg.rhai  # From local file`,
 				},
 				{
 					type: "text",
-					content: "**Removal phases:**",
+					content: rich`${bold("Removal phases:")}`,
 				},
 				{
 					type: "list",
 					ordered: true,
 					items: [
-						"`pre_remove()` - Pre-removal hook (optional)",
-						"Delete all files tracked in `installed_files`",
-						"`remove()` - Custom cleanup during deletion (optional)",
+						rich`${code("pre_remove()")} - Pre-removal hook (optional)`,
+						rich`Delete all files tracked in ${code("installed_files")}`,
+						rich`${code("remove()")} - Custom cleanup during deletion (optional)`,
 						"Clean up empty directories",
-						"`post_remove()` - Post-removal hook (optional)",
+						rich`${code("post_remove()")} - Post-removal hook (optional)`,
 					],
 				},
 				{
@@ -100,12 +99,11 @@ recipe update <package>    # Check specific package`,
 				},
 				{
 					type: "text",
-					content:
-						"Calls the recipe's `check_update()` function if defined. This function should return a new version string if an update is available, or `()` if up to date. When an update is found, the recipe's `version` variable is updated.",
+					content: rich`Calls the recipe's ${code("check_update()")} function if defined. This function should return a new version string if an update is available, or ${code("()")} if up to date. When an update is found, the recipe's ${code("version")} variable is updated.`,
 				},
 				{
 					type: "text",
-					content: "Example `check_update()` implementation:",
+					content: rich`Example ${code("check_update()")} implementation:`,
 				},
 				{
 					type: "code",
@@ -134,8 +132,7 @@ recipe upgrade <package>    # Upgrade specific package`,
 				},
 				{
 					type: "text",
-					content:
-						"Compares the recipe's `version` against `installed_version`. Uses semantic versioning comparison when possible, falling back to string comparison. If an upgrade is needed, removes the old version and installs the new one.",
+					content: rich`Compares the recipe's ${code("version")} against ${code("installed_version")}. Uses semantic versioning comparison when possible, falling back to string comparison. If an upgrade is needed, removes the old version and installs the new one.`,
 				},
 			],
 		},
@@ -212,8 +209,7 @@ recipe deps <package> --resolve # Full install order`,
 				},
 				{
 					type: "text",
-					content:
-						"Without `--resolve`, shows direct dependencies only. With `--resolve`, performs topological sort to show the full install order with cycle detection.",
+					content: rich`Without ${code("--resolve")}, shows direct dependencies only. With ${code("--resolve")}, performs topological sort to show the full install order with cycle detection.`,
 				},
 				{
 					type: "code",
@@ -247,7 +243,7 @@ recipe deps myapp --resolve
 				},
 				{
 					type: "text",
-					content: "The `RECIPE_PATH` environment variable can also set the recipes directory.",
+					content: rich`The ${code("RECIPE_PATH")} environment variable can also set the recipes directory.`,
 				},
 			],
 		},
@@ -256,8 +252,7 @@ recipe deps myapp --resolve
 			content: [
 				{
 					type: "text",
-					content:
-						"Recipes are Rhai scripts (`.rhai` files) that define package metadata and lifecycle functions. See [Recipe Format](/docs/recipe-format) for the full specification.",
+					content: rich`Recipes are Rhai scripts (${code(".rhai")} files) that define package metadata and lifecycle functions. See ${link("Recipe Format", "/docs/recipe-format")} for the full specification.`,
 				},
 			],
 		},
@@ -277,7 +272,7 @@ recipe deps myapp --resolve
 				},
 				{
 					type: "text",
-					content: "When `installed = true`, these are also required:",
+					content: rich`When ${code("installed = true")}, these are also required:`,
 				},
 				{
 					type: "table",
@@ -434,21 +429,20 @@ fn check_update() {
 			content: [
 				{
 					type: "text",
-					content: "When you run `recipe install <name>`, the CLI looks for recipes in this order:",
+					content: rich`When you run ${code("recipe install <name>")}, the CLI looks for recipes in this order:`,
 				},
 				{
 					type: "list",
 					ordered: true,
 					items: [
-						"Explicit path if it contains `/` or ends with `.rhai`",
-						"`<recipes_dir>/<name>.rhai`",
-						"`<recipes_dir>/<name>/<name>.rhai` (subdirectory style)",
+						rich`Explicit path if it contains ${code("/")} or ends with ${code(".rhai")}`,
+						rich`${code("<recipes_dir>/<name>.rhai")}`,
+						rich`${code("<recipes_dir>/<name>/<name>.rhai")} (subdirectory style)`,
 					],
 				},
 				{
 					type: "text",
-					content:
-						"Package names must be alphanumeric with hyphens/underscores only. Path traversal (e.g., `../`) is rejected.",
+					content: rich`Package names must be alphanumeric with hyphens/underscores only. Path traversal (e.g., ${code("../")} ) is rejected.`,
 				},
 			],
 		},
@@ -478,8 +472,8 @@ fn check_update() {
 				{
 					type: "list",
 					items: [
-						"[Recipe Format](/docs/recipe-format) - Full specification for writing recipes",
-						"[Helper Functions](/docs/helpers-overview) - All available functions for recipes",
+						rich`${link("Recipe Format", "/docs/recipe-format")} - Full specification for writing recipes`,
+						rich`${link("Helper Functions", "/docs/helpers-overview")} - All available functions for recipes`,
 					],
 				},
 			],

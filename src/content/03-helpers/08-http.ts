@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, code } from "../../rich-text"
 
 export const helpersHttpContent: DocsContent = {
 	title: "HTTP Helpers",
@@ -9,8 +10,7 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"Timeout defaults to 30 seconds (configurable via `RECIPE_HTTP_TIMEOUT` env var).",
+					content: rich`Timeout defaults to 30 seconds (configurable via ${code("RECIPE_HTTP_TIMEOUT")} env var).`,
 				},
 			],
 		},
@@ -33,8 +33,7 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"Get the latest release version from a GitHub repository. Strips the `v` prefix automatically.",
+					content: rich`Get the latest release version from a GitHub repository. Strips the ${code("v")} prefix automatically.`,
 				},
 				{
 					type: "code",
@@ -56,8 +55,7 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"Get the latest tag from a GitHub repository. Strips the `v` prefix automatically.",
+					content: rich`Get the latest tag from a GitHub repository. Strips the ${code("v")} prefix automatically.`,
 				},
 				{
 					type: "code",
@@ -72,7 +70,7 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Strip common prefixes from version strings (`v`, `release-`, `version-`).",
+					content: rich`Strip common prefixes from version strings (${code("v")}, ${code("release-")}, ${code("version-")}).`,
 				},
 				{
 					type: "code",

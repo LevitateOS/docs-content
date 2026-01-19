@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, code } from "../../rich-text"
 
 export const helpersInstallContent: DocsContent = {
 	title: "Install Helpers",
@@ -19,7 +20,7 @@ export const helpersInstallContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Install files to `PREFIX/bin/` with executable permissions (0755).",
+					content: rich`Install files to ${code("PREFIX/bin/")} with executable permissions (0755).`,
 				},
 				{
 					type: "code",
@@ -34,7 +35,7 @@ install_bin("target/release/*");  // glob patterns work`,
 			content: [
 				{
 					type: "text",
-					content: "Install files to `PREFIX/lib/` with standard permissions (0644).",
+					content: rich`Install files to ${code("PREFIX/lib/")} with standard permissions (0644).`,
 				},
 				{
 					type: "code",
@@ -49,8 +50,7 @@ install_lib("*.a");`,
 			content: [
 				{
 					type: "text",
-					content:
-						"Install man pages to `PREFIX/share/man/manN/`. The section number is auto-detected from the file extension (e.g., `foo.1` goes to `man1/`).",
+					content: rich`Install man pages to ${code("PREFIX/share/man/manN/")}. The section number is auto-detected from the file extension (e.g., ${code("foo.1")} goes to ${code("man1/")}).`,
 				},
 				{
 					type: "code",
@@ -85,8 +85,7 @@ install_to_dir("scripts/*", "libexec/myapp", 0o755);`,
 			content: [
 				{
 					type: "text",
-					content:
-						"Extract all `.rpm` files in the build directory to PREFIX. Requires `rpm2cpio` and `cpio` in PATH. Useful for repackaging Fedora/RHEL packages.",
+					content: rich`Extract all ${code(".rpm")} files in the build directory to PREFIX. Requires ${code("rpm2cpio")} and ${code("cpio")} in PATH. Useful for repackaging Fedora/RHEL packages.`,
 				},
 				{
 					type: "code",

@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, code } from "../../rich-text"
 
 export const helpersAcquireContent: DocsContent = {
 	title: "Acquire Helpers",
@@ -9,8 +10,7 @@ export const helpersAcquireContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"Both `download()` and `copy()` set internal state used by `verify_sha256()` and `extract()`. This allows chaining without passing file paths explicitly.",
+					content: rich`Both ${code("download()")} and ${code("copy()")} set internal state used by ${code("verify_sha256()")} and ${code("extract()")}. This allows chaining without passing file paths explicitly.`,
 				},
 			],
 		},
@@ -19,7 +19,7 @@ export const helpersAcquireContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Download a file from a URL with progress bar. Saves to `BUILD_DIR/{filename}`.",
+					content: rich`Download a file from a URL with progress bar. Saves to ${code("BUILD_DIR/{filename}")}.`,
 				},
 				{
 					type: "code",

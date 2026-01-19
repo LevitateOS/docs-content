@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, bold, link } from "../../rich-text"
 
 export const gettingStartedContent: DocsContent = {
 	title: "Getting Started",
@@ -10,10 +11,10 @@ export const gettingStartedContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						"**Architecture:** x86_64",
-						"**Disk:** 8GB minimum (20GB recommended)",
-						"**RAM:** 512MB minimum (2GB recommended)",
-						"**Boot:** UEFI recommended",
+						rich`${bold("Architecture:")} x86_64`,
+						rich`${bold("Disk:")} 8GB minimum (20GB recommended)`,
+						rich`${bold("RAM:")} 512MB minimum (2GB recommended)`,
+						rich`${bold("Boot:")} UEFI recommended`,
 					],
 				},
 			],
@@ -57,7 +58,7 @@ sudo dd if=LevitateOS.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
 			content: [
 				{
 					type: "text",
-					content: "Use [Rufus](https://rufus.ie) with DD image mode.",
+					content: rich`Use ${link("Rufus", "https://rufus.ie")} with DD image mode.`,
 				},
 			],
 		},
@@ -83,8 +84,7 @@ sudo dd if=LevitateOS.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
 			content: [
 				{
 					type: "text",
-					content:
-						"Boot from the ISO to enter the live environment, then follow the [Installation Guide](/docs/installation) to install LevitateOS.",
+					content: rich`Boot from the ISO to enter the live environment, then follow the ${link("Installation Guide", "/docs/installation")} to install LevitateOS.`,
 				},
 			],
 		},

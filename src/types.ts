@@ -3,9 +3,11 @@
  * Pages define content as structured data, rendered by DocsPage.
  */
 
+import type { RichText } from "./rich-text"
+
 export interface DocsContent {
 	title: string
-	intro?: string
+	intro?: string | RichText
 	sections: Section[]
 }
 
@@ -27,7 +29,8 @@ export type ContentBlock =
 
 export interface TextBlock {
 	type: "text"
-	content: string
+	/** Plain string or rich text array from tagged template */
+	content: string | RichText
 }
 
 export interface CodeBlock {
@@ -54,12 +57,12 @@ export interface TableBlock {
 export interface ListBlock {
 	type: "list"
 	ordered?: boolean
-	items: (string | ListItem)[]
+	items: (string | RichText | ListItem)[]
 }
 
 export interface ListItem {
-	text: string
-	children?: string[]
+	text: string | RichText
+	children?: (string | RichText)[]
 }
 
 export interface ConversationBlock {

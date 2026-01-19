@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, code } from "../../rich-text"
 
 export const helpersCommandsContent: DocsContent = {
 	title: "Command Helpers",
@@ -9,8 +10,7 @@ export const helpersCommandsContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"These functions have `PREFIX` and `BUILD_DIR` environment variables set automatically. Use these when you need the command's output or exit code rather than just running it.",
+					content: rich`These functions have ${code("PREFIX")} and ${code("BUILD_DIR")} environment variables set automatically. Use these when you need the command's output or exit code rather than just running it.`,
 				},
 			],
 		},

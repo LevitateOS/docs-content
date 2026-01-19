@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, bold, link, code } from "../../rich-text"
 
 export const installationContent: DocsContent = {
 	title: "Installation",
@@ -20,11 +21,11 @@ export const installationContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						"**Boot** - Boot the live ISO",
-						"**Partition** - Create EFI and root partitions on your disk",
-						"**Extract** - Extract the stage3 tarball to install the base system",
-						"**Configure** - Set timezone, locale, hostname, users, and bootloader",
-						"**Reboot** - Boot into your new LevitateOS installation",
+						rich`${bold("Boot")} - Boot the live ISO`,
+						rich`${bold("Partition")} - Create EFI and root partitions on your disk`,
+						rich`${bold("Extract")} - Extract the stage3 tarball to install the base system`,
+						rich`${bold("Configure")} - Set timezone, locale, hostname, users, and bootloader`,
+						rich`${bold("Reboot")} - Boot into your new LevitateOS installation`,
 					],
 				},
 			],
@@ -34,8 +35,7 @@ export const installationContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"Boot from the LevitateOS ISO (see [Getting Started](/docs/getting-started)). You'll be dropped into a root shell.",
+					content: rich`Boot from the LevitateOS ISO (see ${link("Getting Started", "/docs/getting-started")}). You'll be dropped into a root shell.`,
 				},
 				{
 					type: "code",
@@ -51,8 +51,7 @@ timedatectl set-ntp true`,
 				},
 				{
 					type: "text",
-					content:
-						"If `/sys/firmware/efi/efivars` doesn't exist, you're in BIOS mode. Reboot and select UEFI boot in your firmware settings.",
+					content: rich`If ${code("/sys/firmware/efi/efivars")} doesn't exist, you're in BIOS mode. Reboot and select UEFI boot in your firmware settings.`,
 				},
 			],
 		},
@@ -75,8 +74,7 @@ timedatectl set-ntp true`,
 				},
 				{
 					type: "text",
-					content:
-						"This guide uses `/dev/sda`. **Replace with your actual device** (e.g., `/dev/nvme0n1` for NVMe).",
+					content: rich`This guide uses ${code("/dev/sda")}. ${bold("Replace with your actual device")} (e.g., ${code("/dev/nvme0n1")} for NVMe).`,
 				},
 			],
 		},
@@ -85,8 +83,7 @@ timedatectl set-ntp true`,
 			content: [
 				{
 					type: "text",
-					content:
-						"**WARNING: This will erase all data on the disk.** Create a 512MB EFI partition and use the rest for root:",
+					content: rich`${bold("WARNING: This will erase all data on the disk.")} Create a 512MB EFI partition and use the rest for root:`,
 				},
 				{
 					type: "code",
@@ -106,7 +103,7 @@ lsblk /dev/sda`,
 				},
 				{
 					type: "text",
-					content: "For NVMe drives, partitions are named `/dev/nvme0n1p1`, `/dev/nvme0n1p2`, etc.",
+					content: rich`For NVMe drives, partitions are named ${code("/dev/nvme0n1p1")}, ${code("/dev/nvme0n1p2")}, etc.`,
 				},
 			],
 		},
@@ -157,8 +154,7 @@ tar xpf /run/media/*/levitateos-stage3.tar.xz -C /mnt`,
 				},
 				{
 					type: "text",
-					content:
-						"This extracts the complete base system: kernel, systemd, coreutils, networking, and the `recipe` package manager.",
+					content: rich`This extracts the complete base system: kernel, systemd, coreutils, networking, and the ${code("recipe")} package manager.`,
 				},
 			],
 		},
@@ -185,7 +181,7 @@ tar xpf /run/media/*/levitateos-stage3.tar.xz -C /mnt`,
 				},
 				{
 					type: "text",
-					content: "Add the following, replacing UUIDs with your values from `blkid`:",
+					content: rich`Add the following, replacing UUIDs with your values from ${code("blkid")}:`,
 				},
 				{
 					type: "file",
@@ -253,8 +249,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 				},
 				{
 					type: "text",
-					content:
-						"For other locales, edit `/etc/locale.gen` and uncomment the lines you need before running `locale-gen`.",
+					content: rich`For other locales, edit ${code("/etc/locale.gen")} and uncomment the lines you need before running ${code("locale-gen")}.`,
 				},
 			],
 		},
@@ -263,7 +258,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 			content: [
 				{
 					type: "text",
-					content: "Set your hostname (replace `myhostname` with your preferred name):",
+					content: rich`Set your hostname (replace ${code("myhostname")} with your preferred name):`,
 				},
 				{
 					type: "code",
@@ -303,7 +298,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 			content: [
 				{
 					type: "text",
-					content: "Create your user (replace `yourname` with your username):",
+					content: rich`Create your user (replace ${code("yourname")} with your username):`,
 				},
 				{
 					type: "code",
@@ -384,8 +379,7 @@ options root=UUID=your-root-uuid-here rw quiet`,
 				},
 				{
 					type: "text",
-					content:
-						"Use the exact kernel filenames from the `ls` command. For Intel CPUs, add `initrd /intel-ucode.img` before initramfs. For AMD: `initrd /amd-ucode.img`.",
+					content: rich`Use the exact kernel filenames from the ${code("ls")} command. For Intel CPUs, add ${code("initrd /intel-ucode.img")} before initramfs. For AMD: ${code("initrd /amd-ucode.img")}.`,
 				},
 			],
 		},
@@ -440,7 +434,7 @@ recipe info firefox    # View package info`,
 				},
 				{
 					type: "text",
-					content: "See the [CLI Reference](/docs/cli-reference) for all available commands.",
+					content: rich`See the ${link("CLI Reference", "/docs/cli-reference")} for all available commands.`,
 				},
 			],
 		},

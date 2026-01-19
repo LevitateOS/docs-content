@@ -1,17 +1,16 @@
 import type { DocsContent } from "../../types"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const recipeFormatContent: DocsContent = {
 	title: "Recipe Format",
-	intro:
-		"Recipes are [Rhai](https://rhai.rs) scripts that define how to acquire, build, and install packages. Each recipe declares metadata as variables and implements lifecycle functions.",
+	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts that define how to acquire, build, and install packages. Each recipe declares metadata as variables and implements lifecycle functions.`,
 	sections: [
 		{
 			title: "Basic Structure",
 			content: [
 				{
 					type: "text",
-					content:
-						"A recipe is a `.rhai` file with variables defining package metadata and functions implementing the installation lifecycle.",
+					content: rich`A recipe is a ${code(".rhai")} file with variables defining package metadata and functions implementing the installation lifecycle.`,
 				},
 				{
 					type: "code",
@@ -67,7 +66,7 @@ fn install() {
 				},
 				{
 					type: "text",
-					content: "When `installed = true`, these are also expected:",
+					content: rich`When ${code("installed = true")}, these are also expected:`,
 				},
 				{
 					type: "table",
@@ -111,34 +110,33 @@ fn install() {
 			content: [
 				{
 					type: "text",
-					content:
-						"When you run `recipe install <package>`, the CLI executes these phases in order:",
+					content: rich`When you run ${code("recipe install <package>")}, the CLI executes these phases in order:`,
 				},
 				{
 					type: "list",
 					ordered: true,
 					items: [
-						"**Check** - `is_installed()` or recipe state (skip if already installed)",
-						"**Acquire** - `acquire()` downloads or copies source materials",
-						"**Build** - `build()` compiles or transforms sources (optional)",
-						"**Pre-install** - `pre_install()` hook (optional)",
-						"**Install** - `install()` copies files to PREFIX",
-						"**Post-install** - `post_install()` hook (optional)",
-						"**State update** - CLI sets `installed = true` and records metadata",
+						rich`${bold("Check")} - ${code("is_installed()")} or recipe state (skip if already installed)`,
+						rich`${bold("Acquire")} - ${code("acquire()")} downloads or copies source materials`,
+						rich`${bold("Build")} - ${code("build()")} compiles or transforms sources (optional)`,
+						rich`${bold("Pre-install")} - ${code("pre_install()")} hook (optional)`,
+						rich`${bold("Install")} - ${code("install()")} copies files to PREFIX`,
+						rich`${bold("Post-install")} - ${code("post_install()")} hook (optional)`,
+						rich`${bold("State update")} - CLI sets ${code("installed = true")} and records metadata`,
 					],
 				},
 				{
 					type: "text",
-					content: "For removal (`recipe remove`), the phases are:",
+					content: rich`For removal (${code("recipe remove")}), the phases are:`,
 				},
 				{
 					type: "list",
 					ordered: true,
 					items: [
-						"**Pre-remove** - `pre_remove()` hook (optional)",
-						"**Delete** - Remove all files in `installed_files`",
-						"**Remove** - `remove()` custom cleanup (optional)",
-						"**Post-remove** - `post_remove()` hook (optional)",
+						rich`${bold("Pre-remove")} - ${code("pre_remove()")} hook (optional)`,
+						rich`${bold("Delete")} - Remove all files in ${code("installed_files")}`,
+						rich`${bold("Remove")} - ${code("remove()")} custom cleanup (optional)`,
+						rich`${bold("Post-remove")} - ${code("post_remove()")} hook (optional)`,
 					],
 				},
 			],
@@ -215,8 +213,7 @@ fn install() {
 				},
 				{
 					type: "text",
-					content:
-						"See [Helper Functions](/docs/helpers-overview) for `download()`, `extract()`, `install_bin()`, etc.",
+					content: rich`See ${link("Helper Functions", "/docs/helpers-overview")} for ${code("download()")}, ${code("extract()")}, ${code("install_bin()")}, etc.`,
 				},
 			],
 		},
@@ -260,7 +257,7 @@ fn install() {
 			content: [
 				{
 					type: "text",
-					content: "Declare dependencies with the `deps` array:",
+					content: rich`Declare dependencies with the ${code("deps")} array:`,
 				},
 				{
 					type: "file",
@@ -289,8 +286,7 @@ fn install() {
 				},
 				{
 					type: "text",
-					content:
-						"Install with `recipe install htop --deps` to resolve and install dependencies first.",
+					content: rich`Install with ${code("recipe install htop --deps")} to resolve and install dependencies first.`,
 				},
 			],
 		},
@@ -300,7 +296,7 @@ fn install() {
 			content: [
 				{
 					type: "text",
-					content: "Implement `check_update()` to enable `recipe update`:",
+					content: rich`Implement ${code("check_update()")} to enable ${code("recipe update")}:`,
 				},
 				{
 					type: "code",
@@ -316,8 +312,7 @@ fn install() {
 				},
 				{
 					type: "text",
-					content:
-						"When an update is found, `recipe upgrade` will remove the old version and install the new one.",
+					content: rich`When an update is found, ${code("recipe upgrade")} will remove the old version and install the new one.`,
 				},
 			],
 		},
@@ -326,21 +321,20 @@ fn install() {
 			content: [
 				{
 					type: "text",
-					content: "When you run `recipe install <name>`, the CLI looks for recipes in this order:",
+					content: rich`When you run ${code("recipe install <name>")}, the CLI looks for recipes in this order:`,
 				},
 				{
 					type: "list",
 					ordered: true,
 					items: [
-						"If `<name>` contains `/` or ends with `.rhai`: treat as explicit path",
-						"`<recipes_dir>/<name>.rhai`",
-						"`<recipes_dir>/<name>/<name>.rhai` (subdirectory style)",
+						rich`If ${code("<name>")} contains ${code("/")} or ends with ${code(".rhai")}: treat as explicit path`,
+						rich`${code("<recipes_dir>/<name>.rhai")}`,
+						rich`${code("<recipes_dir>/<name>/<name>.rhai")} (subdirectory style)`,
 					],
 				},
 				{
 					type: "text",
-					content:
-						"The default recipes directory is `~/.local/share/recipe/recipes/`. Override with `--recipes-path` or `RECIPE_PATH` environment variable.",
+					content: rich`The default recipes directory is ${code("~/.local/share/recipe/recipes/")}. Override with ${code("--recipes-path")} or ${code("RECIPE_PATH")} environment variable.`,
 				},
 			],
 		},
@@ -365,8 +359,8 @@ fn install() {
 				{
 					type: "list",
 					items: [
-						"[CLI Reference](/docs/cli-reference) - Commands for installing and managing packages",
-						"[Helper Functions](/docs/helpers-overview) - All available functions for recipes",
+						rich`${link("CLI Reference", "/docs/cli-reference")} - Commands for installing and managing packages`,
+						rich`${link("Helper Functions", "/docs/helpers-overview")} - All available functions for recipes`,
 					],
 				},
 			],

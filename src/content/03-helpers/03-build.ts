@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, code } from "../../rich-text"
 
 export const helpersBuildContent: DocsContent = {
 	title: "Build Helpers",
@@ -9,8 +10,7 @@ export const helpersBuildContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"The `run()` function has `PREFIX` and `BUILD_DIR` environment variables automatically set.",
+					content: rich`The ${code("run()")} function has ${code("PREFIX")} and ${code("BUILD_DIR")} environment variables automatically set.`,
 				},
 			],
 		},
@@ -19,7 +19,7 @@ export const helpersBuildContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Extract the last downloaded archive to `BUILD_DIR`. Supports multiple formats:",
+					content: rich`Extract the last downloaded archive to ${code("BUILD_DIR")}. Supports multiple formats:`,
 				},
 				{
 					type: "table",
@@ -45,8 +45,7 @@ extract("tar.xz");`,
 			content: [
 				{
 					type: "text",
-					content:
-						"Change the current working directory for subsequent `run()` calls. Relative paths are resolved from `BUILD_DIR`.",
+					content: rich`Change the current working directory for subsequent ${code("run()")} calls. Relative paths are resolved from ${code("BUILD_DIR")}.`,
 				},
 				{
 					type: "code",
@@ -63,18 +62,17 @@ cd("/tmp/other");     // Absolute paths work too`,
 			content: [
 				{
 					type: "text",
-					content:
-						"Run a shell command in the current directory. Shows a spinner for long-running commands. `shell()` is an alias for `run()` - use it when your recipe defines its own `run()` function.",
+					content: rich`Run a shell command in the current directory. Shows a spinner for long-running commands. ${code("shell()")} is an alias for ${code("run()")} - use it when your recipe defines its own ${code("run()")} function.`,
 				},
 				{
 					type: "text",
-					content: "**Environment variables automatically set:**",
+					content: rich`${code("Environment variables automatically set:")}`,
 				},
 				{
 					type: "list",
 					items: [
-						"`PREFIX` - Installation prefix (e.g., `/usr/local`)",
-						"`BUILD_DIR` - Temporary build directory",
+						rich`${code("PREFIX")} - Installation prefix (e.g., ${code("/usr/local")})`,
+						rich`${code("BUILD_DIR")} - Temporary build directory`,
 					],
 				},
 				{

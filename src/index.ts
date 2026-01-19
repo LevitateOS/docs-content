@@ -1,6 +1,10 @@
 // Types
 export * from "./types"
 
+// Rich text helpers
+export { rich, link, bold, code, italic } from "./rich-text"
+export type { RichText, InlineNode, InlineLink, InlineBold, InlineCode, InlineItalic } from "./rich-text"
+
 // Hooks
 export { useCopyToClipboard } from "./hooks/useCopyToClipboard"
 

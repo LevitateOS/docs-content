@@ -1,8 +1,9 @@
 import type { DocsContent } from "../../types"
+import { rich, link } from "../../rich-text"
 
 export const helpersOverviewContent: DocsContent = {
 	title: "Helpers Overview",
-	intro: "Helper functions available in [recipe scripts](/docs/recipe-format).",
+	intro: rich`Helper functions available in ${link("recipe scripts", "/docs/recipe-format")}.`,
 	sections: [
 		{
 			title: "Introduction",
@@ -39,13 +40,13 @@ fn install() {
 				{
 					type: "list",
 					items: [
-						"[Acquire](/docs/helpers-acquire) - Download and verify sources",
-						"[Build](/docs/helpers-build) - Extract archives and run commands",
-						"[Install](/docs/helpers-install) - Install files to PREFIX",
-						"[Filesystem](/docs/helpers-filesystem) - File and directory operations",
-						"[Environment](/docs/helpers-environment) - Environment variables",
-						"[Commands](/docs/helpers-commands) - Command execution variants",
-						"[HTTP](/docs/helpers-http) - HTTP requests and GitHub API",
+						rich`${link("Acquire", "/docs/helpers-acquire")} - Download and verify sources`,
+						rich`${link("Build", "/docs/helpers-build")} - Extract archives and run commands`,
+						rich`${link("Install", "/docs/helpers-install")} - Install files to PREFIX`,
+						rich`${link("Filesystem", "/docs/helpers-filesystem")} - File and directory operations`,
+						rich`${link("Environment", "/docs/helpers-environment")} - Environment variables`,
+						rich`${link("Commands", "/docs/helpers-commands")} - Command execution variants`,
+						rich`${link("HTTP", "/docs/helpers-http")} - HTTP requests and GitHub API`,
 					],
 				},
 			],
