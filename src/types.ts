@@ -43,8 +43,8 @@ export interface CodeBlock {
 
 export interface TableBlock {
 	type: "table"
-	headers: string[]
-	rows: string[][]
+	headers: (string | RichText)[]
+	rows: (string | RichText)[][]
 	/** Column index to render in monospace font (0-indexed) */
 	monospaceCol?: number
 }
@@ -67,15 +67,15 @@ export interface ConversationBlock {
 
 export interface ConversationMessage {
 	role: "user" | "ai"
-	text: string
+	text: string | RichText
 	/** Optional list items shown after the text */
-	list?: string[]
+	list?: (string | RichText)[]
 }
 
 export interface InteractiveBlock {
 	type: "interactive"
 	/** Optional intro text before the steps */
-	intro?: string
+	intro?: string | RichText
 	steps: InteractiveStep[]
 }
 
@@ -83,7 +83,7 @@ export interface InteractiveStep {
 	/** The command to type */
 	command: string
 	/** Description of what this command does */
-	description: string
+	description: string | RichText
 }
 
 export interface CommandBlock {
