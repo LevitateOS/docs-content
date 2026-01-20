@@ -53,7 +53,7 @@ tar xpf /run/media/*/levitateos-stage3.tar.xz -C /mnt`,
 					content: rich`Add the following, replacing UUIDs with your values from ${code("blkid")}:`,
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "/etc/fstab",
 					content: `# <device>                <mount>  <type>  <options>  <dump>  <fsck>
 UUID=your-root-uuid-here  /        ext4    defaults   0       1

@@ -69,7 +69,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 					content: `nano /etc/hosts`,
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "/etc/hosts",
 					content: `127.0.0.1   localhost
 ::1         localhost
@@ -110,7 +110,7 @@ passwd yourname`,
 					content: `nano /etc/sudoers.d/wheel`,
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "/etc/sudoers.d/wheel",
 					content: `%wheel ALL=(ALL:ALL) ALL`,
 				},

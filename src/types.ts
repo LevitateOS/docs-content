@@ -20,7 +20,6 @@ export interface Section {
 export type ContentBlock =
 	| TextBlock
 	| CodeBlock
-	| FileBlock
 	| TableBlock
 	| ListBlock
 	| ConversationBlock
@@ -35,15 +34,11 @@ export interface TextBlock {
 
 export interface CodeBlock {
 	type: "code"
-	language: string
-	content: string
-}
-
-export interface FileBlock {
-	type: "file"
-	filename: string
-	content: string
+	/** Language for syntax highlighting. If omitted, inferred from filename. */
 	language?: string
+	content: string
+	/** Optional filename - when present, shows file header with icon */
+	filename?: string
 }
 
 export interface TableBlock {

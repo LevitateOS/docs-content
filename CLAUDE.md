@@ -32,7 +32,7 @@ command -v nano >/dev/null 2>&1 && echo "installed"
 
 ### DO write:
 ```bash
-# Natural commands humans actually type
+# Natural commands humans actually typeCan y
 ls /sys/firmware/efi/efivars
 cat /etc/passwd
 which nano

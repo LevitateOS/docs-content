@@ -31,7 +31,7 @@ ls /boot/vmlinuz* /boot/initramfs*`,
 					content: `nano /boot/loader/loader.conf`,
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "/boot/loader/loader.conf",
 					content: `default levitate.conf
 timeout 3
@@ -48,7 +48,7 @@ editor no`,
 nano /boot/loader/entries/levitate.conf`,
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "/boot/loader/entries/levitate.conf",
 					content: `title   LevitateOS
 linux   /vmlinuz-linux

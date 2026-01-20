@@ -80,7 +80,7 @@ fn install() {
 					content: "A full recipe demonstrating multiple helper categories:",
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "ripgrep.rhai",
 					language: "rhai",
 					content: `let name = "ripgrep";

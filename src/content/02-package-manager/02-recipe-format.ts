@@ -188,7 +188,7 @@ fn install() {
 					content: "Download and extract a pre-built release:",
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "ripgrep.rhai",
 					language: "rhai",
 					content: `let name = "ripgrep";
@@ -226,7 +226,7 @@ fn install() {
 					content: "Build from source using configure/make:",
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "bash.rhai",
 					language: "rhai",
 					content: `let name = "bash";
@@ -260,7 +260,7 @@ fn install() {
 					content: rich`Declare dependencies with the ${code("deps")} array:`,
 				},
 				{
-					type: "file",
+					type: "code",
 					filename: "htop.rhai",
 					language: "rhai",
 					content: `let name = "htop";

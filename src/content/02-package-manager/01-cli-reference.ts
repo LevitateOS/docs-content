@@ -364,7 +364,7 @@ recipe deps myapp --resolve
 			level: 3,
 			content: [
 				{
-					type: "file",
+					type: "code",
 					filename: "hello.rhai",
 					language: "rhai",
 					content: `let name = "hello";
@@ -393,7 +393,7 @@ fn install() {
 			level: 3,
 			content: [
 				{
-					type: "file",
+					type: "code",
 					filename: "myapp.rhai",
 					language: "rhai",
 					content: `let name = "myapp";
