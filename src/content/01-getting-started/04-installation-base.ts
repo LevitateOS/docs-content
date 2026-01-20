@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
@@ -13,13 +13,14 @@ export const installationBaseContent: DocsContent = {
 					content: "Extract the stage3 tarball to install the base system:",
 				},
 				{
-					type: "code",
-					language: "bash",
-					content: `# Find the stage3 tarball on the ISO
-ls /run/media/*/levitateos-stage3.tar.xz
-
-# Extract to the mounted root (preserves permissions)
-tar xpf /run/media/*/levitateos-stage3.tar.xz -C /mnt`,
+					type: "command",
+					description: "Find the stage3 tarball on the ISO",
+					command: "ls /run/media/*/levitateos-stage3.tar.xz",
+				},
+				{
+					type: "command",
+					description: "Extract to the mounted root (preserves permissions)",
+					command: "tar xpf /run/media/*/levitateos-stage3.tar.xz -C /mnt",
 				},
 				{
 					type: "text",
@@ -31,22 +32,14 @@ tar xpf /run/media/*/levitateos-stage3.tar.xz -C /mnt`,
 			title: "7. Generate fstab",
 			content: [
 				{
-					type: "text",
-					content: "Get the UUIDs for your partitions:",
+					type: "command",
+					description: "Get the UUIDs for your partitions",
+					command: "blkid /dev/sda1 /dev/sda2",
 				},
 				{
-					type: "code",
-					language: "bash",
-					content: `blkid /dev/sda1 /dev/sda2`,
-				},
-				{
-					type: "text",
-					content: "Create the fstab file:",
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `nano /mnt/etc/fstab`,
+					type: "command",
+					description: "Create the fstab file",
+					command: "nano /mnt/etc/fstab",
 				},
 				{
 					type: "text",
@@ -65,18 +58,21 @@ UUID=your-efi-uuid-here   /boot    vfat    defaults   0       2`,
 			title: "8. Enter the New System",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: `# Bind mount system directories
-mount --bind /dev /mnt/dev
-mount --bind /dev/pts /mnt/dev/pts
-mount --bind /proc /mnt/proc
-mount --bind /sys /mnt/sys
-mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
-mount --bind /run /mnt/run
-
-# Enter chroot
-chroot /mnt /bin/bash`,
+					type: "command",
+					description: "Bind mount system directories",
+					command: [
+						"mount --bind /dev /mnt/dev",
+						"mount --bind /dev/pts /mnt/dev/pts",
+						"mount --bind /proc /mnt/proc",
+						"mount --bind /sys /mnt/sys",
+						"mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars",
+						"mount --bind /run /mnt/run",
+					],
+				},
+				{
+					type: "command",
+					description: "Enter chroot",
+					command: "chroot /mnt /bin/bash",
 				},
 				{
 					type: "text",

@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const installationConfigContent: DocsContent = {
 	title: "Configuration",
@@ -9,16 +9,19 @@ export const installationConfigContent: DocsContent = {
 			title: "9. Set Timezone",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: `# List timezones
-ls /usr/share/zoneinfo/
-
-# Set your timezone (example: US Eastern)
-ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
-
-# Sync hardware clock
-hwclock --systohc`,
+					type: "command",
+					description: "List available timezones",
+					command: "ls /usr/share/zoneinfo/",
+				},
+				{
+					type: "command",
+					description: "Set your timezone (example: US Eastern)",
+					command: "ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime",
+				},
+				{
+					type: "command",
+					description: "Sync hardware clock",
+					command: "hwclock --systohc",
 				},
 			],
 		},
@@ -30,16 +33,19 @@ hwclock --systohc`,
 					content: "Enable and generate your locale:",
 				},
 				{
-					type: "code",
-					language: "bash",
-					content: `# Uncomment en_US.UTF-8 (or your preferred locale)
-sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-
-# Generate locales
-locale-gen
-
-# Set system locale
-echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
+					type: "command",
+					description: "Uncomment en_US.UTF-8 (or your preferred locale)",
+					command: "sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen",
+				},
+				{
+					type: "command",
+					description: "Generate locales",
+					command: "locale-gen",
+				},
+				{
+					type: "command",
+					description: "Set system locale",
+					command: 'echo "LANG=en_US.UTF-8" > /etc/locale.conf',
 				},
 				{
 					type: "text",
@@ -55,18 +61,14 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 					content: rich`Set your hostname (replace ${code("myhostname")} with your preferred name):`,
 				},
 				{
-					type: "code",
-					language: "bash",
-					content: `echo "myhostname" > /etc/hostname`,
+					type: "command",
+					description: "Set hostname",
+					command: 'echo "myhostname" > /etc/hostname',
 				},
 				{
-					type: "text",
-					content: "Create the hosts file:",
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `nano /etc/hosts`,
+					type: "command",
+					description: "Create the hosts file",
+					command: "nano /etc/hosts",
 				},
 				{
 					type: "code",
@@ -81,9 +83,9 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 			title: "12. Set Root Password",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: `passwd`,
+					type: "command",
+					description: "Set the root password",
+					command: "passwd",
 				},
 			],
 		},
@@ -95,19 +97,23 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf`,
 					content: rich`Create your user (replace ${code("yourname")} with your username):`,
 				},
 				{
-					type: "code",
-					language: "bash",
-					content: `useradd -m -G wheel -s /bin/bash yourname
-passwd yourname`,
+					type: "command",
+					description: "Create user with home directory and add to wheel group",
+					command: "useradd -m -G wheel -s /bin/bash yourname",
+				},
+				{
+					type: "command",
+					description: "Set user password",
+					command: "passwd yourname",
 				},
 				{
 					type: "text",
 					content: "Enable sudo for the wheel group:",
 				},
 				{
-					type: "code",
-					language: "bash",
-					content: `nano /etc/sudoers.d/wheel`,
+					type: "command",
+					description: "Create sudoers file for wheel group",
+					command: "nano /etc/sudoers.d/wheel",
 				},
 				{
 					type: "code",
@@ -115,9 +121,9 @@ passwd yourname`,
 					content: `%wheel ALL=(ALL:ALL) ALL`,
 				},
 				{
-					type: "code",
-					language: "bash",
-					content: `chmod 0440 /etc/sudoers.d/wheel`,
+					type: "command",
+					description: "Set correct permissions on sudoers file",
+					command: "chmod 0440 /etc/sudoers.d/wheel",
 				},
 				{
 					type: "text",

@@ -25,6 +25,7 @@ export type ContentBlock =
 	| ConversationBlock
 	| InteractiveBlock
 	| CommandBlock
+	| QABlock
 
 export interface TextBlock {
 	type: "text"
@@ -113,4 +114,16 @@ export interface NavItemSection {
 	title: string
 	anchor: string
 	level: 2 | 3
+}
+
+export interface QABlock {
+	type: "qa"
+	items: QAItem[]
+}
+
+export interface QAItem {
+	/** The question text */
+	question: string | RichText
+	/** Answer content - can contain any block types */
+	answer: ContentBlock[]
 }
