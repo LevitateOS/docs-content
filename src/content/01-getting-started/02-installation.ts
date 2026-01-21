@@ -11,7 +11,7 @@ export const installationContent: DocsContent = {
 				{
 					type: "text",
 					content:
-						"Installing LevitateOS follows the same process as Gentoo. You'll boot from a live environment, prepare your disk, extract the stage3 tarball, and configure the system before rebooting. No network connection is required.",
+						"Installing LevitateOS follows the same process as Gentoo. You'll boot from a live environment, prepare your disk, extract the base tarball, and configure the system before rebooting. No network connection is required.",
 				},
 			],
 		},

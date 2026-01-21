@@ -68,14 +68,11 @@ export const installationConfigContent: DocsContent = {
 				{
 					type: "command",
 					description: "Create the hosts file",
-					command: "nano /etc/hosts",
-				},
-				{
-					type: "code",
-					filename: "/etc/hosts",
-					content: `127.0.0.1   localhost
+					command: `cat > /etc/hosts << 'EOF'
+127.0.0.1   localhost
 ::1         localhost
-127.0.1.1   myhostname.localdomain myhostname`,
+127.0.1.1   myhostname.localdomain myhostname
+EOF`,
 				},
 			],
 		},
@@ -113,17 +110,7 @@ export const installationConfigContent: DocsContent = {
 				{
 					type: "command",
 					description: "Create sudoers file for wheel group",
-					command: "nano /etc/sudoers.d/wheel",
-				},
-				{
-					type: "code",
-					filename: "/etc/sudoers.d/wheel",
-					content: `%wheel ALL=(ALL:ALL) ALL`,
-				},
-				{
-					type: "command",
-					description: "Set correct permissions on sudoers file",
-					command: "chmod 0440 /etc/sudoers.d/wheel",
+					command: `echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel && chmod 0440 /etc/sudoers.d/wheel`,
 				},
 				{
 					type: "text",

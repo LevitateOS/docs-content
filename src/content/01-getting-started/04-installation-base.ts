@@ -3,24 +3,33 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
-	intro: rich`Installation steps 6-8: Extract the stage3 tarball and enter the new system. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 6-9: Mount installation media, extract the base tarball, and enter the new system. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
-			title: "6. Extract Stage3",
+			title: "6. Mount Installation Media",
 			content: [
 				{
-					type: "text",
-					content: "Extract the stage3 tarball to install the base system:",
+					type: "command",
+					description: "Create mount point and mount the ISO",
+					command: [
+						"mkdir -p /media/cdrom",
+						"mount /dev/sr0 /media/cdrom",
+					],
 				},
 				{
 					type: "command",
-					description: "Find the stage3 tarball on the ISO",
-					command: "ls /run/media/*/levitateos-stage3.tar.xz",
+					description: "Verify the base tarball is accessible",
+					command: "ls -la /media/cdrom/levitateos-base.tar.xz",
 				},
+			],
+		},
+		{
+			title: "7. Extract Base System",
+			content: [
 				{
 					type: "command",
 					description: "Extract to the mounted root (preserves permissions)",
-					command: "tar xpf /run/media/*/levitateos-stage3.tar.xz -C /mnt",
+					command: "tar xpf /media/cdrom/levitateos-base.tar.xz -C /mnt",
 				},
 				{
 					type: "text",
@@ -29,7 +38,7 @@ export const installationBaseContent: DocsContent = {
 			],
 		},
 		{
-			title: "7. Generate fstab",
+			title: "8. Generate fstab",
 			content: [
 				{
 					type: "command",
@@ -37,25 +46,22 @@ export const installationBaseContent: DocsContent = {
 					command: "blkid /dev/sda1 /dev/sda2",
 				},
 				{
+					type: "text",
+					content: rich`Create the fstab file, replacing UUIDs with your values from ${code("blkid")}:`,
+				},
+				{
 					type: "command",
 					description: "Create the fstab file",
-					command: "nano /mnt/etc/fstab",
-				},
-				{
-					type: "text",
-					content: rich`Add the following, replacing UUIDs with your values from ${code("blkid")}:`,
-				},
-				{
-					type: "code",
-					filename: "/etc/fstab",
-					content: `# <device>                <mount>  <type>  <options>  <dump>  <fsck>
+					command: `cat > /mnt/etc/fstab << 'EOF'
+# <device>                <mount>  <type>  <options>  <dump>  <fsck>
 UUID=your-root-uuid-here  /        ext4    defaults   0       1
-UUID=your-efi-uuid-here   /boot    vfat    defaults   0       2`,
+UUID=your-efi-uuid-here   /boot    vfat    defaults   0       2
+EOF`,
 				},
 			],
 		},
 		{
-			title: "8. Enter the New System",
+			title: "9. Enter the New System",
 			content: [
 				{
 					type: "command",

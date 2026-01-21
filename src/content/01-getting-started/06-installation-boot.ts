@@ -25,14 +25,11 @@ export const installationBootContent: DocsContent = {
 				{
 					type: "command",
 					description: "Create the loader configuration",
-					command: "nano /boot/loader/loader.conf",
-				},
-				{
-					type: "code",
-					filename: "/boot/loader/loader.conf",
-					content: `default levitate.conf
+					command: `cat > /boot/loader/loader.conf << 'EOF'
+default levitate.conf
 timeout 3
-editor no`,
+editor no
+EOF`,
 				},
 				{
 					type: "text",
@@ -45,16 +42,13 @@ editor no`,
 				},
 				{
 					type: "command",
-					description: "Create boot entry",
-					command: "nano /boot/loader/entries/levitate.conf",
-				},
-				{
-					type: "code",
-					filename: "/boot/loader/entries/levitate.conf",
-					content: `title   LevitateOS
+					description: "Create boot entry (replace UUID with value from blkid)",
+					command: `cat > /boot/loader/entries/levitate.conf << 'EOF'
+title   LevitateOS
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
-options root=UUID=your-root-uuid-here rw quiet`,
+options root=UUID=your-root-uuid-here rw quiet
+EOF`,
 				},
 				{
 					type: "text",
