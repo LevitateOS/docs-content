@@ -1,5 +1,7 @@
 # @levitate/docs-content
 
+> **STOP. READ. THEN ACT.** Before writing code, read the existing content files. Before deleting anything, read it first.
+
 Structured documentation content library for LevitateOS. Single source of truth consumed by both website and TUI viewer.
 
 ## Installation
