@@ -3,10 +3,10 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const installationConfigContent: DocsContent = {
 	title: "Configuration",
-	intro: rich`Installation steps 9-13: Configure timezone, locale, hostname, and user accounts. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 10-14: Configure timezone, locale, hostname, and user accounts. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
-			title: "9. Set Timezone",
+			title: "10. Set Timezone",
 			content: [
 				{
 					type: "command",
@@ -26,7 +26,7 @@ export const installationConfigContent: DocsContent = {
 			],
 		},
 		{
-			title: "10. Set Locale",
+			title: "11. Set Locale",
 			content: [
 				{
 					type: "text",
@@ -54,7 +54,7 @@ export const installationConfigContent: DocsContent = {
 			],
 		},
 		{
-			title: "11. Set Hostname",
+			title: "12. Set Hostname",
 			content: [
 				{
 					type: "text",
@@ -77,7 +77,7 @@ EOF`,
 			],
 		},
 		{
-			title: "12. Set Root Password",
+			title: "13. Set Root Password",
 			content: [
 				{
 					type: "command",
@@ -87,7 +87,7 @@ EOF`,
 			],
 		},
 		{
-			title: "13. Create User Account",
+			title: "14. Create User Account",
 			content: [
 				{
 					type: "text",
@@ -114,7 +114,7 @@ EOF`,
 				},
 				{
 					type: "text",
-					content: rich`Continue to ${link("Bootloader & Finish", "/docs/installation-boot")} (steps 14-16).`,
+					content: rich`Continue to ${link("Bootloader & Finish", "/docs/installation-boot")} (steps 15-18).`,
 				},
 			],
 		},

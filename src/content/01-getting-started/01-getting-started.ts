@@ -11,10 +11,10 @@ export const gettingStartedContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("Architecture:")} x86_64`,
-						rich`${bold("Disk:")} 8GB minimum (20GB recommended)`,
-						rich`${bold("RAM:")} 512MB minimum (2GB recommended)`,
-						rich`${bold("Boot:")} UEFI recommended`,
+						rich`${bold("Architecture:")} x86_64 (Haswell 2013+)`,
+						rich`${bold("Disk:")} 64GB SSD minimum (256GB NVMe recommended)`,
+						rich`${bold("RAM:")} 8GB minimum (16GB recommended)`,
+						rich`${bold("Boot:")} UEFI required`,
 					],
 				},
 			],

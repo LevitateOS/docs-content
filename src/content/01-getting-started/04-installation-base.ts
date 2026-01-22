@@ -3,23 +3,19 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
-	intro: rich`Installation steps 6-9: Mount installation media, extract the base tarball, and enter the new system. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 6-9: Extract the system and configure fstab. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
-			title: "6. Mount Installation Media",
+			title: "6. Verify Installation Media",
 			content: [
 				{
-					type: "command",
-					description: "Create mount point and mount the ISO",
-					command: [
-						"mkdir -p /media/cdrom",
-						"mount /dev/sr0 /media/cdrom",
-					],
+					type: "text",
+					content: "The live ISO is already mounted. Verify the squashfs is accessible:",
 				},
 				{
 					type: "command",
-					description: "Verify the base tarball is accessible",
-					command: "ls -la /media/cdrom/levitateos-base.tar.xz",
+					description: "Check for squashfs image",
+					command: "ls -la /media/cdrom/live/filesystem.squashfs",
 				},
 			],
 		},
@@ -27,13 +23,22 @@ export const installationBaseContent: DocsContent = {
 			title: "7. Extract Base System",
 			content: [
 				{
+					type: "text",
+					content: rich`Use ${code("recstrap")} to extract the squashfs to your mounted root:`,
+				},
+				{
 					type: "command",
-					description: "Extract to the mounted root (preserves permissions)",
-					command: "tar xpf /media/cdrom/levitateos-base.tar.xz -C /mnt",
+					description: "Extract system to /mnt",
+					command: "recstrap /mnt",
 				},
 				{
 					type: "text",
-					content: rich`This extracts the complete base system: kernel, systemd, coreutils, networking, and the ${code("recipe")} package manager.`,
+					content: rich`This extracts the complete system: kernel, systemd, coreutils, networking, and the ${code("recipe")} package manager.`,
+				},
+				{
+					type: "command",
+					description: "Verify extraction succeeded",
+					command: "ls /mnt/bin /mnt/usr /mnt/etc",
 				},
 			],
 		},
@@ -82,7 +87,7 @@ EOF`,
 				},
 				{
 					type: "text",
-					content: rich`Continue to ${link("Configuration", "/docs/installation-config")} (steps 9-13).`,
+					content: rich`Continue to ${link("Configuration", "/docs/installation-config")} (steps 10-14).`,
 				},
 			],
 		},

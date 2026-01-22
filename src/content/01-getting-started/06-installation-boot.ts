@@ -3,10 +3,34 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBootContent: DocsContent = {
 	title: "Bootloader & Finish",
-	intro: rich`Installation steps 14-16: Install the bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 15-18: Generate initramfs, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
-			title: "14. Install Bootloader",
+			title: "15. Generate Initramfs",
+			content: [
+				{
+					type: "text",
+					content: "Generate the initramfs using dracut. This creates the initial ramdisk needed to boot:",
+				},
+				{
+					type: "command",
+					description: "Find your kernel version",
+					command: "ls /usr/lib/modules/",
+				},
+				{
+					type: "command",
+					description: "Generate initramfs (replace VERSION with your kernel version)",
+					command: "dracut --force --no-hostonly /boot/initramfs.img VERSION",
+				},
+				{
+					type: "command",
+					description: "Verify initramfs was created",
+					command: "ls -lh /boot/initramfs.img",
+				},
+			],
+		},
+		{
+			title: "16. Install Bootloader",
 			content: [
 				{
 					type: "text",
@@ -16,11 +40,6 @@ export const installationBootContent: DocsContent = {
 					type: "command",
 					description: "Install systemd-boot to EFI partition",
 					command: "bootctl install",
-				},
-				{
-					type: "command",
-					description: "Check what kernel files exist (note the exact filenames)",
-					command: "ls /boot/vmlinuz* /boot/initramfs*",
 				},
 				{
 					type: "command",
@@ -45,19 +64,15 @@ EOF`,
 					description: "Create boot entry (replace UUID with value from blkid)",
 					command: `cat > /boot/loader/entries/levitate.conf << 'EOF'
 title   LevitateOS
-linux   /vmlinuz-linux
-initrd  /initramfs-linux.img
+linux   /vmlinuz
+initrd  /initramfs.img
 options root=UUID=your-root-uuid-here rw quiet
 EOF`,
-				},
-				{
-					type: "text",
-					content: rich`Use the exact kernel filenames from the ${code("ls")} command. For Intel CPUs, add ${code("initrd /intel-ucode.img")} before initramfs. For AMD: ${code("initrd /amd-ucode.img")}.`,
 				},
 			],
 		},
 		{
-			title: "15. Enable Services",
+			title: "17. Enable Services",
 			content: [
 				{
 					type: "command",
@@ -72,7 +87,7 @@ EOF`,
 			],
 		},
 		{
-			title: "16. Exit and Reboot",
+			title: "18. Exit and Reboot",
 			content: [
 				{
 					type: "command",
