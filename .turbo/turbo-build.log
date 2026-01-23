@@ -1,0 +1,5 @@
+$ bun scripts/build.ts
+Building docs-content...
+Found 23 content files
+Generated: /home/vince/Projects/LevitateOS/docs-content/src/generated/index.ts
+Done!
