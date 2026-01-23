@@ -4,6 +4,36 @@
 
 Structured documentation content library for LevitateOS. Single source of truth consumed by both website and TUI viewer.
 
+## Status
+
+| Metric | Value |
+|--------|-------|
+| Stage | Beta |
+| Target | TypeScript/Bun |
+| Last verified | 2026-01-23 |
+
+### Works
+
+- Structured content types (text, code, table, list, conversation, qa, command, interactive)
+- Shared between website and TUI
+- TypeScript type exports
+
+### Known Issues
+
+- See parent repo issues
+
+---
+
+## Author
+
+<!-- HUMAN WRITTEN - DO NOT MODIFY -->
+
+[Waiting for human input]
+
+<!-- END HUMAN WRITTEN -->
+
+---
+
 ## Installation
 
 ```bash
