@@ -1,43 +1,50 @@
-# CLAUDE.md - Docs Content
+# CLAUDE.md - docs-content
 
-## ⛔ STOP. READ. THEN ACT.
+## What is docs-content?
 
-Every time you think you know where something goes - **stop. Read first.**
+Single source of truth for LevitateOS documentation. Consumed by both website and TUI.
 
-Every time you think something is worthless and should be deleted - **stop. Read it first.**
+## What Belongs Here
 
-Every time you're about to write code - **stop. Read what already exists first.**
+- All user-facing documentation
+- Installation guides
+- Command references
+- Troubleshooting guides
 
-The five minutes you spend reading will save hours of cleanup.
+## What Does NOT Belong Here
 
----
+| Don't put here | Put it in |
+|----------------|-----------|
+| TUI rendering | `docs/tui/` |
+| Website rendering | `website/` (submodule) |
+| Developer docs | `.teams/KNOWLEDGE_*.md` |
 
-## Docs Are the Spec
+## Key Rules
 
-Documentation = what the final ISO should be. If ISO doesn't match docs, fix the ISO - NOT the docs.
+### Docs Are the Spec
 
-**Wrong:** "timedatectl missing from ISO, remove from docs"
-**Right:** "timedatectl in docs, add to ISO"
+Documentation = what the final ISO should be. If ISO doesn't match docs, **fix the ISO**, not the docs.
 
-## Write for Humans
+- **Wrong:** "timedatectl missing from ISO, remove from docs"
+- **Right:** "timedatectl in docs, add to ISO"
+
+### Write for Humans
 
 ```bash
 # BAD - AI garbage
 [ -d /sys/firmware/efi ] && echo "UEFI" || echo "BIOS"
-command -v nano >/dev/null 2>&1 && echo "installed"
 
 # GOOD - Human commands
 ls /sys/firmware/efi/efivars
-which nano
 ```
 
-Avoid: `&&` chains, `>/dev/null 2>&1`, test brackets `[ ]`, excessive error handling.
+Avoid: `&&` chains, `>/dev/null 2>&1`, test brackets `[ ]`.
 
-## When to Update
+### When to Update
 
-Only update docs when:
+Only update when:
 1. User explicitly asks
-2. Feature complete AND user confirms
+2. Feature is complete AND user confirms
 3. Actual error (typo, wrong path)
 
 Do NOT update because ISO is unfinished.
