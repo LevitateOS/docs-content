@@ -54,17 +54,17 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "table",
-									headers: ["Component", "Minimum", "Recommended"],
+									headers: ["Component", "Minimum", "Recommended (LLM-ready)"],
 									rows: [
-										["CPU", "Intel Haswell / AMD Zen", "Recent 8+ core"],
-										["RAM", "8 GB", "16-32 GB"],
-										["Storage", "64 GB SSD", "256+ GB NVMe"],
-										["GPU", "Intel/AMD integrated", "Dedicated GPU for LLM acceleration"],
+										["CPU", "Intel Haswell / AMD Zen", "8+ cores, AVX2 support"],
+										["RAM", "16 GB", "32-64 GB"],
+										["Storage", "512 GB NVMe", "1-2 TB NVMe"],
+										["GPU", "Integrated / CPU inference", "NVIDIA RTX 3060+ (12GB VRAM)"],
 									],
 								},
 								{
 									type: "text",
-									content: "LevitateOS targets modern desktop and workstation hardware. These specs reflect real-world daily driver usage, not virtualized toy environments.",
+									content: "LevitateOS ships with local LLM capabilities. The recommended specs enable running 7B-13B parameter models for AI-assisted workflows. CPU-only inference works with 32GB+ RAM.",
 								},
 							],
 						},

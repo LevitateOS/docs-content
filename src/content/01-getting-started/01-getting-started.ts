@@ -12,9 +12,9 @@ export const gettingStartedContent: DocsContent = {
 					type: "list",
 					items: [
 						rich`${bold("CPU:")} x86_64, Intel Haswell (2013) or AMD Zen (2017) or newer`,
-						rich`${bold("RAM:")} 8GB minimum, 16GB+ recommended for development workloads`,
-						rich`${bold("Storage:")} 256GB NVMe SSD recommended (64GB minimum)`,
-						rich`${bold("GPU:")} Intel/AMD (works out of box), NVIDIA (proprietary driver available)`,
+						rich`${bold("RAM:")} 16GB minimum, 32GB+ recommended for local LLM inference`,
+						rich`${bold("Storage:")} 512GB NVMe SSD minimum (1TB+ recommended for AI models)`,
+						rich`${bold("GPU:")} NVIDIA RTX 3060+ (12GB VRAM) for LLM acceleration, or CPU-only with 32GB+ RAM`,
 						rich`${bold("Boot:")} UEFI required (Secure Boot must be disabled)`,
 					],
 				},
