@@ -32,6 +32,32 @@ export const faqContent: DocsContent = {
 							],
 						},
 						{
+							question: "Why not just use Arch?",
+							answer: [
+								{
+									type: "text",
+									content: "Arch requires compiling AUR packages. That means build dependencies, compiler toolchains, and waiting. LevitateOS extracts enterprise-tested Rocky RPMs in minutes. Same philosophy, less waiting.",
+								},
+								{
+									type: "text",
+									content: "If you want to compile everything yourself, use Arch. If you want the same control without the compilation overhead, use LevitateOS.",
+								},
+							],
+						},
+						{
+							question: "Why not Fedora?",
+							answer: [
+								{
+									type: "text",
+									content: "Fedora is GNOME-focused and opinionated. It makes choices for you. LevitateOS is a base system - you build what you want on top of it.",
+								},
+								{
+									type: "text",
+									content: "Fedora ships a complete desktop experience. LevitateOS ships a foundation. Different goals, different users.",
+								},
+							],
+						},
+						{
 							question: "What is LevitateOS NOT?",
 							answer: [
 								{
@@ -68,6 +94,19 @@ export const faqContent: DocsContent = {
 								},
 							],
 						},
+						{
+							question: "Is this just a hobby project?",
+							answer: [
+								{
+									type: "text",
+									content: "Boot the ISO. Run the E2E tests. Read the commit history. Code speaks.",
+								},
+								{
+									type: "text",
+									content: rich`The test suite runs full installation workflows in QEMU VMs. The ISO boots on real hardware. Every commit is tested. If something doesn't work, open an issue with specifics.`,
+								},
+							],
+						},
 					],
 				},
 			],
@@ -93,7 +132,24 @@ export const faqContent: DocsContent = {
 								},
 								{
 									type: "text",
-									content: "Rocky was chosen for its 10-year support lifecycle and complete system packages. This decision is non-negotiable.",
+									content: "Rocky packages are tested in enterprise deployments. You get RHEL stability without maintaining a build farm. This decision is non-negotiable.",
+								},
+							],
+						},
+						{
+							question: "How do I know the RPMs are safe?",
+							answer: [
+								{
+									type: "text",
+									content: rich`Same way you trust any distro - they're GPG-signed by Rocky Linux. Run ${code("rpm -K /path/to/package.rpm")} yourself.`,
+								},
+								{
+									type: "text",
+									content: "We don't recompile packages. We don't inject code. We don't modify binaries. We extract what Rocky ships and verify signatures match their public keys.",
+								},
+								{
+									type: "text",
+									content: rich`See ${code("SUPPLY_CHAIN.md")} in the repository root for full verification steps.`,
 								},
 							],
 						},
@@ -209,11 +265,11 @@ let libs = get_all_dependencies(&ctx.rootfs, &bin_path)?;
 					type: "qa",
 					items: [
 						{
-							question: "Why Rhai instead of YAML/TOML or S-expressions?",
+							question: "Why Rhai instead of Python, Lua, or YAML?",
 							answer: [
 								{
 									type: "text",
-									content: "The original design used S-expressions where recipes were DATA that the executor INTERPRETED. This was limiting - adding new capabilities required modifying executor code.",
+									content: "YAML isn't a programming language - you can't write conditionals or loops. Python has dependency hell and isn't embeddable without significant overhead. Lua lacks a standard library. Rhai is Rust-native, sandboxed, and actually programmable.",
 								},
 								{
 									type: "text",
@@ -310,6 +366,28 @@ let installed_files = [];        // List of installed file paths`,
 										rich`${bold("Orphan detection")}: Finds packages installed only as dependencies`,
 										rich`${bold("Lock file")}: TOML-based lockfile with ${code("--locked")} flag`,
 									],
+								},
+							],
+						},
+						{
+							question: "Are recipes trusted code? What about security?",
+							answer: [
+								{
+									type: "text",
+									content: "Yes, recipes are trusted code. They can execute shell commands, download files, and modify your system. This is intentional - recipes need full access to install software.",
+								},
+								{
+									type: "list",
+									items: [
+										"Recipes are code, not config - they can do anything",
+										"Only use recipes from official LevitateOS sources",
+										"You write your own recipes - you control what they do",
+										"Never run recipes downloaded from untrusted sources",
+									],
+								},
+								{
+									type: "text",
+									content: "This is the same trust model as Arch's PKGBUILD or Gentoo's ebuilds. The user is responsible for reviewing what they install. LevitateOS doesn't sandbox recipes because that would break legitimate functionality.",
 								},
 							],
 						},
