@@ -53,6 +53,25 @@ export const postInstallationContent: DocsContent = {
 			],
 		},
 		{
+			title: "Graphics Drivers",
+			content: [
+				{
+					type: "text",
+					content: "Intel and AMD graphics work out of the box. For NVIDIA:",
+				},
+				{
+					type: "command",
+					description: "Install NVIDIA proprietary drivers",
+					command: "recipe install nvidia-driver",
+				},
+				{
+					type: "command",
+					description: "Reboot to load the driver",
+					command: "reboot",
+				},
+			],
+		},
+		{
 			title: "Next Steps",
 			content: [
 				{

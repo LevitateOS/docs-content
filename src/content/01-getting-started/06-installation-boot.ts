@@ -52,16 +52,16 @@ EOF`,
 				},
 				{
 					type: "text",
-					content: "Get your root partition UUID and create the boot entry:",
+					content: "Get your root partition UUID from the fstab that recfstab generated:",
 				},
 				{
 					type: "command",
-					description: "Get root partition UUID",
-					command: "blkid /dev/sda2",
+					description: "Show root partition entry from fstab",
+					command: "grep ' / ' /etc/fstab",
 				},
 				{
 					type: "command",
-					description: "Create boot entry (replace UUID with value from blkid)",
+					description: "Create boot entry (copy the UUID from your fstab output above)",
 					command: `cat > /boot/loader/entries/levitate.conf << 'EOF'
 title   LevitateOS
 linux   /vmlinuz

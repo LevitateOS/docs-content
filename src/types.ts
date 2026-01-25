@@ -26,6 +26,7 @@ export type ContentBlock =
 	| InteractiveBlock
 	| CommandBlock
 	| QABlock
+	| NoteBlock
 
 export interface TextBlock {
 	type: "text"
@@ -126,4 +127,12 @@ export interface QAItem {
 	question: string | RichText
 	/** Answer content - can contain any block types */
 	answer: ContentBlock[]
+}
+
+export interface NoteBlock {
+	type: "note"
+	/** Visual style: info (blue), warning (yellow), danger (red) */
+	variant: "info" | "warning" | "danger"
+	/** Note content */
+	content: string | RichText
 }

@@ -3,7 +3,7 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
-	intro: rich`Installation steps 6-9: Extract the system and configure fstab. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 6-9: Verify media, extract the system, generate fstab, and enter chroot. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
 			title: "6. Verify Installation Media",
@@ -46,22 +46,22 @@ export const installationBaseContent: DocsContent = {
 			title: "8. Generate fstab",
 			content: [
 				{
+					type: "text",
+					content: rich`Use ${code("recfstab")} (like Arch's ${code("genfstab")}) to automatically detect mounted filesystems and generate fstab entries:`,
+				},
+				{
 					type: "command",
-					description: "Get the UUIDs for your partitions",
-					command: "blkid /dev/sda1 /dev/sda2",
+					description: "Generate fstab from current mounts",
+					command: "recfstab /mnt >> /mnt/etc/fstab",
+				},
+				{
+					type: "command",
+					description: "Verify the generated fstab",
+					command: "cat /mnt/etc/fstab",
 				},
 				{
 					type: "text",
-					content: rich`Create the fstab file, replacing UUIDs with your values from ${code("blkid")}:`,
-				},
-				{
-					type: "command",
-					description: "Create the fstab file",
-					command: `cat > /mnt/etc/fstab << 'EOF'
-# <device>                <mount>  <type>  <options>  <dump>  <fsck>
-UUID=your-root-uuid-here  /        ext4    defaults   0       1
-UUID=your-efi-uuid-here   /boot    vfat    defaults   0       2
-EOF`,
+					content: rich`You should see entries for ${code("/")} (ext4) and ${code("/boot")} (vfat) with UUIDs.`,
 				},
 			],
 		},
@@ -69,25 +69,17 @@ EOF`,
 			title: "9. Enter the New System",
 			content: [
 				{
-					type: "command",
-					description: "Bind mount system directories",
-					command: [
-						"mount --bind /dev /mnt/dev",
-						"mount --bind /dev/pts /mnt/dev/pts",
-						"mount --bind /proc /mnt/proc",
-						"mount --bind /sys /mnt/sys",
-						"mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars",
-						"mount --bind /run /mnt/run",
-					],
+					type: "text",
+					content: rich`Use ${code("recchroot")} (like Arch's ${code("arch-chroot")}) to enter the new system. It automatically sets up bind mounts for ${code("/dev")}, ${code("/proc")}, ${code("/sys")}, ${code("/run")}, and EFI variables:`,
 				},
 				{
 					type: "command",
-					description: "Enter chroot",
-					command: "chroot /mnt /bin/bash",
+					description: "Enter the installed system",
+					command: "recchroot /mnt",
 				},
 				{
 					type: "text",
-					content: rich`Continue to ${link("Configuration", "/docs/installation-config")} (steps 10-14).`,
+					content: rich`You are now inside the new system. Continue to ${link("Configuration", "/docs/installation-config")} (steps 10-14).`,
 				},
 			],
 		},

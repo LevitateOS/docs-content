@@ -13,6 +13,11 @@ export const installationDiskContent: DocsContent = {
 					content: rich`Boot from the LevitateOS ISO (see ${link("Getting Started", "/docs/getting-started")}). You'll be dropped into a root shell.`,
 				},
 				{
+					type: "note",
+					variant: "info",
+					content: rich`${bold("Secure Boot:")} If your system won't boot, disable Secure Boot in your UEFI firmware settings. LevitateOS does not currently ship with signed bootloaders.`,
+				},
+				{
 					type: "command",
 					description: "Verify you booted in UEFI mode",
 					command: "ls /sys/firmware/efi/efivars",
@@ -30,6 +35,25 @@ export const installationDiskContent: DocsContent = {
 					type: "command",
 					description: "Sync system clock",
 					command: "timedatectl set-ntp true",
+				},
+			],
+		},
+		{
+			title: "WiFi Connection (Optional)",
+			content: [
+				{
+					type: "text",
+					content: "Installation is fully offline - no network required. Skip this if using Ethernet or don't need network access.",
+				},
+				{
+					type: "command",
+					description: "List wireless interfaces",
+					command: "iwctl device list",
+				},
+				{
+					type: "command",
+					description: "Scan and connect (replace wlan0 and YOUR_NETWORK)",
+					command: "iwctl station wlan0 connect YOUR_NETWORK",
 				},
 			],
 		},
@@ -56,6 +80,11 @@ nvme0n1     1T WD Black SN850X         nvme`,
 				{
 					type: "text",
 					content: rich`${bold("WARNING: This will erase all data on the disk.")} We'll create this layout:`,
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Dual-boot:")} If keeping Windows, do NOT create a new EFI partition. Use your existing EFI partition (usually the first partition on your Windows disk). Only create the root partition for LevitateOS.`,
 				},
 				{
 					type: "table",
@@ -127,7 +156,7 @@ nvme0n1     1T WD Black SN850X         nvme`,
 				},
 				{
 					type: "text",
-					content: rich`Continue to ${link("Base System", "/docs/installation-base")} (steps 6-8).`,
+					content: rich`Continue to ${link("Base System", "/docs/installation-base")} (steps 6-9).`,
 				},
 			],
 		},
