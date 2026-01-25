@@ -54,17 +54,17 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "table",
-									headers: ["Resource", "Minimum", "Recommended"],
+									headers: ["Component", "Minimum", "Recommended"],
 									rows: [
-										["RAM", "8 GB", "16+ GB"],
+										["CPU", "Intel Haswell / AMD Zen", "Recent 8+ core"],
+										["RAM", "8 GB", "16-32 GB"],
 										["Storage", "64 GB SSD", "256+ GB NVMe"],
-										["CPU", "x86-64-v3 (Haswell 2013+)", "Recent AMD/Intel"],
-										["GPU", "Any", "For LLM acceleration"],
+										["GPU", "Intel/AMD integrated", "Dedicated GPU for LLM acceleration"],
 									],
 								},
 								{
 									type: "text",
-									content: "These are not toy values. LevitateOS ships with a local LLM and targets modern hardware.",
+									content: "LevitateOS targets modern desktop and workstation hardware. These specs reflect real-world daily driver usage, not virtualized toy environments.",
 								},
 							],
 						},

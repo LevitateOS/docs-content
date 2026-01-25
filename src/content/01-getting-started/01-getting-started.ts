@@ -11,10 +11,11 @@ export const gettingStartedContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("Architecture:")} x86_64 (Haswell 2013+)`,
-						rich`${bold("Disk:")} 64GB SSD minimum (256GB NVMe recommended)`,
-						rich`${bold("RAM:")} 8GB minimum (16GB recommended)`,
-						rich`${bold("Boot:")} UEFI required`,
+						rich`${bold("CPU:")} x86_64, Intel Haswell (2013) or AMD Zen (2017) or newer`,
+						rich`${bold("RAM:")} 8GB minimum, 16GB+ recommended for development workloads`,
+						rich`${bold("Storage:")} 256GB NVMe SSD recommended (64GB minimum)`,
+						rich`${bold("GPU:")} Intel/AMD (works out of box), NVIDIA (proprietary driver available)`,
+						rich`${bold("Boot:")} UEFI required (Secure Boot must be disabled)`,
 					],
 				},
 			],
@@ -69,10 +70,16 @@ sudo dd if=LevitateOS.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
 				{
 					type: "code",
 					language: "bash",
-					content: `qemu-system-x86_64 \\
-  -m 4G \\
+					content: `# Create a 256GB virtual disk
+qemu-img create -f qcow2 disk.qcow2 256G
+
+# Boot the installer
+qemu-system-x86_64 \\
+  -m 8G \\
+  -smp 4 \\
   -enable-kvm \\
   -cpu host \\
+  -bios /usr/share/ovmf/OVMF.fd \\
   -cdrom LevitateOS.iso \\
   -drive file=disk.qcow2,format=qcow2,if=virtio \\
   -boot d`,

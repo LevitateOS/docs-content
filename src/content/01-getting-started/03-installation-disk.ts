@@ -64,13 +64,14 @@ export const installationDiskContent: DocsContent = {
 					type: "command",
 					description: "List all disks and identify your installation target",
 					command: "lsblk -d -o NAME,SIZE,MODEL,TRAN",
-					output: `NAME      SIZE MODEL                   TRAN
-sda       500G Samsung SSD 860         sata
-nvme0n1     1T WD Black SN850X         nvme`,
+					output: `NAME      SIZE MODEL                     TRAN
+nvme0n1     2T Samsung 990 PRO 2TB      nvme
+nvme1n1     1T WD Black SN850X 1TB      nvme
+sda       4.0T Seagate Barracuda        sata`,
 				},
 				{
 					type: "text",
-					content: rich`This guide uses ${code("/dev/sda")}. ${bold("Replace with your actual device")} (e.g., ${code("/dev/nvme0n1")} for NVMe).`,
+					content: rich`This guide uses ${code("/dev/sda")} as an example. ${bold("Replace with your actual device.")} Most modern systems use NVMe (${code("/dev/nvme0n1")}) - partitions are named ${code("nvme0n1p1")}, ${code("nvme0n1p2")}, etc.`,
 				},
 			],
 		},
