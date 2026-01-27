@@ -182,7 +182,7 @@ UUID=ABCD-1234	/boot	vfat	rw,relatime,fmask=0022,dmask=0022	0	2`,
 					language: "text",
 					content: `proc  sysfs  devtmpfs  tmpfs  devpts  securityfs  cgroup  cgroup2
 pstore  bpf  tracefs  debugfs  hugetlbfs  mqueue  fusectl  configfs
-efivarfs  autofs  fuse.gvfsd-fuse  overlay  squashfs`,
+efivarfs  autofs  fuse.gvfsd-fuse  overlay  squashfs  erofs`,
 				},
 			],
 		},

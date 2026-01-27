@@ -154,55 +154,60 @@ export const faqContent: DocsContent = {
 							],
 						},
 						{
-							question: "Why use squashfs instead of a large initramfs?",
+							question: "Why use EROFS instead of a large initramfs?",
 							answer: [
 								{
 									type: "text",
-									content: "The old approach loaded a ~250MB initramfs entirely into RAM. The squashfs architecture provides:",
+									content: "The old approach loaded a ~250MB initramfs entirely into RAM. The EROFS architecture provides:",
 								},
 								{
 									type: "list",
 									items: [
 										rich`${bold("RAM savings")}: ~400MB → ~50MB at boot`,
 										rich`${bold("Single source of truth")}: Live environment = Installed system (no duplication)`,
-										rich`${bold("Simpler installation")}: ${code("unsquashfs")} to disk instead of complex copy logic`,
+										rich`${bold("Simpler installation")}: Extract to disk instead of complex copy logic`,
 										rich`${bold("Scalable")}: Easy to add packages without bloating initramfs`,
 									],
 								},
 								{
 									type: "text",
-									content: rich`The tiny initramfs (~5MB) contains just busybox and mount logic. The squashfs image (~350MB) is mounted read-only with a tmpfs overlay for live modifications.`,
+									content: rich`The tiny initramfs (~5MB) contains just busybox and mount logic. The EROFS image (~350MB) is mounted read-only with a tmpfs overlay for live modifications.`,
 								},
 							],
 						},
 						{
-							question: "Why dracut instead of custom initramfs from scratch?",
+							question: "Why UKI (Unified Kernel Images) instead of separate vmlinuz + initramfs?",
 							answer: [
 								{
 									type: "list",
 									items: [
-										"Uses dracut with dmsquash-live module - standard Linux live boot infrastructure",
-										"Not custom-built from scratch - dracut handles the complexity",
-										"Proven in archiso - LevitateOS follows Arch's battle-tested approach",
-										"Standard kernel modules - works across different hardware",
+										rich`${bold("Single signed artifact")} - Kernel, initramfs, and cmdline in one PE binary`,
+										rich`${bold("Secure Boot ready")} - Single file to sign and verify`,
+										rich`${bold("Auto-discovery")} - systemd-boot auto-detects UKIs in /EFI/Linux/`,
+										rich`${bold("Simpler installation")} - Copy one file, no boot entry configuration needed`,
+										rich`${bold("Modern standard")} - Used by Fedora, Arch, and systemd-first distros`,
 									],
 								},
 							],
 						},
 						{
-							question: "Why both BIOS and UEFI support?",
+							question: "Why UEFI-only (no BIOS support)?",
 							answer: [
+								{
+									type: "text",
+									content: "LevitateOS targets modern hardware (2013+). UEFI has been standard for over a decade. Dropping BIOS support allows:",
+								},
 								{
 									type: "list",
 									items: [
-										rich`${bold("BIOS support via isolinux")} - Legacy boot for older hardware`,
-										rich`${bold("UEFI support via GRUB")} - Modern standard, required for Secure Boot`,
-										rich`${bold("Hybrid ISO via xorriso")} - Single ISO boots both modes`,
+										rich`${bold("Clean boot stack")} - systemd-boot + UKI only, no GRUB or isolinux complexity`,
+										rich`${bold("Secure Boot path")} - UKIs are Secure Boot compatible (signing support planned)`,
+										rich`${bold("Simpler code")} - One boot path to test and maintain`,
 									],
 								},
 								{
 									type: "text",
-									content: rich`Design principle: Required features are ON by default. Wrong: ${code("--uefi")} flag. Right: UEFI default, ${code("--bios")} flag to opt out.`,
+									content: "If you have hardware from before 2013 that lacks UEFI, LevitateOS is not the right distribution for you.",
 								},
 							],
 						},
@@ -413,10 +418,10 @@ let installed_files = [];        // List of installed file paths`,
 									headers: ["Phase", "Description"],
 									rows: [
 										["1. Boot", "Verify UEFI, sync clock"],
-										["2. Disk", "Partition, format, mount"],
-										["3. Base System", "Mount media, extract tarball, generate fstab, setup chroot"],
+										["2. Disk", "Partition, format (label root), mount"],
+										["3. Base System", "Mount media, extract EROFS, generate fstab, setup chroot"],
 										["4. Configuration", "Timezone, locale, hostname, users"],
-										["5. Boot Setup", "Generate initramfs, install bootloader, enable services"],
+										["5. Boot Setup", "Copy UKI, install systemd-boot, enable services"],
 										["6. Verification", "Verify system boots from disk, user login, networking"],
 									],
 								},
@@ -500,12 +505,12 @@ fn test_bootloader_install() { ... }`,
 								},
 								{
 									type: "text",
-									content: "The simple solution: The live ISO already boots into a working environment. Recipe can run FROM the live environment and install TO /mnt:",
+									content: "The simple solution: The live ISO already contains a complete system in an EROFS image. Just extract it:",
 								},
 								{
 									type: "code",
 									language: "text",
-									content: `Boot ISO (has recipe) → Mount /mnt → recipe install base --prefix /mnt → Done`,
+									content: `Boot ISO → Mount /mnt → recstrap /mnt (extracts EROFS) → Done`,
 								},
 								{
 									type: "text",
@@ -569,7 +574,7 @@ fn test_bootloader_install() { ... }`,
 					headers: ["Decision", "Alternative", "Why Chosen"],
 					rows: [
 						["Rocky Linux 10", "Compile from source", "Minutes vs hours, stable packages"],
-						["Squashfs", "Large initramfs", "RAM savings, scalability, single source"],
+						["EROFS", "Large initramfs", "RAM savings, scalability, single source"],
 						["Rhai recipes", "S-expressions/YAML", "Real programming, infinite extensibility"],
 						["State in files", "Database", "Self-contained, easy to sync, simple"],
 						["E2E tests", "Unit tests", "Catches integration issues"],

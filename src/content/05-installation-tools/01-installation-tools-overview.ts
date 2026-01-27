@@ -64,6 +64,10 @@ export const installationToolsOverviewContent: DocsContent = {
 							description: "Generate fstab entries",
 						},
 						{
+							command: "mkdir -p /mnt/boot/EFI/Linux && cp /media/cdrom/boot/uki/levitateos.efi /mnt/boot/EFI/Linux/",
+							description: "Copy pre-built UKI",
+						},
+						{
 							command: "recchroot /mnt",
 							description: "Enter the new system",
 						},

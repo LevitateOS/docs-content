@@ -10,12 +10,12 @@ export const installationBaseContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "The live ISO is already mounted. Verify the squashfs is accessible:",
+					content: "The live ISO is already mounted. Verify the EROFS image is accessible:",
 				},
 				{
 					type: "command",
-					description: "Check for squashfs image",
-					command: "ls -la /media/cdrom/live/filesystem.squashfs",
+					description: "Check for EROFS image",
+					command: "ls -la /media/cdrom/live/filesystem.erofs",
 				},
 			],
 		},
@@ -24,7 +24,7 @@ export const installationBaseContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Use ${code("recstrap")} to extract the squashfs to your mounted root:`,
+					content: rich`Use ${code("recstrap")} to extract the EROFS image to your mounted root:`,
 				},
 				{
 					type: "command",

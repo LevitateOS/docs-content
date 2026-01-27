@@ -24,7 +24,7 @@ export const installationDiskContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`If ${code("/sys/firmware/efi/efivars")} doesn't exist, you're in BIOS mode. Reboot and select UEFI boot in your firmware settings.`,
+					content: rich`If ${code("/sys/firmware/efi/efivars")} doesn't exist, you booted in legacy BIOS mode. LevitateOS requires UEFI. Reboot and select UEFI boot in your firmware settings.`,
 				},
 				{
 					type: "command",
@@ -137,8 +137,13 @@ sda       4.0T Seagate Barracuda        sata`,
 				},
 				{
 					type: "command",
-					description: "Format root partition",
+					description: "Format root partition (label MUST be 'root' for UKI boot)",
 					command: "mkfs.ext4 -L root /dev/sda2",
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Important:")} The root partition ${bold("must")} be labeled ${code("root")}. The pre-built UKI uses ${code("root=LABEL=root")} to find the root filesystem.`,
 				},
 			],
 		},

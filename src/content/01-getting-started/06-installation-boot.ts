@@ -3,29 +3,33 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBootContent: DocsContent = {
 	title: "Bootloader & Finish",
-	intro: rich`Installation steps 15-18: Generate initramfs, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 15-18: Install pre-built UKI, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
-			title: "15. Generate Initramfs",
+			title: "15. Install Boot Image (UKI)",
 			content: [
 				{
 					type: "text",
-					content: "Generate the initramfs using dracut. This creates the initial ramdisk needed to boot:",
+					content: "LevitateOS uses Unified Kernel Images (UKI) - a single file containing the kernel, initramfs, and boot parameters. The ISO includes pre-built UKIs ready to copy.",
 				},
 				{
 					type: "command",
-					description: "Find your kernel version",
-					command: "ls /usr/lib/modules/",
+					description: "Create the EFI Linux directory",
+					command: "mkdir -p /boot/EFI/Linux",
 				},
 				{
 					type: "command",
-					description: "Generate initramfs (replace VERSION with your kernel version)",
-					command: "dracut --force --no-hostonly /boot/initramfs.img VERSION",
+					description: "Copy the pre-built UKI from the ISO",
+					command: "cp /media/cdrom/boot/uki/levitateos.efi /boot/EFI/Linux/",
+				},
+				{
+					type: "text",
+					content: "Optionally copy the recovery UKI for emergency access:",
 				},
 				{
 					type: "command",
-					description: "Verify initramfs was created",
-					command: "ls -lh /boot/initramfs.img",
+					description: "Copy recovery UKI (optional)",
+					command: "cp /media/cdrom/boot/uki/levitateos-recovery.efi /boot/EFI/Linux/",
 				},
 			],
 		},
@@ -34,7 +38,7 @@ export const installationBootContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Install systemd-boot:",
+					content: "Install systemd-boot. It automatically discovers UKIs in /boot/EFI/Linux/:",
 				},
 				{
 					type: "command",
@@ -42,31 +46,20 @@ export const installationBootContent: DocsContent = {
 					command: "bootctl install",
 				},
 				{
-					type: "command",
-					description: "Create the loader configuration",
-					command: `cat > /boot/loader/loader.conf << 'EOF'
-default levitate.conf
-timeout 3
-editor no
-EOF`,
+					type: "note",
+					variant: "info",
+					content: rich`${bold("No boot entries needed:")} systemd-boot auto-discovers UKIs in ${code("/boot/EFI/Linux/")}. The UKI contains all boot parameters.`,
 				},
 				{
 					type: "text",
-					content: "Get your root partition UUID from the fstab that recfstab generated:",
+					content: "Optionally configure bootloader timeout:",
 				},
 				{
 					type: "command",
-					description: "Show root partition entry from fstab",
-					command: "grep ' / ' /etc/fstab",
-				},
-				{
-					type: "command",
-					description: "Create boot entry (copy the UUID from your fstab output above)",
-					command: `cat > /boot/loader/entries/levitate.conf << 'EOF'
-title   LevitateOS
-linux   /vmlinuz
-initrd  /initramfs.img
-options root=UUID=your-root-uuid-here rw quiet
+					description: "Set boot menu timeout (optional)",
+					command: `cat > /boot/loader/loader.conf << 'EOF'
+timeout 3
+editor no
 EOF`,
 				},
 			],

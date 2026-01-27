@@ -77,7 +77,7 @@ export const postInstallationContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`Configure your ${link("desktop environment", "/docs/desktop")} or window manager`,
+						"Install a desktop environment or window manager (Sway, GNOME, KDE, etc.)",
 						"Set up development tools and editors",
 						rich`Review ${link("Troubleshooting", "/docs/troubleshooting")} if you encounter issues`,
 					],

@@ -10,7 +10,7 @@ export const recstrapContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recstrap")} extracts the LevitateOS squashfs image from the live ISO to a mounted target directory. This is the equivalent of Arch Linux's ${code("pacstrap")} command.`,
+					content: rich`${code("recstrap")} extracts the LevitateOS EROFS image from the live ISO to a mounted target directory. This is the equivalent of Arch Linux's ${code("pacstrap")} command.`,
 				},
 				{
 					type: "text",
@@ -44,8 +44,8 @@ export const recstrapContent: DocsContent = {
 					headers: ["Option", "Description"],
 					rows: [
 						[
-							rich`${code("--squashfs <PATH>")}`,
-							"Custom squashfs location (auto-detected from live ISO if not specified)",
+							rich`${code("--erofs <PATH>")}`,
+							"Custom EROFS image location (auto-detected from live ISO if not specified)",
 						],
 						[
 							rich`${code("-f, --force")}`,
@@ -76,8 +76,8 @@ export const recstrapContent: DocsContent = {
 				},
 				{
 					type: "command",
-					description: "Use custom squashfs location",
-					command: "recstrap /mnt --squashfs /media/usb/filesystem.squashfs",
+					description: "Use custom EROFS image location",
+					command: "recstrap /mnt --erofs /media/usb/filesystem.erofs",
 				},
 				{
 					type: "command",
@@ -104,7 +104,7 @@ export const recstrapContent: DocsContent = {
 					ordered: true,
 					items: [
 						"Running as root",
-						"unsquashfs is available",
+						"fsck.erofs is available",
 						"Target directory exists",
 						"Target is a directory (not a file)",
 						"Target is not a protected system path",
@@ -112,30 +112,30 @@ export const recstrapContent: DocsContent = {
 						"Target is a mount point (skipped with --force)",
 						"Target is empty (skipped with --force; lost+found ignored)",
 						"Sufficient disk space (minimum 2GB)",
-						"Squashfs exists",
-						"Squashfs is a regular file",
-						"Squashfs is readable",
-						"Squashfs is not inside the target directory",
+						"EROFS image exists",
+						"EROFS image is a regular file",
+						"EROFS image is readable",
+						"EROFS image is not inside the target directory",
 						"Extraction completes successfully",
 					],
 				},
 			],
 		},
 		{
-			title: "Squashfs Auto-Detection",
+			title: "EROFS Auto-Detection",
 			content: [
 				{
 					type: "text",
 					content:
-						"If --squashfs is not specified, recstrap searches these paths in order:",
+						"If --erofs is not specified, recstrap searches these paths in order:",
 				},
 				{
 					type: "list",
 					items: [
-						rich`${code("/media/cdrom/live/filesystem.squashfs")}`,
-						rich`${code("/run/initramfs/live/filesystem.squashfs")}`,
-						rich`${code("/run/archiso/bootmnt/live/filesystem.squashfs")}`,
-						rich`${code("/mnt/cdrom/live/filesystem.squashfs")}`,
+						rich`${code("/media/cdrom/live/filesystem.erofs")}`,
+						rich`${code("/run/initramfs/live/filesystem.erofs")}`,
+						rich`${code("/run/archiso/bootmnt/live/filesystem.erofs")}`,
+						rich`${code("/mnt/cdrom/live/filesystem.erofs")}`,
 					],
 				},
 			],
@@ -168,18 +168,18 @@ export const recstrapContent: DocsContent = {
 						["E001", "1", "Target directory does not exist"],
 						["E002", "2", "Target is not a directory"],
 						["E003", "3", "Target directory not writable"],
-						["E004", "4", "Squashfs image not found"],
-						["E005", "5", "unsquashfs command failed"],
+						["E004", "4", "EROFS image not found"],
+						["E005", "5", "EROFS extraction command failed"],
 						["E006", "6", "Extracted system verification failed"],
-						["E007", "7", "unsquashfs not installed"],
+						["E007", "7", "EROFS tools not installed"],
 						["E008", "8", "Must run as root"],
 						["E009", "9", "Target directory not empty (use --force)"],
 						["E010", "10", "Target is a protected system path"],
 						["E011", "11", "Target is not a mount point (use --force)"],
 						["E012", "12", "Insufficient disk space"],
-						["E013", "13", "Squashfs is not a regular file"],
-						["E014", "14", "Squashfs is not readable"],
-						["E015", "15", "Squashfs is inside target directory"],
+						["E013", "13", "EROFS image is not a regular file"],
+						["E014", "14", "EROFS image is not readable"],
+						["E015", "15", "EROFS image is inside target directory"],
 					],
 					monospaceCol: 0,
 				},
@@ -198,13 +198,17 @@ export const recstrapContent: DocsContent = {
 					content: `# Generate fstab
 recfstab /mnt >> /mnt/etc/fstab
 
+# Copy pre-built UKI
+mkdir -p /mnt/boot/EFI/Linux
+cp /media/cdrom/boot/uki/levitateos.efi /mnt/boot/EFI/Linux/
+
 # Enter chroot
 recchroot /mnt
 
 # Set root password
 passwd
 
-# Install bootloader
+# Install bootloader (auto-discovers UKI)
 bootctl install
 
 # Exit and reboot
@@ -220,7 +224,7 @@ reboot`,
 					type: "table",
 					headers: ["Feature", "recstrap", "pacstrap"],
 					rows: [
-						["Source", "Squashfs image", "Package repository"],
+						["Source", "EROFS image", "Package repository"],
 						["Speed", "Fast (extract only)", "Slower (download + install)"],
 						["Package selection", "Full base system", "Selectable packages"],
 						["Offline capable", "Yes (from live ISO)", "No (needs network)"],
