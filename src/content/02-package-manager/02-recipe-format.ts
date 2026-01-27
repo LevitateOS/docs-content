@@ -3,84 +3,140 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const recipeFormatContent: DocsContent = {
 	title: "Recipe Format",
-	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts that define how to acquire, build, and install packages. Each recipe declares metadata as variables and implements lifecycle functions.`,
+	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts that define how to acquire, build, and install packages. Each recipe uses a context map (${code("ctx")}) to pass state between lifecycle phases and implements check/action function pairs.`,
 	sections: [
 		{
 			title: "Basic Structure",
 			content: [
 				{
 					type: "text",
-					content: rich`A recipe is a ${code(".rhai")} file with variables defining package metadata and functions implementing the installation lifecycle.`,
+					content: rich`A recipe is a ${code(".rhai")} file with a ${code("ctx")} map for metadata and paired lifecycle functions: each action has an ${code("is_*")} check function that returns the context or throws.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let name = "mypackage";
-let version = "1.0.0";
-let description = "Short description";
-let installed = false;
+					content: `let ctx = #{
+    name: "mypackage",
+    version: "1.0.0",
+    description: "Short description",
+    // Custom fields for tracking paths between phases
+    source_dir: "",
+    build_dir: "",
+};
 
-fn acquire() {
-    download(\`https://example.com/\${name}-\${version}.tar.gz\`);
+fn is_acquired(ctx) {
+    // Check if source exists, return ctx with paths filled in
+    let src = join_path(BUILD_DIR, "mypackage-" + ctx.version);
+    if is_dir(src) {
+        ctx.source_dir = src;
+        return ctx;
+    }
+    throw "source not acquired";
 }
 
-fn build() {
-    extract("tar.gz");
-    cd(\`\${name}-\${version}\`);
-    run(\`./configure --prefix=\${PREFIX}\`);
-    run(\`make -j\${NPROC}\`);
+fn acquire(ctx) {
+    let url = "https://example.com/" + ctx.name + "-" + ctx.version + ".tar.gz";
+    let archive = download(url, join_path(BUILD_DIR, ctx.name + ".tar.gz"));
+    extract(archive, BUILD_DIR);
+    ctx.source_dir = join_path(BUILD_DIR, ctx.name + "-" + ctx.version);
+    ctx
 }
 
-fn install() {
-    run("make install");
+fn is_built(ctx) {
+    let binary = join_path(ctx.source_dir, "mypackage");
+    if is_file(binary) {
+        return ctx;
+    }
+    throw "not built";
+}
+
+fn build(ctx) {
+    shell_in(ctx.source_dir, "./configure --prefix=" + PREFIX);
+    shell_in(ctx.source_dir, "make -j" + NPROC);
+    ctx
+}
+
+fn is_installed(ctx) {
+    if is_file(join_path(PREFIX, "bin/mypackage")) {
+        return ctx;
+    }
+    throw "not installed";
+}
+
+fn install(ctx) {
+    shell_in(ctx.source_dir, "make install DESTDIR=" + PREFIX);
+    ctx
 }`,
 				},
 			],
 		},
 		{
-			title: "Required Variables",
+			title: "Context Map (ctx)",
 			content: [
 				{
+					type: "text",
+					content: rich`The ${code("ctx")} map holds package metadata and state that flows through lifecycle phases:`,
+				},
+				{
 					type: "table",
-					headers: ["Variable", "Type", "Description"],
+					headers: ["Field", "Type", "Description"],
 					rows: [
 						["name", "String", "Package name (alphanumeric, hyphens, underscores)"],
 						["version", "String", "Package version"],
-						["installed", "Boolean", "Installation state (start with `false`)"],
+						["description", "String", "Human-readable description"],
+						["(custom)", "Any", "Add any fields needed to track paths, state, etc."],
 					],
 					monospaceCol: 0,
+				},
+				{
+					type: "text",
+					content: rich`Functions receive ${code("ctx")} as a parameter and return it (possibly modified) or throw on error. This enables caching - if ${code("is_acquired(ctx)")} succeeds, ${code("acquire(ctx)")} is skipped.`,
 				},
 			],
 		},
 		{
-			title: "Optional Variables",
+			title: "Living ctx Persistence",
 			content: [
 				{
-					type: "table",
-					headers: ["Variable", "Type", "Description"],
-					rows: [
-						["description", "String", "Human-readable description"],
-						["deps", "Array", 'Dependencies: `let deps = ["pkg1", "pkg2"];`'],
-					],
-					monospaceCol: 0,
+					type: "text",
+					content: rich`The ${code("ctx")} map is a "living" object that persists across invocations. After each lifecycle phase completes, the Rust engine writes the modified ${code("ctx")} back to the ${code(".rhai")} file on disk.`,
 				},
 				{
 					type: "text",
-					content: rich`When ${code("installed = true")}, these are also expected:`,
+					content: "This persistence model provides three key benefits:",
 				},
 				{
-					type: "table",
-					headers: ["Variable", "Type", "Description"],
-					rows: [
-						["installed_version", "String", "Version that was installed"],
-						["installed_files", "Array", "Paths of installed files (for removal)"],
-						["installed_at", "Integer", "Unix timestamp of installation"],
+					type: "list",
+					items: [
+						rich`${bold("Caching")} - If ${code("is_acquired(ctx)")} succeeds, ${code("acquire(ctx)")} is skipped, but ${code("ctx")} still has paths filled in from the saved state`,
+						rich`${bold("Resumability")} - If a build crashes halfway, re-running picks up from the saved ${code("ctx")} state`,
+						rich`${bold("Introspection")} - You can see the current state by reading the recipe file directly`,
 					],
-					monospaceCol: 0,
 				},
 				{
 					type: "text",
-					content: "These are set automatically by the recipe CLI after successful installation.",
+					content: "Example: after acquire completes, the recipe file on disk is updated:",
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `// Before acquire runs:
+let ctx = #{
+    name: "ripgrep",
+    version: "14.1.1",
+    extract_dir: "",  // Empty - not yet known
+};
+
+// After acquire completes, the file on disk becomes:
+let ctx = #{
+    name: "ripgrep",
+    version: "14.1.1",
+    extract_dir: "/tmp/recipe-abc123/ripgrep-14.1.1-x86_64-unknown-linux-musl",
+};`,
+				},
+				{
+					type: "text",
+					content: rich`The next time you run ${code("recipe install ripgrep")}, the engine loads this saved ${code("ctx")} and passes it to ${code("is_acquired(ctx)")}. Since ${code("extract_dir")} is already populated, the check succeeds and ${code("acquire(ctx)")} is skipped entirely.`,
 				},
 			],
 		},
@@ -95,7 +151,7 @@ fn install() {
 					type: "table",
 					headers: ["Constant", "Example Value", "Description"],
 					rows: [
-						["PREFIX", "/usr/local", "Installation prefix"],
+						["PREFIX", "/usr/local", "Installation prefix (or $OUT if set)"],
 						["BUILD_DIR", "/tmp/recipe-xxxx", "Temporary build directory"],
 						["ARCH", "x86_64", "Target architecture"],
 						["NPROC", "8", "Number of CPU cores"],
@@ -110,34 +166,20 @@ fn install() {
 			content: [
 				{
 					type: "text",
-					content: rich`When you run ${code("recipe install <package>")}, the CLI executes these phases in order:`,
+					content: rich`When you run ${code("recipe install <package>")}, the CLI executes these phases in order. Each phase has a check function that's called first - if it succeeds, the action is skipped:`,
 				},
 				{
 					type: "list",
 					ordered: true,
 					items: [
-						rich`${bold("Check")} - ${code("is_installed()")} or recipe state (skip if already installed)`,
-						rich`${bold("Acquire")} - ${code("acquire()")} downloads or copies source materials`,
-						rich`${bold("Build")} - ${code("build()")} compiles or transforms sources (optional)`,
-						rich`${bold("Pre-install")} - ${code("pre_install()")} hook (optional)`,
-						rich`${bold("Install")} - ${code("install()")} copies files to PREFIX`,
-						rich`${bold("Post-install")} - ${code("post_install()")} hook (optional)`,
-						rich`${bold("State update")} - CLI sets ${code("installed = true")} and records metadata`,
+						rich`${bold("Acquire")} - ${code("is_acquired(ctx)")} → ${code("acquire(ctx)")} - Get source materials`,
+						rich`${bold("Build")} - ${code("is_built(ctx)")} → ${code("build(ctx)")} - Compile or transform (optional)`,
+						rich`${bold("Install")} - ${code("is_installed(ctx)")} → ${code("install(ctx)")} - Copy files to PREFIX`,
 					],
 				},
 				{
 					type: "text",
-					content: rich`For removal (${code("recipe remove")}), the phases are:`,
-				},
-				{
-					type: "list",
-					ordered: true,
-					items: [
-						rich`${bold("Pre-remove")} - ${code("pre_remove()")} hook (optional)`,
-						rich`${bold("Delete")} - Remove all files in ${code("installed_files")}`,
-						rich`${bold("Remove")} - ${code("remove()")} custom cleanup (optional)`,
-						rich`${bold("Post-remove")} - ${code("post_remove()")} hook (optional)`,
-					],
+					content: "This check-then-act pattern enables efficient caching. If sources are already downloaded, acquire is skipped. If already built, build is skipped.",
 				},
 			],
 		},
@@ -148,8 +190,10 @@ fn install() {
 					type: "table",
 					headers: ["Function", "Purpose"],
 					rows: [
-						["acquire()", "Download or copy source materials to BUILD_DIR"],
-						["install()", "Install files to PREFIX"],
+						["is_acquired(ctx)", "Check if source materials exist, return ctx with paths or throw"],
+						["acquire(ctx)", "Download/copy source materials, return ctx with source_path"],
+						["is_installed(ctx)", "Check if package is installed, return ctx or throw"],
+						["install(ctx)", "Install files to PREFIX, return ctx"],
 					],
 					monospaceCol: 0,
 				},
@@ -162,14 +206,10 @@ fn install() {
 					type: "table",
 					headers: ["Function", "Purpose"],
 					rows: [
-						["build()", "Compile or transform sources"],
-						["is_installed()", "Custom installation check (return bool)"],
+						["is_built(ctx)", "Check if already built, return ctx or throw"],
+						["build(ctx)", "Compile or transform sources, return ctx"],
+						["cleanup(ctx)", "Remove build artifacts, preserve installed files"],
 						["check_update()", "Check for updates (return version string or `()`)"],
-						["pre_install()", "Hook before install phase"],
-						["post_install()", "Hook after install phase"],
-						["pre_remove()", "Hook before removal"],
-						["remove()", "Custom cleanup during removal"],
-						["post_remove()", "Hook after removal"],
 					],
 					monospaceCol: 0,
 				},
@@ -180,40 +220,60 @@ fn install() {
 			content: [],
 		},
 		{
-			title: "Pre-built Binary",
+			title: "GitHub Release Binary",
 			level: 3,
 			content: [
 				{
 					type: "text",
-					content: "Download and extract a pre-built release:",
+					content: rich`Download a pre-built release using ${code("github_download_release()")}:`,
 				},
 				{
 					type: "code",
 					filename: "ripgrep.rhai",
 					language: "rhai",
-					content: `let name = "ripgrep";
-let version = "14.1.1";
-let description = "Fast line-oriented search tool";
-let installed = false;
+					content: `let ctx = #{
+    name: "ripgrep",
+    version: "14.1.1",
+    repo: "BurntSushi/ripgrep",
+    description: "Fast line-oriented search tool",
+    extract_dir: "",
+};
 
-fn acquire() {
-    let url = \`https://github.com/BurntSushi/ripgrep/releases/download/\${version}/ripgrep-\${version}-\${ARCH}-unknown-linux-musl.tar.gz\`;
-    download(url);
+fn is_acquired(ctx) {
+    let dir = join_path(BUILD_DIR, "ripgrep-" + ctx.version + "-" + ARCH + "-unknown-linux-musl");
+    if is_file(join_path(dir, "rg")) {
+        ctx.extract_dir = dir;
+        return ctx;
+    }
+    throw "not acquired";
 }
 
-fn build() {
-    extract("tar.gz");
-    cd(\`ripgrep-\${version}-\${ARCH}-unknown-linux-musl\`);
+fn acquire(ctx) {
+    mkdir(BUILD_DIR);
+    let pattern = "ripgrep-*-" + ARCH + "-unknown-linux-musl.tar.gz";
+    let archive = github_download_release(ctx.repo, ctx.version, pattern);
+    extract(archive, BUILD_DIR);
+    ctx.extract_dir = join_path(BUILD_DIR, "ripgrep-" + ctx.version + "-" + ARCH + "-unknown-linux-musl");
+    ctx
 }
 
-fn install() {
-    install_bin("rg");
-    install_man("doc/rg.1");
+fn is_installed(ctx) {
+    if is_file(join_path(PREFIX, "bin/rg")) {
+        return ctx;
+    }
+    throw "not installed";
+}
+
+fn install(ctx) {
+    mkdir(join_path(PREFIX, "bin"));
+    shell("install -Dm755 " + join_path(ctx.extract_dir, "rg") + " " + join_path(PREFIX, "bin/rg"));
+    shell("install -Dm644 " + join_path(ctx.extract_dir, "doc/rg.1") + " " + join_path(PREFIX, "share/man/man1/rg.1"));
+    ctx
 }`,
 				},
 				{
 					type: "text",
-					content: rich`See ${link("Helper Functions", "/docs/helpers-overview")} for ${code("download()")}, ${code("extract()")}, ${code("install_bin()")}, etc.`,
+					content: rich`See ${link("Helper Functions", "/docs/helpers-overview")} for ${code("github_download_release()")}, ${code("extract()")}, etc.`,
 				},
 			],
 		},
@@ -229,64 +289,118 @@ fn install() {
 					type: "code",
 					filename: "bash.rhai",
 					language: "rhai",
-					content: `let name = "bash";
-let version = "5.2.37";
-let description = "GNU Bourne-Again Shell";
-let installed = false;
+					content: `let ctx = #{
+    name: "bash",
+    version: "5.2.37",
+    description: "GNU Bourne-Again Shell",
+    source_dir: "",
+};
 
-fn acquire() {
-    download(\`https://ftp.gnu.org/gnu/bash/bash-\${version}.tar.gz\`);
+fn is_acquired(ctx) {
+    let src = join_path(BUILD_DIR, ctx.name + "-" + ctx.version);
+    if is_file(join_path(src, "configure")) {
+        ctx.source_dir = src;
+        return ctx;
+    }
+    throw "source not acquired";
 }
 
-fn build() {
-    extract("tar.gz");
-    cd(\`bash-\${version}\`);
-    run(\`./configure --prefix=\${PREFIX}\`);
-    run(\`make -j\${NPROC}\`);
+fn acquire(ctx) {
+    mkdir(BUILD_DIR);
+    let url = "https://ftp.gnu.org/gnu/bash/bash-" + ctx.version + ".tar.gz";
+    let archive = download(url, join_path(BUILD_DIR, "bash.tar.gz"));
+    extract(archive, BUILD_DIR);
+    ctx.source_dir = join_path(BUILD_DIR, ctx.name + "-" + ctx.version);
+    ctx
 }
 
-fn install() {
-    run("make install");
+fn is_built(ctx) {
+    if is_file(join_path(ctx.source_dir, "bash")) {
+        return ctx;
+    }
+    throw "not built";
+}
+
+fn build(ctx) {
+    shell_in(ctx.source_dir, "./configure --prefix=" + PREFIX);
+    shell_in(ctx.source_dir, "make -j" + NPROC);
+    ctx
+}
+
+fn is_installed(ctx) {
+    if is_file(join_path(PREFIX, "bin/bash")) {
+        return ctx;
+    }
+    throw "not installed";
+}
+
+fn install(ctx) {
+    shell_in(ctx.source_dir, "make install DESTDIR=" + PREFIX);
+    ctx
 }`,
 				},
 			],
 		},
 		{
-			title: "With Dependencies",
+			title: "Git Clone Source",
 			level: 3,
 			content: [
 				{
 					type: "text",
-					content: rich`Declare dependencies with the ${code("deps")} array:`,
+					content: rich`Clone source from git using ${code("git_clone_depth()")}:`,
 				},
 				{
 					type: "code",
-					filename: "htop.rhai",
+					filename: "neovim.rhai",
 					language: "rhai",
-					content: `let name = "htop";
-let version = "3.3.0";
-let description = "Interactive process viewer";
-let deps = ["ncurses"];
-let installed = false;
+					content: `let ctx = #{
+    name: "neovim",
+    version: "0.10.0",
+    repo: "https://github.com/neovim/neovim.git",
+    description: "Vim-fork focused on extensibility",
+    source_dir: "",
+};
 
-fn acquire() {
-    download(\`https://github.com/htop-dev/htop/releases/download/\${version}/htop-\${version}.tar.xz\`);
+fn is_acquired(ctx) {
+    let src = join_path(BUILD_DIR, "neovim");
+    if is_file(join_path(src, "CMakeLists.txt")) {
+        ctx.source_dir = src;
+        return ctx;
+    }
+    throw "source not acquired";
 }
 
-fn build() {
-    extract("tar.xz");
-    cd(\`htop-\${version}\`);
-    run(\`./configure --prefix=\${PREFIX}\`);
-    run(\`make -j\${NPROC}\`);
+fn acquire(ctx) {
+    mkdir(BUILD_DIR);
+    let src = git_clone_depth(ctx.repo, join_path(BUILD_DIR, "neovim"), 1);
+    shell_in(src, "git checkout v" + ctx.version);
+    ctx.source_dir = src;
+    ctx
 }
 
-fn install() {
-    run("make install");
+fn is_built(ctx) {
+    if is_file(join_path(ctx.source_dir, "build/bin/nvim")) {
+        return ctx;
+    }
+    throw "not built";
+}
+
+fn build(ctx) {
+    shell_in(ctx.source_dir, "make CMAKE_BUILD_TYPE=Release");
+    ctx
+}
+
+fn is_installed(ctx) {
+    if is_file(join_path(PREFIX, "bin/nvim")) {
+        return ctx;
+    }
+    throw "not installed";
+}
+
+fn install(ctx) {
+    shell_in(ctx.source_dir, "make install CMAKE_INSTALL_PREFIX=" + PREFIX);
+    ctx
 }`,
-				},
-				{
-					type: "text",
-					content: rich`Install with ${code("recipe install htop --deps")} to resolve and install dependencies first.`,
 				},
 			],
 		},
@@ -303,7 +417,7 @@ fn install() {
 					language: "rhai",
 					content: `fn check_update() {
     let latest = github_latest_release("BurntSushi/ripgrep");
-    if latest != version {
+    if latest != ctx.version {
         latest  // Return new version
     } else {
         ()      // No update available
@@ -339,21 +453,6 @@ fn install() {
 			],
 		},
 		{
-			title: "State Persistence",
-			content: [
-				{
-					type: "text",
-					content:
-						"After successful installation, the CLI updates the recipe file itself with installation metadata. This means recipes are self-contained - the file contains both the instructions and the current state.",
-				},
-				{
-					type: "text",
-					content:
-						"State updates are atomic: written to a temporary file first, then renamed to prevent corruption if interrupted.",
-				},
-			],
-		},
-		{
 			title: "See Also",
 			content: [
 				{
@@ -361,6 +460,7 @@ fn install() {
 					items: [
 						rich`${link("CLI Reference", "/docs/cli-reference")} - Commands for installing and managing packages`,
 						rich`${link("Helper Functions", "/docs/helpers-overview")} - All available functions for recipes`,
+						rich`${link("Path Helpers", "/docs/helpers-paths")} - ${code("join_path()")}, ${code("dirname()")}, ${code("basename()")}`,
 					],
 				},
 			],
