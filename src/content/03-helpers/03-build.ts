@@ -3,14 +3,14 @@ import { rich, code } from "../../rich-text"
 
 export const helpersBuildContent: DocsContent = {
 	title: "Build Helpers",
-	intro: "Functions for extracting archives and running build commands.",
+	intro: "Functions for extracting archives. For running commands, see the Commands helpers.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`The ${code("run()")} function has ${code("PREFIX")} and ${code("BUILD_DIR")} environment variables automatically set.`,
+					content: rich`Build helpers extract archives to prepare sources for compilation. Use ${code("shell()")} or ${code("shell_in()")} from the Commands helpers to run build commands.`,
 				},
 			],
 		},
@@ -19,7 +19,7 @@ export const helpersBuildContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Extract the last downloaded archive to ${code("BUILD_DIR")}. Supports multiple formats:`,
+					content: rich`Extract an archive to a destination directory. Takes the archive path and destination directory as arguments. Format is auto-detected from the file extension.`,
 				},
 				{
 					type: "table",
@@ -28,6 +28,7 @@ export const helpersBuildContent: DocsContent = {
 						["tar.gz / tgz", ".tar.gz, .tgz"],
 						["tar.xz / txz", ".tar.xz, .txz"],
 						["tar.bz2 / tbz2", ".tar.bz2, .tbz2"],
+						["tar.zst", ".tar.zst"],
 						["zip", ".zip"],
 					],
 					monospaceCol: 0,
@@ -35,55 +36,52 @@ export const helpersBuildContent: DocsContent = {
 				{
 					type: "code",
 					language: "rhai",
-					content: `download("https://example.com/foo-1.0.tar.xz");
-extract("tar.xz");`,
+					content: `let archive = download(url, join_path(BUILD_DIR, "foo-1.0.tar.xz"));
+extract(archive, BUILD_DIR);
+// Creates BUILD_DIR/foo-1.0/`,
 				},
 			],
 		},
 		{
-			title: "cd",
+			title: "extract_with_format",
 			content: [
 				{
 					type: "text",
-					content: rich`Change the current working directory for subsequent ${code("run()")} calls. Relative paths are resolved from ${code("BUILD_DIR")}.`,
+					content: "Extract an archive with an explicit format. Useful when the file extension doesn't match the actual format.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `extract("tar.gz");
-cd("foo-1.0");        // Now in BUILD_DIR/foo-1.0
-run("./configure");   // Runs in that directory
-cd("/tmp/other");     // Absolute paths work too`,
+					content: `// Force tar.gz extraction even if extension is wrong
+extract_with_format(archive, BUILD_DIR, "tar.gz");`,
 				},
 			],
 		},
 		{
-			title: "run / shell",
+			title: "Running Build Commands",
 			content: [
 				{
 					type: "text",
-					content: rich`Run a shell command in the current directory. Shows a spinner for long-running commands. ${code("shell()")} is an alias for ${code("run()")} - use it when your recipe defines its own ${code("run()")} function.`,
-				},
-				{
-					type: "text",
-					content: rich`${code("Environment variables automatically set:")}`,
-				},
-				{
-					type: "list",
-					items: [
-						rich`${code("PREFIX")} - Installation prefix (e.g., ${code("/usr/local")})`,
-						rich`${code("BUILD_DIR")} - Temporary build directory`,
-					],
+					content: rich`Use ${code("shell_in()")} to run commands in a specific directory. This is the recommended pattern instead of changing directories:`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `run("./configure --prefix=$PREFIX");
-run("make -j4");
-run("make install");
+					content: `fn build(ctx) {
+    let src = ctx.source_dir;
 
-// Use shell() if recipe has its own run() function
-shell("make test");`,
+    // Run configure in the source directory
+    shell_in(src, "./configure --prefix=" + PREFIX);
+
+    // Run make in the source directory
+    shell_in(src, "make -j" + NPROC);
+
+    ctx
+}`,
+				},
+				{
+					type: "text",
+					content: rich`See ${code("shell()")}, ${code("shell_in()")}, ${code("shell_output()")} in the Commands helpers for more options.`,
 				},
 			],
 		},

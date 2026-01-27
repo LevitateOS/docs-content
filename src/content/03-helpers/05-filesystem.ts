@@ -1,30 +1,38 @@
 import type { DocsContent } from "../../types"
+import { rich, code } from "../../rich-text"
 
 export const helpersFilesystemContent: DocsContent = {
 	title: "Filesystem Helpers",
 	intro: "File and directory operations including path checks, manipulation, and reading.",
 	sections: [
 		{
-			title: "exists / file_exists / dir_exists",
+			title: "exists / is_file / is_dir",
 			content: [
 				{
 					type: "text",
-					content: "Check if paths exist.",
+					content: "Check if paths exist. These are essential for the is_* check functions in recipes.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `if exists("/usr/bin/gcc") {
-    run("make CC=gcc");
+					content: `// Check if anything exists at path
+if exists("/usr/bin/gcc") {
+    set_env("CC", "gcc");
 }
 
-if file_exists("config.toml") {
-    // ...
+// Check specifically for a file
+if is_file(join_path(ctx.source_dir, "configure")) {
+    shell_in(ctx.source_dir, "./configure");
 }
 
-if dir_exists("vendor") {
-    cd("vendor");
+// Check specifically for a directory
+if is_dir(join_path(BUILD_DIR, "vendor")) {
+    log("Vendor directory exists");
 }`,
+				},
+				{
+					type: "text",
+					content: rich`Aliases: ${code("file_exists()")} = ${code("is_file()")}, ${code("dir_exists()")} = ${code("is_dir()")}`,
 				},
 			],
 		},
@@ -33,12 +41,14 @@ if dir_exists("vendor") {
 			content: [
 				{
 					type: "text",
-					content: "Create a directory and all parent directories.",
+					content: "Create a directory and all parent directories (like mkdir -p).",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `mkdir("/opt/myapp/data");`,
+					content: `mkdir(BUILD_DIR);
+mkdir(join_path(PREFIX, "bin"));
+mkdir(join_path(PREFIX, "share/man/man1"));`,
 				},
 			],
 		},
@@ -47,13 +57,13 @@ if dir_exists("vendor") {
 			content: [
 				{
 					type: "text",
-					content: "Remove files or directories matching a glob pattern.",
+					content: "Remove files or directories. Accepts a path string.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `rm("*.tmp");
-rm("build/cache/*");`,
+					content: `rm(join_path(BUILD_DIR, "tmp"));
+rm(join_path(ctx.source_dir, "build"));`,
 				},
 			],
 		},
@@ -67,7 +77,10 @@ rm("build/cache/*");`,
 				{
 					type: "code",
 					language: "rhai",
-					content: `mv("config.example", "config.toml");`,
+					content: `mv(
+    join_path(ctx.source_dir, "config.example"),
+    join_path(ctx.source_dir, "config.toml")
+);`,
 				},
 			],
 		},
@@ -76,12 +89,16 @@ rm("build/cache/*");`,
 			content: [
 				{
 					type: "text",
-					content: "Create a symbolic link.",
+					content: "Create a symbolic link. First argument is the target, second is the link name.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `ln("myapp-1.0", "myapp");  // myapp -> myapp-1.0`,
+					content: `// Create symlink: /usr/local/bin/python -> python3
+ln(
+    join_path(PREFIX, "bin/python3"),
+    join_path(PREFIX, "bin/python")
+);`,
 				},
 			],
 		},
@@ -90,30 +107,49 @@ rm("build/cache/*");`,
 			content: [
 				{
 					type: "text",
-					content: "Change file permissions. Takes octal mode.",
+					content: "Change file permissions. Takes octal mode as integer.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `chmod("script.sh", 0o755);   // rwxr-xr-x
-chmod("secret.key", 0o600);  // rw-------`,
+					content: `chmod(join_path(PREFIX, "bin/myapp"), 0o755);   // rwxr-xr-x
+chmod(join_path(PREFIX, "etc/secret.key"), 0o600);  // rw-------`,
 				},
 			],
 		},
 		{
-			title: "read_file",
+			title: "read_file / read_file_or_empty",
 			content: [
 				{
 					type: "text",
-					content: "Read a file's contents as a string.",
+					content: rich`Read a file's contents as a string. ${code("read_file_or_empty()")} returns empty string if file doesn't exist instead of throwing.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let config = read_file("config.toml");
-if config.contains("debug = true") {
-    // ...
+					content: `// Read kernel version from file
+let version = trim(read_file(join_path(build_dir, "include/config/kernel.release")));
+
+// Read with fallback to empty
+let cached_hash = read_file_or_empty(join_path(build_dir, ".hash"));
+if cached_hash == "" {
+    // No cached hash, need to rebuild
 }`,
+				},
+			],
+		},
+		{
+			title: "write_file / append_file",
+			content: [
+				{
+					type: "text",
+					content: "Write or append content to a file.",
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `write_file(join_path(build_dir, ".hash"), new_hash);
+append_file(join_path(PREFIX, "etc/shells"), "/bin/zsh\\n");`,
 				},
 			],
 		},
@@ -127,9 +163,9 @@ if config.contains("debug = true") {
 				{
 					type: "code",
 					language: "rhai",
-					content: `let sources = glob_list("src/*.c");
+					content: `let sources = glob_list(join_path(ctx.source_dir, "src/*.c"));
 for file in sources {
-    print(file);
+    log("Found: " + file);
 }`,
 				},
 			],

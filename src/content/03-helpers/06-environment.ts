@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, code } from "../../rich-text"
 
 export const helpersEnvironmentContent: DocsContent = {
 	title: "Environment Helpers",
@@ -27,14 +28,30 @@ if cc == "" {
 			content: [
 				{
 					type: "text",
-					content: "Set an environment variable for the current process.",
+					content: rich`Set an environment variable for the current process and all subsequent ${code("shell()")} calls.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
 					content: `set_env("CFLAGS", "-O2 -march=native");
 set_env("CC", "clang");
-run("make");`,
+shell_in(ctx.source_dir, "make");`,
+				},
+			],
+		},
+		{
+			title: "Logging",
+			content: [
+				{
+					type: "text",
+					content: "Log messages at different levels:",
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `log("Building kernel...");           // Info level
+debug("Source dir: " + ctx.source_dir); // Debug level (hidden by default)
+warn("Config changed, rebuilding");     // Warning level`,
 				},
 			],
 		},
