@@ -3,7 +3,8 @@ import { rich, code, link } from "../../rich-text"
 
 export const helpersHttpContent: DocsContent = {
 	title: "HTTP Helpers",
-	intro: "Functions for HTTP requests and GitHub API access, useful for update checking and downloading.",
+	intro:
+		"Functions for HTTP requests and GitHub API access, useful for update checking and downloading.",
 	sections: [
 		{
 			title: "Overview",

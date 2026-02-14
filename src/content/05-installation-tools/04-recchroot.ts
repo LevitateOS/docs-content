@@ -31,14 +31,8 @@ export const recchrootContent: DocsContent = {
 					type: "table",
 					headers: ["Argument", "Description"],
 					rows: [
-						[
-							rich`${code("CHROOT_DIR")}`,
-							"Directory to chroot into (e.g., /mnt)",
-						],
-						[
-							rich`${code("COMMAND")}`,
-							"Command to run (default: /bin/bash)",
-						],
+						[rich`${code("CHROOT_DIR")}`, "Directory to chroot into (e.g., /mnt)"],
+						[rich`${code("COMMAND")}`, "Command to run (default: /bin/bash)"],
 					],
 					monospaceCol: 0,
 				},
@@ -99,21 +93,9 @@ export const recchrootContent: DocsContent = {
 							rich`${code("<chroot>/proc")}`,
 							"Process information filesystem",
 						],
-						[
-							rich`${code("/sys")}`,
-							rich`${code("<chroot>/sys")}`,
-							"Kernel/hardware information",
-						],
-						[
-							rich`${code("/dev")}`,
-							rich`${code("<chroot>/dev")}`,
-							"Device nodes",
-						],
-						[
-							rich`${code("/run")}`,
-							rich`${code("<chroot>/run")}`,
-							"Runtime data (udev, systemd)",
-						],
+						[rich`${code("/sys")}`, rich`${code("<chroot>/sys")}`, "Kernel/hardware information"],
+						[rich`${code("/dev")}`, rich`${code("<chroot>/dev")}`, "Device nodes"],
+						[rich`${code("/run")}`, rich`${code("<chroot>/run")}`, "Runtime data (udev, systemd)"],
 					],
 					monospaceCol: 0,
 				},
@@ -209,8 +191,7 @@ export const recchrootContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content:
-						"Errors from recchroot itself use the error codes in the table above.",
+					content: "Errors from recchroot itself use the error codes in the table above.",
 				},
 			],
 		},

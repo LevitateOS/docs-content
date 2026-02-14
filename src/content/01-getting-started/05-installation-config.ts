@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import { rich, code, link } from "../../rich-text"
 
 export const installationConfigContent: DocsContent = {
 	title: "Configuration",

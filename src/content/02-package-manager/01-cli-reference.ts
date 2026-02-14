@@ -13,6 +13,12 @@ export const cliReferenceContent: DocsContent = {
 					type: "text",
 					content: rich`${code("recipe")} is the local-first package manager for LevitateOS. It executes Rhai scripts that define how to acquire, build, and install packages.`,
 				},
+				{
+					type: "note",
+					variant: "info",
+					content:
+						"Immutable-by-default: on A/B systems, recipe changes are composed into the inactive slot (B) and activated on reboot after a trial boot + commit. Mutable mode exists as an explicit opt-in for daredevils.",
+				},
 				{ type: "code", language: "bash", content: "recipe <command> [options] [arguments]" },
 			],
 		},
@@ -51,6 +57,11 @@ recipe install ./path/to/pkg.rhai  # From local file`,
 				{
 					type: "text",
 					content: rich`After successful install, the recipe is updated with ${code("installed = true")}, ${code("installed_version")}, ${code("installed_at")} (timestamp), and ${code("installed_files")} (list of installed paths).`,
+				},
+				{
+					type: "text",
+					content:
+						"On immutable A/B systems, installs and upgrades target the inactive slot. The running system is not mutated in-place; activation happens via reboot (trial boot slot B, then commit).",
 				},
 			],
 		},
@@ -132,7 +143,7 @@ recipe upgrade <package>    # Upgrade specific package`,
 				},
 				{
 					type: "text",
-					content: rich`Compares the recipe's ${code("version")} against ${code("installed_version")}. Uses semantic versioning comparison when possible, falling back to string comparison. If an upgrade is needed, removes the old version and installs the new one.`,
+					content: rich`Compares the recipe's ${code("version")} against ${code("installed_version")}. Uses semantic versioning comparison when possible, falling back to string comparison. If an upgrade is needed, upgrades into the inactive slot (A/B default) or in-place in mutable mode.`,
 				},
 			],
 		},

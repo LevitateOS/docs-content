@@ -31,10 +31,7 @@ export const recfstabContent: DocsContent = {
 					type: "table",
 					headers: ["Argument", "Description"],
 					rows: [
-						[
-							rich`${code("ROOT")}`,
-							"Root directory to scan for mounted filesystems (e.g., /mnt)",
-						],
+						[rich`${code("ROOT")}`, "Root directory to scan for mounted filesystems (e.g., /mnt)"],
 					],
 					monospaceCol: 0,
 				},
@@ -47,10 +44,7 @@ export const recfstabContent: DocsContent = {
 					type: "table",
 					headers: ["Option", "Description"],
 					rows: [
-						[
-							rich`${code("-L, --label")}`,
-							"Use filesystem LABEL instead of UUID",
-						],
+						[rich`${code("-L, --label")}`, "Use filesystem LABEL instead of UUID"],
 						[
 							rich`${code("-p, --partuuid")}`,
 							"Use partition UUID (PARTUUID) instead of filesystem UUID",
@@ -124,30 +118,10 @@ UUID=ABCD-1234	/boot	vfat	rw,relatime,fmask=0022,dmask=0022	0	2`,
 					type: "table",
 					headers: ["Type", "Flag", "Example", "Use Case"],
 					rows: [
-						[
-							"UUID",
-							"(default)",
-							"UUID=a1b2c3d4-...",
-							"Most reliable for single-disk systems",
-						],
-						[
-							"LABEL",
-							"-L",
-							"LABEL=root",
-							"Human-readable if you label filesystems",
-						],
-						[
-							"PARTUUID",
-							"-p",
-							"PARTUUID=12345678-01",
-							"GPT partition UUID, survives reformatting",
-						],
-						[
-							"PARTLABEL",
-							"-t",
-							"PARTLABEL=EFI",
-							"GPT partition label if set during partitioning",
-						],
+						["UUID", "(default)", "UUID=a1b2c3d4-...", "Most reliable for single-disk systems"],
+						["LABEL", "-L", "LABEL=system-a", "Human-readable if you label filesystems"],
+						["PARTUUID", "-p", "PARTUUID=12345678-01", "GPT partition UUID, survives reformatting"],
+						["PARTLABEL", "-t", "PARTLABEL=EFI", "GPT partition label if set during partitioning"],
 					],
 				},
 			],

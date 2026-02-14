@@ -64,10 +64,7 @@ export const italic = (text: string): InlineItalic => ({
  * rich`Hello ${bold("world")}!`
  * // Returns: ["Hello ", { type: "bold", text: "world" }, "!"]
  */
-export function rich(
-	strings: TemplateStringsArray,
-	...values: InlineNode[]
-): RichText {
+export function rich(strings: TemplateStringsArray, ...values: InlineNode[]): RichText {
 	const result: RichText = []
 
 	strings.forEach((str, i) => {

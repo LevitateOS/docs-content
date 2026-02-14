@@ -3,7 +3,7 @@ import { rich, bold, link } from "../../rich-text"
 
 export const gettingStartedContent: DocsContent = {
 	title: "Getting Started",
-	intro: "Download LevitateOS and create bootable installation media.",
+	intro: "Download a LevitateOS variant and create bootable installation media (desktop variants).",
 	sections: [
 		{
 			title: "Requirements",
@@ -23,7 +23,11 @@ export const gettingStartedContent: DocsContent = {
 		{
 			title: "Download",
 			content: [
-				{ type: "text", content: "Download the latest ISO and verify the checksum:" },
+				{
+					type: "text",
+					content: rich`Download the variant you want from ${link("Download", "/download")}. Desktop variants ship as live ISOs; appliance variants ship as disk images.`,
+				},
+				{ type: "text", content: "Example: download the LevitateOS ISO and verify the checksum:" },
 				{
 					type: "code",
 					language: "bash",

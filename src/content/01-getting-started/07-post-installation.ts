@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import { rich, link } from "../../rich-text"
 
 export const postInstallationContent: DocsContent = {
 	title: "Post-Installation",
@@ -11,6 +11,12 @@ export const postInstallationContent: DocsContent = {
 				{
 					type: "text",
 					content: "Install additional packages using the recipe package manager:",
+				},
+				{
+					type: "note",
+					variant: "info",
+					content:
+						"Immutable-by-default: recipe changes are composed into the inactive slot (B) and activated on reboot after a trial boot + commit. Mutable mode exists as an explicit opt-in for daredevils.",
 				},
 				{
 					type: "command",
@@ -38,7 +44,7 @@ export const postInstallationContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Keep your system up to date:",
+					content: "Keep your system up to date (A/B default):",
 				},
 				{
 					type: "command",
@@ -49,6 +55,11 @@ export const postInstallationContent: DocsContent = {
 					type: "command",
 					description: "Upgrade installed packages",
 					command: "recipe upgrade",
+				},
+				{
+					type: "command",
+					description: "Reboot to trial-boot the updated slot (B)",
+					command: "reboot",
 				},
 			],
 		},

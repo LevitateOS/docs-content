@@ -3,7 +3,8 @@ import { rich, code } from "../../rich-text"
 
 export const helpersPathsContent: DocsContent = {
 	title: "Path Helpers",
-	intro: "Functions for manipulating file paths. These are essential for building paths to sources, archives, and install destinations.",
+	intro:
+		"Functions for manipulating file paths. These are essential for building paths to sources, archives, and install destinations.",
 	sections: [
 		{
 			title: "Overview",

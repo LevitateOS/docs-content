@@ -10,7 +10,8 @@ export const helpersFilesystemContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Check if paths exist. These are essential for the is_* check functions in recipes.",
+					content:
+						"Check if paths exist. These are essential for the is_* check functions in recipes.",
 				},
 				{
 					type: "code",

@@ -1,9 +1,10 @@
 import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import { rich, bold, link } from "../../rich-text"
 
 export const installationToolsOverviewContent: DocsContent = {
 	title: "Installation Tools Overview",
-	intro: "Command-line tools for manual LevitateOS installation, equivalent to Arch Linux's pacstrap, genfstab, and arch-chroot.",
+	intro:
+		"Command-line tools for manual LevitateOS installation, equivalent to Arch Linux's pacstrap, genfstab, and arch-chroot.",
 	sections: [
 		{
 			title: "Overview",
@@ -49,11 +50,15 @@ export const installationToolsOverviewContent: DocsContent = {
 					steps: [
 						{
 							command: "mount /dev/sda2 /mnt",
-							description: "Mount root partition",
+							description: "Mount system slot A (system-a)",
 						},
 						{
 							command: "mount --mkdir /dev/sda1 /mnt/boot",
 							description: "Mount EFI System Partition",
+						},
+						{
+							command: "mount --mkdir /dev/sda4 /mnt/var",
+							description: "Mount persistent state partition (/var)",
 						},
 						{
 							command: "recstrap /mnt",
@@ -64,8 +69,9 @@ export const installationToolsOverviewContent: DocsContent = {
 							description: "Generate fstab entries",
 						},
 						{
-							command: "mkdir -p /mnt/boot/EFI/Linux && cp /media/cdrom/boot/uki/levitateos.efi /mnt/boot/EFI/Linux/",
-							description: "Copy pre-built UKI",
+							command:
+								"mkdir -p /mnt/boot/EFI/Linux && cp /media/cdrom/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/ && cp /media/cdrom/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/",
+							description: "Copy A/B boot images (UKIs)",
 						},
 						{
 							command: "recchroot /mnt",

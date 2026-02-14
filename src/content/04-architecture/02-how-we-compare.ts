@@ -3,7 +3,8 @@ import { rich, bold } from "../../rich-text"
 
 export const howWeCompareContent: DocsContent = {
 	title: "How We Compare",
-	intro: "Honest comparison with other distributions. We show our strengths and admit our weaknesses.",
+	intro:
+		"Honest comparison with other distributions. We show our strengths and admit our weaknesses.",
 	sections: [
 		{
 			title: "Feature Comparison",
@@ -15,7 +16,7 @@ export const howWeCompareContent: DocsContent = {
 						["Time to usable system", "Hours", "30 min", "Hours", "15 min"],
 						["Package customization", "Full (AUR)", "Limited", "Full (nix)", "Full (Rhai)"],
 						["Binary packages", "Partial", "Yes", "Yes", "Yes"],
-						["Reproducible builds", "No", "No", "Yes", "No (planned)"],
+						["Reproducible builds", "No", "No", "Yes", "Partial (lock + A/B)"],
 						["Learning curve", "Medium", "Low", "High", "Medium"],
 						["Community size", "Huge", "Large", "Medium", "Growing"],
 						["Local AI integration", "No", "No", "No", "Yes"],
@@ -45,21 +46,23 @@ export const howWeCompareContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Every distribution has tradeoffs. Here's where LevitateOS falls short compared to alternatives:",
+					content:
+						"Every distribution has tradeoffs. Here's where LevitateOS falls short compared to alternatives:",
 				},
 				{
 					type: "list",
 					items: [
 						rich`${bold("Smaller community")}: We're new. Arch and Fedora have decades of community knowledge.`,
 						rich`${bold("Fewer packages than AUR")}: Rocky's repository is curated enterprise software. Niche packages require writing recipes.`,
-						rich`${bold("No reproducibility")}: NixOS can rebuild identical systems from config. We can't (yet).`,
+						rich`${bold("Not Nix-level reproducibility")}: A/B + lock files help, but we don't (yet) match NixOS generation semantics.`,
 						rich`${bold("Less documentation")}: Arch Wiki is comprehensive. Our docs are growing but not there yet.`,
 						rich`${bold("Younger project")}: Less battle-tested edge cases compared to established distros.`,
 					],
 				},
 				{
 					type: "text",
-					content: "If these limitations matter to you, use the distro that fits your needs. We won't pretend to be everything for everyone.",
+					content:
+						"If these limitations matter to you, use the distro that fits your needs. We won't pretend to be everything for everyone.",
 				},
 			],
 		},
@@ -92,7 +95,7 @@ export const howWeCompareContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("You need NixOS-style reproducibility")}: LevitateOS doesn't have it`,
+						rich`${bold("You need NixOS-style reproducibility")}: LevitateOS isn't trying to be NixOS`,
 						rich`${bold("You want a huge package ecosystem")}: AUR has more packages than Rocky repos`,
 						rich`${bold("You prefer guided installation")}: Fedora and Ubuntu have better installers`,
 						rich`${bold("You need extensive documentation")}: Arch Wiki is unmatched`,
@@ -101,7 +104,8 @@ export const howWeCompareContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: "No distribution is perfect for everyone. Pick the one that matches your priorities.",
+					content:
+						"No distribution is perfect for everyone. Pick the one that matches your priorities.",
 				},
 			],
 		},

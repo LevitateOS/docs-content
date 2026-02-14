@@ -43,7 +43,8 @@ export const installationDiskContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Installation is fully offline - no network required. Skip this if using Ethernet or don't need network access.",
+					content:
+						"Installation is fully offline - no network required. Skip this if using Ethernet or don't need network access.",
 				},
 				{
 					type: "command",
@@ -80,19 +81,21 @@ sda       4.0T Seagate Barracuda        sata`,
 			content: [
 				{
 					type: "text",
-					content: rich`${bold("WARNING: This will erase all data on the disk.")} We'll create this layout:`,
+					content: rich`${bold("WARNING: This will erase all data on the disk.")} We'll create the default A/B layout:`,
 				},
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`${bold("Dual-boot:")} If keeping Windows, do NOT create a new EFI partition. Use your existing EFI partition (usually the first partition on your Windows disk). Only create the root partition for LevitateOS.`,
+					content: rich`${bold("Dual-boot:")} If keeping Windows, do NOT create a new EFI partition. Use your existing EFI partition (usually the first partition on your Windows disk). Create the LevitateOS partitions (system-a, system-b, var) in free space.`,
 				},
 				{
 					type: "table",
 					headers: ["Partition", "Size", "Type", "Mount"],
 					rows: [
 						["/dev/sda1", "1 GB", "EFI System", "/boot"],
-						["/dev/sda2", "Remainder", "Linux filesystem", "/"],
+						["/dev/sda2", "64 GB", "Linux filesystem", "/ (system-a)"],
+						["/dev/sda3", "64 GB", "Linux filesystem", "(system-b)"],
+						["/dev/sda4", "Remainder", "Linux filesystem", "/var"],
 					],
 				},
 				{
@@ -114,8 +117,16 @@ sda       4.0T Seagate Barracuda        sata`,
 						{ command: "+1G", description: "Size (room for multiple kernels)" },
 						{ command: "t", description: "Change partition type" },
 						{ command: "1", description: "EFI System" },
-						{ command: "n", description: "New partition (root)" },
+						{ command: "n", description: "New partition (system-a)" },
 						{ command: "2", description: "Partition number" },
+						{ command: "Enter", description: "Default first sector" },
+						{ command: "+64G", description: "Size (slot A)" },
+						{ command: "n", description: "New partition (system-b)" },
+						{ command: "3", description: "Partition number" },
+						{ command: "Enter", description: "Default first sector" },
+						{ command: "+64G", description: "Size (slot B)" },
+						{ command: "n", description: "New partition (var)" },
+						{ command: "4", description: "Partition number" },
 						{ command: "Enter", description: "Default first sector" },
 						{ command: "Enter", description: "Use remaining space" },
 						{ command: "w", description: "Write changes and exit" },
@@ -137,13 +148,23 @@ sda       4.0T Seagate Barracuda        sata`,
 				},
 				{
 					type: "command",
-					description: "Format root partition (label MUST be 'root' for UKI boot)",
-					command: "mkfs.ext4 -L root /dev/sda2",
+					description: "Format system slot A",
+					command: "mkfs.ext4 -L system-a /dev/sda2",
+				},
+				{
+					type: "command",
+					description: "Format system slot B",
+					command: "mkfs.ext4 -L system-b /dev/sda3",
+				},
+				{
+					type: "command",
+					description: "Format persistent state partition (/var)",
+					command: "mkfs.ext4 -L var /dev/sda4",
 				},
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`${bold("Important:")} The root partition ${bold("must")} be labeled ${code("root")}. The pre-built UKI uses ${code("root=LABEL=root")} to find the root filesystem.`,
+					content: rich`${bold("Important:")} Labels matter. Slot A boots with ${code("root=LABEL=system-a")}, slot B boots with ${code("root=LABEL=system-b")}. Persistent data lives in ${code("/var")} (label ${code("var")}); user homes live under ${code("/var/home")}.`,
 				},
 			],
 		},
@@ -152,13 +173,23 @@ sda       4.0T Seagate Barracuda        sata`,
 			content: [
 				{
 					type: "command",
-					description: "Mount root partition",
+					description: "Mount system slot A (system-a) at /mnt",
 					command: "mount /dev/sda2 /mnt",
 				},
 				{
 					type: "command",
 					description: "Create mount point and mount EFI",
 					command: ["mkdir -p /mnt/boot", "mount /dev/sda1 /mnt/boot"],
+				},
+				{
+					type: "command",
+					description: "Mount persistent state partition (var) at /mnt/var",
+					command: ["mkdir -p /mnt/var", "mount /dev/sda4 /mnt/var"],
+				},
+				{
+					type: "text",
+					content:
+						"Leave system-b unmounted for now. It will be used as the inactive slot for atomic updates.",
 				},
 				{
 					type: "text",

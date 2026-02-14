@@ -29,9 +29,7 @@ export const recstrapContent: DocsContent = {
 				{
 					type: "table",
 					headers: ["Argument", "Description"],
-					rows: [
-						[rich`${code("TARGET")}`, "Target directory (must be mounted, e.g., /mnt)"],
-					],
+					rows: [[rich`${code("TARGET")}`, "Target directory (must be mounted, e.g., /mnt)"]],
 					monospaceCol: 0,
 				},
 			],
@@ -51,14 +49,8 @@ export const recstrapContent: DocsContent = {
 							rich`${code("-f, --force")}`,
 							"Allow extraction even if target is not empty or not a mount point",
 						],
-						[
-							rich`${code("-q, --quiet")}`,
-							"Minimal output for scripting",
-						],
-						[
-							rich`${code("-c, --check")}`,
-							"Run pre-flight validation only, do not extract",
-						],
+						[rich`${code("-q, --quiet")}`, "Minimal output for scripting"],
+						[rich`${code("-c, --check")}`, "Run pre-flight validation only, do not extract"],
 						[rich`${code("--version")}`, "Show version"],
 						[rich`${code("--help")}`, "Show help"],
 					],
@@ -126,8 +118,7 @@ export const recstrapContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"If --erofs is not specified, recstrap searches these paths in order:",
+					content: "If --erofs is not specified, recstrap searches these paths in order:",
 				},
 				{
 					type: "list",
@@ -200,7 +191,8 @@ recfstab /mnt >> /mnt/etc/fstab
 
 # Copy pre-built UKI
 mkdir -p /mnt/boot/EFI/Linux
-cp /media/cdrom/boot/uki/levitateos.efi /mnt/boot/EFI/Linux/
+cp /media/cdrom/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/
+cp /media/cdrom/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/
 
 # Enter chroot
 recchroot /mnt

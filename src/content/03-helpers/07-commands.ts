@@ -120,7 +120,8 @@ if status != 0 {
 			content: [
 				{
 					type: "text",
-					content: "Execute a command with an array of arguments (no shell interpretation). Returns the exit code. Useful when arguments contain special characters.",
+					content:
+						"Execute a command with an array of arguments (no shell interpretation). Returns the exit code. Useful when arguments contain special characters.",
 				},
 				{
 					type: "code",
@@ -135,7 +136,8 @@ let code = exec("cp", ["-r", src, dest]);`,
 			content: [
 				{
 					type: "text",
-					content: "Execute a command with array arguments and return its stdout. Throws if exit code is non-zero.",
+					content:
+						"Execute a command with array arguments and return its stdout. Throws if exit code is non-zero.",
 				},
 				{
 					type: "code",

@@ -179,7 +179,8 @@ let ctx = #{
 				},
 				{
 					type: "text",
-					content: "This check-then-act pattern enables efficient caching. If sources are already downloaded, acquire is skipped. If already built, build is skipped.",
+					content:
+						"This check-then-act pattern enables efficient caching. If sources are already downloaded, acquire is skipped. If already built, build is skipped.",
 				},
 			],
 		},
@@ -426,7 +427,7 @@ fn install(ctx) {
 				},
 				{
 					type: "text",
-					content: rich`When an update is found, ${code("recipe upgrade")} will remove the old version and install the new one.`,
+					content: rich`When an update is found, ${code("recipe upgrade")} will upgrade to the new version. On A/B immutable systems this composes the change into the inactive slot; in mutable mode it upgrades in-place.`,
 				},
 			],
 		},

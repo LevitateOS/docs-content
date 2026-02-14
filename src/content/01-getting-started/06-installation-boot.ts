@@ -1,16 +1,17 @@
 import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import { rich, link } from "../../rich-text"
 
 export const installationBootContent: DocsContent = {
 	title: "Bootloader & Finish",
-	intro: rich`Installation steps 15-18: Install pre-built UKI, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 15-18: Install A/B boot images, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
-			title: "15. Install Boot Image (UKI)",
+			title: "15. Install Boot Images (A/B UKIs)",
 			content: [
 				{
 					type: "text",
-					content: "LevitateOS uses Unified Kernel Images (UKI) - a single file containing the kernel, initramfs, and boot parameters. The ISO includes pre-built UKIs ready to copy.",
+					content:
+						"LevitateOS boots via Unified Kernel Images (UKI) and systemd-boot. The default install uses two boot images: slot A (system-a) and slot B (system-b).",
 				},
 				{
 					type: "command",
@@ -19,12 +20,13 @@ export const installationBootContent: DocsContent = {
 				},
 				{
 					type: "command",
-					description: "Copy the pre-built UKI from the ISO",
-					command: "cp /media/cdrom/boot/uki/levitateos.efi /boot/EFI/Linux/",
+					description: "Copy slot A boot image (system-a)",
+					command: "cp /media/cdrom/boot/uki/levitateos-system-a.efi /boot/EFI/Linux/",
 				},
 				{
-					type: "text",
-					content: "Optionally copy the recovery UKI for emergency access:",
+					type: "command",
+					description: "Copy slot B boot image (system-b)",
+					command: "cp /media/cdrom/boot/uki/levitateos-system-b.efi /boot/EFI/Linux/",
 				},
 				{
 					type: "command",
@@ -38,7 +40,7 @@ export const installationBootContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Install systemd-boot. It automatically discovers UKIs in /boot/EFI/Linux/:",
+					content: "Install systemd-boot and create explicit boot entries for slot A and slot B:",
 				},
 				{
 					type: "command",
@@ -46,18 +48,25 @@ export const installationBootContent: DocsContent = {
 					command: "bootctl install",
 				},
 				{
-					type: "note",
-					variant: "info",
-					content: rich`${bold("No boot entries needed:")} systemd-boot auto-discovers UKIs in ${code("/boot/EFI/Linux/")}. The UKI contains all boot parameters.`,
-				},
-				{
-					type: "text",
-					content: "Optionally configure bootloader timeout:",
+					type: "command",
+					description: "Create slot A + slot B boot entries",
+					command: [
+						"mkdir -p /boot/loader/entries",
+						`cat > /boot/loader/entries/levitate-a.conf << 'EOF'
+title   LevitateOS (Slot A)
+efi     /EFI/Linux/levitateos-system-a.efi
+EOF`,
+						`cat > /boot/loader/entries/levitate-b.conf << 'EOF'
+title   LevitateOS (Slot B)
+efi     /EFI/Linux/levitateos-system-b.efi
+EOF`,
+					],
 				},
 				{
 					type: "command",
-					description: "Set boot menu timeout (optional)",
+					description: "Configure bootloader defaults",
 					command: `cat > /boot/loader/loader.conf << 'EOF'
+default levitate-a.conf
 timeout 3
 editor no
 EOF`,

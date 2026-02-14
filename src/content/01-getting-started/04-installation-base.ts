@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import { rich, code, link } from "../../rich-text"
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
@@ -62,6 +62,10 @@ export const installationBaseContent: DocsContent = {
 				{
 					type: "text",
 					content: rich`You should see entries for ${code("/")} (ext4) and ${code("/boot")} (vfat) with UUIDs.`,
+				},
+				{
+					type: "text",
+					content: rich`With the default A/B layout, you should also see an entry for ${code("/var")} (ext4). Persistent state (including ${code("/var/home")}) lives there.`,
 				},
 			],
 		},

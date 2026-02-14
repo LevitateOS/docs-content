@@ -3,7 +3,8 @@ import { rich, code } from "../../rich-text"
 
 export const helpersLlmContent: DocsContent = {
 	title: "LLM Helpers",
-	intro: "AI-assisted functions for extracting version numbers and download URLs from unstructured sources. These helpers use a local LLM to parse complex web pages.",
+	intro:
+		"AI-assisted functions for extracting version numbers and download URLs from unstructured sources. These helpers use a local LLM to parse complex web pages.",
 	sections: [
 		{
 			title: "Overview",
@@ -36,7 +37,8 @@ export const helpersLlmContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Find the latest version number from a download page. The LLM parses the page and returns just the version string.",
+					content:
+						"Find the latest version number from a download page. The LLM parses the page and returns just the version string.",
 				},
 				{
 					type: "code",
@@ -58,7 +60,8 @@ export const helpersLlmContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Find the download URL for a specific version and platform. Useful for complex download pages.",
+					content:
+						"Find the download URL for a specific version and platform. Useful for complex download pages.",
 				},
 				{
 					type: "code",
@@ -95,7 +98,8 @@ export const helpersLlmContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: "LLM helpers are slower and require a local LLM, so only use them when no structured alternative exists.",
+					content:
+						"LLM helpers are slower and require a local LLM, so only use them when no structured alternative exists.",
 				},
 			],
 		},

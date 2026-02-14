@@ -1,5 +1,4 @@
 import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
 
 export const troubleshootingContent: DocsContent = {
 	title: "Troubleshooting",
@@ -21,34 +20,35 @@ export const troubleshootingContent: DocsContent = {
 								{
 									type: "command",
 									description: "Mount your partitions",
-									command: ["mount /dev/sda2 /mnt", "mount /dev/sda1 /mnt/boot"],
+									command: [
+										"mount /dev/sda2 /mnt",
+										"mount /dev/sda1 /mnt/boot",
+										"mount /dev/sda4 /mnt/var",
+									],
 								},
 								{
 									type: "command",
-									description: "Verify root partition is labeled 'root' (required for UKI)",
-									command: "blkid /dev/sda2 | grep 'LABEL=\"root\"'",
+									description: "Verify slot A partition is labeled 'system-a'",
+									command: "blkid /dev/sda2 | grep 'LABEL=\"system-a\"'",
 								},
 								{
 									type: "command",
-									description: "Verify UKI exists",
-									command: "ls -la /mnt/boot/EFI/Linux/levitateos.efi",
+									description: "Verify slot A boot image exists",
+									command: "ls -la /mnt/boot/EFI/Linux/levitateos-system-a.efi",
 								},
 								{
 									type: "command",
-									description: "Reinstall UKI if missing",
+									description: "Reinstall A/B boot images if missing",
 									command: [
 										"mkdir -p /mnt/boot/EFI/Linux",
-										"cp /media/cdrom/boot/uki/levitateos.efi /mnt/boot/EFI/Linux/",
+										"cp /media/cdrom/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/",
+										"cp /media/cdrom/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/",
 									],
 								},
 								{
 									type: "command",
 									description: "Re-enter chroot and reinstall bootloader",
-									command: [
-										"recchroot /mnt",
-										"bootctl install",
-										"exit",
-									],
+									command: ["recchroot /mnt", "bootctl install", "exit"],
 								},
 							],
 						},
@@ -120,7 +120,8 @@ export const troubleshootingContent: DocsContent = {
 								},
 								{
 									type: "text",
-									content: "If no wireless device appears, you may need to install additional firmware packages.",
+									content:
+										"If no wireless device appears, you may need to install additional firmware packages.",
 								},
 							],
 						},

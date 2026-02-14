@@ -3,7 +3,8 @@ import { rich, code } from "../../rich-text"
 
 export const helpersAcquireContent: DocsContent = {
 	title: "Acquire Helpers",
-	intro: "Functions for downloading, cloning, and verifying source materials. All functions take explicit paths and return paths.",
+	intro:
+		"Functions for downloading, cloning, and verifying source materials. All functions take explicit paths and return paths.",
 	sections: [
 		{
 			title: "Overview",
@@ -43,7 +44,8 @@ let archive = download("https://example.com/foo-1.0.tar.gz", dest);
 			content: [
 				{
 					type: "text",
-					content: "Download a file with resume support. If the download is interrupted, it will continue from where it left off.",
+					content:
+						"Download a file with resume support. If the download is interrupted, it will continue from where it left off.",
 				},
 				{
 					type: "code",
@@ -79,7 +81,8 @@ let archive = github_download_release("jqlang/jq", "1.7.1", "*.tar.gz");`,
 			content: [
 				{
 					type: "text",
-					content: "Clone a git repository to a destination directory. Returns the cloned directory path.",
+					content:
+						"Clone a git repository to a destination directory. Returns the cloned directory path.",
 				},
 				{
 					type: "code",
@@ -96,7 +99,8 @@ let archive = github_download_release("jqlang/jq", "1.7.1", "*.tar.gz");`,
 			content: [
 				{
 					type: "text",
-					content: "Shallow clone a git repository with limited history. Much faster for large repos.",
+					content:
+						"Shallow clone a git repository with limited history. Much faster for large repos.",
 				},
 				{
 					type: "code",
@@ -115,7 +119,8 @@ let src = git_clone_depth(
 			content: [
 				{
 					type: "text",
-					content: "Extract specific files from a tarball matching a glob pattern. Useful for extracting just binaries without full extraction.",
+					content:
+						"Extract specific files from a tarball matching a glob pattern. Useful for extracting just binaries without full extraction.",
 				},
 				{
 					type: "code",
@@ -176,7 +181,8 @@ verify_sha256(archive, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362
 			content: [
 				{
 					type: "text",
-					content: "Verify the BLAKE3 hash of a file. BLAKE3 is faster than SHA256 for large files.",
+					content:
+						"Verify the BLAKE3 hash of a file. BLAKE3 is faster than SHA256 for large files.",
 				},
 				{
 					type: "code",

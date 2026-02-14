@@ -3,7 +3,8 @@ import { rich, code, bold } from "../../rich-text"
 
 export const faqContent: DocsContent = {
 	title: "Architecture FAQ",
-	intro: "Design decisions and rationale behind LevitateOS components. Each answer explains why we chose a particular approach over alternatives.",
+	intro:
+		"Design decisions and rationale behind LevitateOS components. Each answer explains why we chose a particular approach over alternatives.",
 	sections: [
 		{
 			title: "Core Philosophy",
@@ -36,11 +37,13 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: "Arch requires compiling AUR packages. That means build dependencies, compiler toolchains, and waiting. LevitateOS extracts enterprise-tested Rocky RPMs in minutes. Same philosophy, less waiting.",
+									content:
+										"Arch requires compiling AUR packages. That means build dependencies, compiler toolchains, and waiting. LevitateOS extracts enterprise-tested Rocky RPMs in minutes. Same philosophy, less waiting.",
 								},
 								{
 									type: "text",
-									content: "If you want to compile everything yourself, use Arch. If you want the same control without the compilation overhead, use LevitateOS.",
+									content:
+										"If you want to compile everything yourself, use Arch. If you want the same control without the compilation overhead, use LevitateOS.",
 								},
 							],
 						},
@@ -49,11 +52,13 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: "Fedora is GNOME-focused and opinionated. It makes choices for you. LevitateOS is a base system - you build what you want on top of it.",
+									content:
+										"Fedora is GNOME-focused and opinionated. It makes choices for you. LevitateOS is a base system - you build what you want on top of it.",
 								},
 								{
 									type: "text",
-									content: "Fedora ships a complete desktop experience. LevitateOS ships a foundation. Different goals, different users.",
+									content:
+										"Fedora ships a complete desktop experience. LevitateOS ships a foundation. Different goals, different users.",
 								},
 							],
 						},
@@ -71,7 +76,8 @@ export const faqContent: DocsContent = {
 								},
 								{
 									type: "text",
-									content: "LevitateOS targets modern desktop and workstation hardware with full capabilities.",
+									content:
+										"LevitateOS targets modern desktop and workstation hardware with full capabilities.",
 								},
 							],
 						},
@@ -90,7 +96,8 @@ export const faqContent: DocsContent = {
 								},
 								{
 									type: "text",
-									content: "LevitateOS ships with local LLM capabilities. The recommended specs enable running 7B-13B parameter models for AI-assisted workflows. CPU-only inference works with 32GB+ RAM.",
+									content:
+										"LevitateOS ships with local LLM capabilities. The recommended specs enable running 7B-13B parameter models for AI-assisted workflows. CPU-only inference works with 32GB+ RAM.",
 								},
 							],
 						},
@@ -132,7 +139,8 @@ export const faqContent: DocsContent = {
 								},
 								{
 									type: "text",
-									content: "Rocky packages are tested in enterprise deployments. You get RHEL stability without maintaining a build farm. This decision is non-negotiable.",
+									content:
+										"Rocky packages are tested in enterprise deployments. You get RHEL stability without maintaining a build farm. This decision is non-negotiable.",
 								},
 							],
 						},
@@ -145,7 +153,8 @@ export const faqContent: DocsContent = {
 								},
 								{
 									type: "text",
-									content: "We don't recompile packages. We don't inject code. We don't modify binaries. We extract what Rocky ships and verify signatures match their public keys.",
+									content:
+										"We don't recompile packages. We don't inject code. We don't modify binaries. We extract what Rocky ships and verify signatures match their public keys.",
 								},
 								{
 									type: "text",
@@ -158,7 +167,8 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: "The old approach loaded a ~250MB initramfs entirely into RAM. The EROFS architecture provides:",
+									content:
+										"The old approach loaded a ~250MB initramfs entirely into RAM. The EROFS architecture provides:",
 								},
 								{
 									type: "list",
@@ -195,7 +205,8 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: "LevitateOS targets modern hardware (2013+). UEFI has been standard for over a decade. Dropping BIOS support allows:",
+									content:
+										"LevitateOS targets modern hardware (2013+). UEFI has been standard for over a decade. Dropping BIOS support allows:",
 								},
 								{
 									type: "list",
@@ -207,7 +218,8 @@ export const faqContent: DocsContent = {
 								},
 								{
 									type: "text",
-									content: "If you have hardware from before 2013 that lacks UEFI, LevitateOS is not the right distribution for you.",
+									content:
+										"If you have hardware from before 2013 that lacks UEFI, LevitateOS is not the right distribution for you.",
 								},
 							],
 						},
@@ -231,7 +243,8 @@ load_module ext4      # modprobe loads mbcache, jbd2 automatically`,
 								},
 								{
 									type: "text",
-									content: "Benefits: No manual ordering, kernel updates won't break boot, easy to add new modules.",
+									content:
+										"Benefits: No manual ordering, kernel updates won't break boot, easy to add new modules.",
 								},
 							],
 						},
@@ -255,7 +268,8 @@ let libs = get_all_dependencies(&ctx.rootfs, &bin_path)?;
 								},
 								{
 									type: "text",
-									content: "readelf reads ELF NEEDED entries directly from the file. No execution, no dynamic linker involvement. Works for any architecture on any host.",
+									content:
+										"readelf reads ELF NEEDED entries directly from the file. No execution, no dynamic linker involvement. Works for any architecture on any host.",
 								},
 							],
 						},
@@ -274,7 +288,8 @@ let libs = get_all_dependencies(&ctx.rootfs, &bin_path)?;
 							answer: [
 								{
 									type: "text",
-									content: "YAML isn't a programming language - you can't write conditionals or loops. Python has dependency hell and isn't embeddable without significant overhead. Lua lacks a standard library. Rhai is Rust-native, sandboxed, and actually programmable.",
+									content:
+										"YAML isn't a programming language - you can't write conditionals or loops. Python has dependency hell and isn't embeddable without significant overhead. Lua lacks a standard library. Rhai is Rust-native, sandboxed, and actually programmable.",
 								},
 								{
 									type: "text",
@@ -379,7 +394,13 @@ let installed_files = [];        // List of installed file paths`,
 							answer: [
 								{
 									type: "text",
-									content: "Yes, recipes are trusted code. They can execute shell commands, download files, and modify your system. This is intentional - recipes need full access to install software.",
+									content:
+										"Yes, recipes are trusted code. They can execute shell commands, download files, and install software. This is intentional.",
+								},
+								{
+									type: "text",
+									content:
+										"By default, LevitateOS is A/B immutable: recipes compose the next system in the inactive slot and you trial-boot it before committing. Mutable mode exists as an explicit opt-in for daredevils.",
 								},
 								{
 									type: "list",
@@ -392,7 +413,8 @@ let installed_files = [];        // List of installed file paths`,
 								},
 								{
 									type: "text",
-									content: "This is the same trust model as Arch's PKGBUILD or Gentoo's ebuilds. The user is responsible for reviewing what they install. LevitateOS doesn't sandbox recipes because that would break legitimate functionality.",
+									content:
+										"This is the same trust model as Arch's PKGBUILD or Gentoo's ebuilds. The user is responsible for reviewing what they install. Immutable-by-default reduces drift, but it doesn't make untrusted recipes safe.",
 								},
 							],
 						},
@@ -411,7 +433,8 @@ let installed_files = [];        // List of installed file paths`,
 							answer: [
 								{
 									type: "text",
-									content: "LevitateOS uses 6-phase E2E testing to validate the full installation flow:",
+									content:
+										"LevitateOS uses 6-phase E2E testing to validate the full installation flow:",
 								},
 								{
 									type: "table",
@@ -427,7 +450,8 @@ let installed_files = [];        // List of installed file paths`,
 								},
 								{
 									type: "text",
-									content: "Unit tests can't catch system integration issues. Installation is inherently end-to-end. Tests run in real QEMU VM with real hardware simulation.",
+									content:
+										"Unit tests can't catch system integration issues. Installation is inherently end-to-end. Tests run in real QEMU VM with real hardware simulation.",
 								},
 							],
 						},
@@ -466,7 +490,7 @@ fn test_bootloader_install() { ... }`,
 					type: "qa",
 					items: [
 						{
-							question: "What is \"STOP. READ. THEN ACT\"?",
+							question: 'What is "STOP. READ. THEN ACT"?',
 							answer: [
 								{
 									type: "text",
@@ -483,7 +507,8 @@ fn test_bootloader_install() { ... }`,
 								},
 								{
 									type: "text",
-									content: "This exists because a previous development session broke tests, created code in the wrong location, and deleted it without checking - wasting significant time and resources. Five minutes reading saves hours of cleanup.",
+									content:
+										"This exists because a previous development session broke tests, created code in the wrong location, and deleted it without checking - wasting significant time and resources. Five minutes reading saves hours of cleanup.",
 								},
 							],
 						},
@@ -501,11 +526,13 @@ fn test_bootloader_install() { ... }`,
 								},
 								{
 									type: "text",
-									content: "What was built: 34 recipe files, bootstrap module, busybox download, static binary compilation - all unnecessary.",
+									content:
+										"What was built: 34 recipe files, bootstrap module, busybox download, static binary compilation - all unnecessary.",
 								},
 								{
 									type: "text",
-									content: "The simple solution: The live ISO already contains a complete system in an EROFS image. Just extract it:",
+									content:
+										"The simple solution: The live ISO already contains a complete system in an EROFS image. Just extract it:",
 								},
 								{
 									type: "code",
@@ -537,7 +564,8 @@ fn test_bootloader_install() { ... }`,
 								},
 								{
 									type: "text",
-									content: "Silent implementation can waste resources, add complexity, and create technical debt.",
+									content:
+										"Silent implementation can waste resources, add complexity, and create technical debt.",
 								},
 							],
 						},
@@ -546,7 +574,7 @@ fn test_bootloader_install() { ... }`,
 							answer: [
 								{
 									type: "text",
-									content: "When unsure about UX decisions, ask \"What does archiso do?\"",
+									content: 'When unsure about UX decisions, ask "What does archiso do?"',
 								},
 								{
 									type: "list",
@@ -558,7 +586,8 @@ fn test_bootloader_install() { ... }`,
 								},
 								{
 									type: "text",
-									content: "LevitateOS competes with Arch. The live ISO experience should match archiso's behavior where applicable.",
+									content:
+										"LevitateOS competes with Arch. The live ISO experience should match archiso's behavior where applicable.",
 								},
 							],
 						},

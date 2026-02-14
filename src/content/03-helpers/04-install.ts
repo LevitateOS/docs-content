@@ -3,7 +3,8 @@ import { rich, code } from "../../rich-text"
 
 export const helpersInstallContent: DocsContent = {
 	title: "Install Helpers",
-	intro: "Functions for installing files to PREFIX. Use shell commands with explicit paths for most installations.",
+	intro:
+		"Functions for installing files to PREFIX. Use shell commands with explicit paths for most installations.",
 	sections: [
 		{
 			title: "Overview",

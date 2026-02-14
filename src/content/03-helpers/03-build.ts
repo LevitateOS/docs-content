@@ -47,7 +47,8 @@ extract(archive, BUILD_DIR);
 			content: [
 				{
 					type: "text",
-					content: "Extract an archive with an explicit format. Useful when the file extension doesn't match the actual format.",
+					content:
+						"Extract an archive with an explicit format. Useful when the file extension doesn't match the actual format.",
 				},
 				{
 					type: "code",
