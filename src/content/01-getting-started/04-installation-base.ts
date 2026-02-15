@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
@@ -34,6 +34,11 @@ export const installationBaseContent: DocsContent = {
 				{
 					type: "text",
 					content: rich`This extracts the complete system: kernel, systemd, coreutils, networking, and the ${code("recipe")} package manager.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 				{
 					type: "command",

@@ -86,6 +86,11 @@ sda       4.0T Seagate Barracuda        sata`,
 				{
 					type: "note",
 					variant: "warning",
+					content: rich`${bold("Why this layout:")} LevitateOS is A/B immutable by default. Slot B is the inactive target for atomic updates and rollback. ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
 					content: rich`${bold("Dual-boot:")} If keeping Windows, do NOT create a new EFI partition. Use your existing EFI partition (usually the first partition on your Windows disk). Create the LevitateOS partitions (system-a, system-b, var) in free space.`,
 				},
 				{

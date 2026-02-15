@@ -36,6 +36,7 @@ export const howWeCompareContent: DocsContent = {
 						rich`${bold("Enterprise packages")}: Rocky RPMs are tested in production RHEL deployments`,
 						rich`${bold("Programmable recipes")}: Rhai scripts can do anything, not just declare dependencies`,
 						rich`${bold("No build dependencies")}: You don't need gcc to install software`,
+						rich`${bold("A/B immutable by default")}: atomic slot updates + rollback; mutable mode exists for daredevils and is unsafe if you let an LLM author recipes without review`,
 						rich`${bold("Local LLM ready")}: First-class AI tooling built into the distribution`,
 					],
 				},

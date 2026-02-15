@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const helpersLlmContent: DocsContent = {
 	title: "LLM Helpers",
@@ -12,6 +12,11 @@ export const helpersLlmContent: DocsContent = {
 				{
 					type: "text",
 					content: rich`LLM helpers are useful when version numbers or download URLs aren't available via a clean API (like GitHub releases). They fetch a web page and use AI to extract the information. Requires a local LLM configured via ${code("RECIPE_LLM_ENDPOINT")}.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Safety:")} LLM output is untrusted. Review the extracted version/URL and anything that will be executed. The default update model is A/B immutable (slot updates + rollback); ${bold("mutable mode")} is an explicit opt-in for daredevils and is unsafe if you let an LLM author recipes without review. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
 		},

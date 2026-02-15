@@ -14,6 +14,11 @@ export const installationToolsOverviewContent: DocsContent = {
 					content: rich`LevitateOS provides three installation tools that mirror Arch Linux's manual installation workflow. These tools give you complete control over the installation process.`,
 				},
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
+				},
+				{
 					type: "table",
 					headers: ["LevitateOS", "Arch Linux", "Purpose"],
 					rows: [

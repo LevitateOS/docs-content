@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, link } from "../../rich-text"
+import { rich, bold, link } from "../../rich-text"
 
 export const installationBootContent: DocsContent = {
 	title: "Bootloader & Finish",
@@ -12,6 +12,11 @@ export const installationBootContent: DocsContent = {
 					type: "text",
 					content:
 						"LevitateOS boots via Unified Kernel Images (UKI) and systemd-boot. The default install uses two boot images: slot A (system-a) and slot B (system-b).",
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
 				},
 				{
 					type: "command",

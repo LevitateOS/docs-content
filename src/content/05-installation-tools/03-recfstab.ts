@@ -13,6 +13,11 @@ export const recfstabContent: DocsContent = {
 					content: rich`${code("recfstab")} reads mounted filesystems under a root directory and outputs properly formatted fstab entries to stdout. This is the equivalent of Arch Linux's ${code("genfstab")} command.`,
 				},
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
+				},
+				{
 					type: "text",
 					content:
 						"The output is suitable for appending to /etc/fstab. Pseudo-filesystems (proc, sysfs, tmpfs) are automatically filtered out.",

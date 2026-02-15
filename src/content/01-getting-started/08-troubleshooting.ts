@@ -8,6 +8,12 @@ export const troubleshootingContent: DocsContent = {
 			title: "Boot Issues",
 			content: [
 				{
+					type: "note",
+					variant: "warning",
+					content:
+						"Default update model is A/B immutable (slot updates + rollback). Mutable mode is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.",
+				},
+				{
 					type: "qa",
 					items: [
 						{

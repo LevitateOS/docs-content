@@ -13,6 +13,11 @@ export const recchrootContent: DocsContent = {
 					content: rich`${code("recchroot")} sets up the necessary bind mounts (/dev, /proc, /sys, /run), enters the chroot, runs your command (or an interactive shell), and cleans up on exit. This is the equivalent of Arch Linux's ${code("arch-chroot")} command.`,
 				},
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
+				},
+				{
 					type: "text",
 					content:
 						"The tool handles mount cleanup automatically, even if the command fails or is interrupted with Ctrl+C.",

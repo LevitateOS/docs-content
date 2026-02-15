@@ -42,7 +42,7 @@ export const variantsContent: DocsContent = {
 				{
 					type: "note",
 					variant: "info",
-					content: rich`All variants are moving toward A/B immutable by default. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`All variants are A/B immutable by default. Mutable mode (where it exists) is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
 		},

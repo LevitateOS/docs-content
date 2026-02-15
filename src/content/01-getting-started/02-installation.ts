@@ -13,6 +13,11 @@ export const installationContent: DocsContent = {
 					content:
 						"Installing LevitateOS follows the same process as Arch Linux. You'll boot from a live environment, prepare your disk, extract the system with recstrap, and configure before rebooting. No network connection is required.",
 				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+				},
 			],
 		},
 		{
