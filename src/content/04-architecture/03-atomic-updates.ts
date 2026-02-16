@@ -39,7 +39,7 @@ export const atomicUpdatesContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`See also the checkpoint model in ${code("checkpoints.md")} (CP7 Slot B Trial Boot).`,
+					content: rich`See also the stage model in ${code("stages.md")} (Stage 07 Slot B Trial Boot).`,
 				},
 			],
 		},

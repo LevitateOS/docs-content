@@ -78,7 +78,7 @@ export const variantsContent: DocsContent = {
 						rich`${bold("Desktop")} → ${link("Getting Started", "/docs/getting-started")}`,
 						rich`${bold("Packages")} → ${link("recipe CLI Reference", "/docs/cli-reference")}`,
 						rich`${bold("Update model")} → ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}`,
-						rich`${bold("Build/test loop")} → ${code("checkpoints.md")} (repo root)`,
+						rich`${bold("Build/test loop")} → ${code("stages.md")} (repo root)`,
 					],
 				},
 			],
