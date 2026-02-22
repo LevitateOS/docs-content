@@ -15,4 +15,4 @@ export type {
 // Navigation and content (pre-built)
 export { docsNav, contentBySlug } from "./generated"
 
-export type { DocsContent } from "./types"
+export type { DocsContent, DocsSyntaxLanguage } from "./types"

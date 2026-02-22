@@ -68,21 +68,25 @@ export const recstrapContent: DocsContent = {
 			content: [
 				{
 					type: "command",
+					language: "bash",
 					description: "Extract to mounted root partition",
 					command: "recstrap /mnt",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Use custom EROFS image location",
 					command: "recstrap /mnt --erofs /media/usb/filesystem.erofs",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Run pre-flight checks only (no extraction)",
 					command: "recstrap /mnt --check",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Force extraction to non-empty directory",
 					command: "recstrap /mnt --force",
 				},

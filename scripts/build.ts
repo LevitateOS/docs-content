@@ -5,26 +5,32 @@
  * This removes the dependency on Vite's import.meta.glob, making the package
  * work in any runtime (Bun, Node, etc).
  *
- * Run: bun scripts/build.ts
+ * Run:
+ *   bun scripts/build.ts
+ *   bun scripts/build.ts --validate-only
  */
 
 import { readdir, mkdir, writeFile } from "node:fs/promises"
-import { join, dirname } from "node:path"
+import { join } from "node:path"
 import type { DocsContent, NavSection } from "../src/types"
+import { snapshotDocsContent } from "./syntax"
 
 const SRC_DIR = join(import.meta.dir, "../src")
 const CONTENT_DIR = join(SRC_DIR, "content")
 const GENERATED_DIR = join(SRC_DIR, "generated")
 
 interface ContentEntry {
+	filePath: string
 	sectionOrder: number
 	sectionName: string
 	pageOrder: number
 	pageName: string
 	slug: string
 	content: DocsContent
-	importPath: string
-	exportName: string
+}
+
+type BuildOptions = {
+	validateOnly?: boolean
 }
 
 async function discoverContentFiles(): Promise<string[]> {
@@ -81,6 +87,8 @@ async function loadContentEntries(): Promise<ContentEntry[]> {
 		const parsed = parseContentPath(filePath)
 		if (!parsed) continue
 
+		const slug = generateSlug(parsed.sectionName, parsed.pageName)
+
 		// Import the module
 		const module = await import(filePath)
 
@@ -95,30 +103,16 @@ async function loadContentEntries(): Promise<ContentEntry[]> {
 			continue
 		}
 
-		// Generate export name from filename
-		// Helpers section files have "helpers" prefix (e.g., "01-overview" -> "helpersOverviewContent")
-		// Other sections use camelCase filename (e.g., "02-installation" -> "installationContent")
-		const baseExportName = parsed.pageName
-			.split("-")
-			.map((word, i) => (i === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
-			.join("")
-
-		const exportName =
-			parsed.sectionName === "helpers"
-				? "helpers" + baseExportName.charAt(0).toUpperCase() + baseExportName.slice(1) + "Content"
-				: baseExportName + "Content"
-
-		// Relative import path from generated/ to content/
-		const relativePath = filePath
-			.replace(SRC_DIR, "..")
-			.replace(/\.ts$/, "")
+		const snapshotted = await snapshotDocsContent(content, {
+			filePath,
+			slug,
+		})
 
 		entries.push({
+			filePath,
 			...parsed,
-			slug: generateSlug(parsed.sectionName, parsed.pageName),
-			content,
-			importPath: relativePath,
-			exportName,
+			slug,
+			content: snapshotted,
 		})
 	}
 
@@ -168,8 +162,17 @@ function buildNavigation(entries: ContentEntry[]): NavSection[] {
 		}))
 }
 
+function buildContentMap(entries: ContentEntry[]): Record<string, DocsContent> {
+	const contentBySlug: Record<string, DocsContent> = {}
+	for (const entry of entries) {
+		contentBySlug[entry.slug] = entry.content
+	}
+	return contentBySlug
+}
+
 async function generateOutput(entries: ContentEntry[]): Promise<string> {
 	const nav = buildNavigation(entries)
+	const contentBySlug = buildContentMap(entries)
 
 	const lines: string[] = [
 		"/**",
@@ -183,50 +186,49 @@ async function generateOutput(entries: ContentEntry[]): Promise<string> {
 		"",
 	]
 
-	// Import all content files
-	for (const entry of entries) {
-		lines.push(`import { ${entry.exportName} } from "${entry.importPath}"`)
-	}
-
-	lines.push("")
-
 	// Export navigation
 	lines.push("export const docsNav: NavSection[] = " + JSON.stringify(nav, null, "\t"))
 	lines.push("")
 
-	// Export content by slug
-	lines.push("export const contentBySlug: Record<string, DocsContent> = {")
-	for (const entry of entries) {
-		lines.push(`\t"${entry.slug}": ${entry.exportName},`)
-	}
-	lines.push("}")
+	// Export content by slug with build-time syntax snapshot payloads
+	lines.push(
+		"export const contentBySlug: Record<string, DocsContent> = " +
+			JSON.stringify(contentBySlug, null, "\t"),
+	)
 	lines.push("")
 
 	return lines.join("\n")
 }
 
-async function main() {
+export async function runBuild(options: BuildOptions = {}): Promise<void> {
 	console.log("Building docs-content...")
 
-	// Load all content entries
 	const entries = await loadContentEntries()
-	console.log(`Found ${entries.length} content files`)
+	console.log(`Loaded ${entries.length} content files`)
 
-	// Generate output
+	if (options.validateOnly) {
+		console.log("Syntax validation passed")
+		return
+	}
+
 	const output = await generateOutput(entries)
 
-	// Ensure generated directory exists
 	await mkdir(GENERATED_DIR, { recursive: true })
-
-	// Write generated file
 	const outputPath = join(GENERATED_DIR, "index.ts")
 	await writeFile(outputPath, output)
-	console.log(`Generated: ${outputPath}`)
 
+	console.log(`Generated: ${outputPath}`)
 	console.log("Done!")
 }
 
-main().catch((err) => {
-	console.error("Build failed:", err)
-	process.exit(1)
-})
+async function main() {
+	const validateOnly = process.argv.includes("--validate-only")
+	await runBuild({ validateOnly })
+}
+
+if (import.meta.main) {
+	main().catch((err) => {
+		console.error("Build failed:", err)
+		process.exit(1)
+	})
+}

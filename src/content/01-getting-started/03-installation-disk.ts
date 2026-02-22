@@ -19,6 +19,7 @@ export const installationDiskContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Verify you booted in UEFI mode",
 					command: "ls /sys/firmware/efi/efivars",
 				},
@@ -28,11 +29,13 @@ export const installationDiskContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Set keyboard layout (optional, default is US)",
 					command: "loadkeys us",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Sync system clock",
 					command: "timedatectl set-ntp true",
 				},
@@ -48,11 +51,13 @@ export const installationDiskContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "List wireless interfaces",
 					command: "iwctl device list",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Scan and connect (replace wlan0 and YOUR_NETWORK)",
 					command: "iwctl station wlan0 connect YOUR_NETWORK",
 				},
@@ -63,6 +68,7 @@ export const installationDiskContent: DocsContent = {
 			content: [
 				{
 					type: "command",
+					language: "bash",
 					description: "List all disks and identify your installation target",
 					command: "lsblk -d -o NAME,SIZE,MODEL,TRAN",
 					output: `NAME      SIZE MODEL                     TRAN
@@ -105,6 +111,7 @@ sda       4.0T Seagate Barracuda        sata`,
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Start fdisk",
 					command: "fdisk /dev/sda",
 				},
@@ -148,21 +155,25 @@ sda       4.0T Seagate Barracuda        sata`,
 			content: [
 				{
 					type: "command",
+					language: "bash",
 					description: "Format EFI partition",
 					command: "mkfs.fat -F32 -n EFI /dev/sda1",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Format system slot A",
 					command: "mkfs.ext4 -L system-a /dev/sda2",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Format system slot B",
 					command: "mkfs.ext4 -L system-b /dev/sda3",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Format persistent state partition (/var)",
 					command: "mkfs.ext4 -L var /dev/sda4",
 				},
@@ -178,16 +189,19 @@ sda       4.0T Seagate Barracuda        sata`,
 			content: [
 				{
 					type: "command",
+					language: "bash",
 					description: "Mount system slot A (system-a) at /mnt",
 					command: "mount /dev/sda2 /mnt",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Create mount point and mount EFI",
 					command: ["mkdir -p /mnt/boot", "mount /dev/sda1 /mnt/boot"],
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Mount persistent state partition (var) at /mnt/var",
 					command: ["mkdir -p /mnt/var", "mount /dev/sda4 /mnt/var"],
 				},

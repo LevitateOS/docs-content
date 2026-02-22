@@ -25,6 +25,7 @@ export const troubleshootingContent: DocsContent = {
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Mount your partitions",
 									command: [
 										"mount /dev/sda2 /mnt",
@@ -34,16 +35,19 @@ export const troubleshootingContent: DocsContent = {
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Verify slot A partition is labeled 'system-a'",
 									command: "blkid /dev/sda2 | grep 'LABEL=\"system-a\"'",
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Verify slot A boot image exists",
 									command: "ls -la /mnt/boot/EFI/Linux/levitateos-system-a.efi",
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Reinstall A/B boot images if missing",
 									command: [
 										"mkdir -p /mnt/boot/EFI/Linux",
@@ -53,6 +57,7 @@ export const troubleshootingContent: DocsContent = {
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Re-enter chroot and reinstall bootloader",
 									command: ["recchroot /mnt", "bootctl install", "exit"],
 								},
@@ -67,11 +72,13 @@ export const troubleshootingContent: DocsContent = {
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Check if EFI variables are accessible",
 									command: "ls /sys/firmware/efi/efivars",
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Verify ESP is mounted at /boot",
 									command: "mount | grep boot",
 								},
@@ -92,16 +99,19 @@ export const troubleshootingContent: DocsContent = {
 							answer: [
 								{
 									type: "command",
+									language: "bash",
 									description: "Check NetworkManager status",
 									command: "systemctl status NetworkManager",
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Start if not running",
 									command: "sudo systemctl enable --now NetworkManager",
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Connect to WiFi",
 									command: 'nmcli device wifi connect "YourNetwork" password "YourPassword"',
 								},
@@ -116,11 +126,13 @@ export const troubleshootingContent: DocsContent = {
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "List network interfaces",
 									command: "ip link",
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Check for wireless devices",
 									command: "nmcli device",
 								},
@@ -150,11 +162,13 @@ export const troubleshootingContent: DocsContent = {
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Update package lists",
 									command: "recipe update",
 								},
 								{
 									type: "command",
+									language: "bash",
 									description: "Retry installation",
 									command: "recipe install packagename",
 								},

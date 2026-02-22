@@ -29,7 +29,8 @@ export const helpersLlmContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Extract arbitrary information from unstructured text (HTML, changelog, etc) using a natural language prompt.",
+					content:
+						"Extract arbitrary information from unstructured text (HTML, changelog, etc) using a natural language prompt.",
 				},
 				{
 					type: "code",

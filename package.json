@@ -12,12 +12,13 @@
   },
   "scripts": {
     "build": "bun scripts/build.ts",
+    "syntax:validate": "bun scripts/validate-syntax.ts",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint src",
     "lint:fix": "oxlint src --fix",
     "format": "biome format --write src",
     "format:check": "biome format src",
-    "check": "bun run typecheck && bun run lint && bun run format:check"
+    "check": "bun run syntax:validate && bun run typecheck && bun run lint && bun run format:check"
   },
   "peerDependencies": {
     "react": ">=18"
@@ -26,6 +27,7 @@
     "@biomejs/biome": "2.3.11",
     "@types/react": "^18.3.0",
     "oxlint": "1.39.0",
+    "shiki": "^3.22.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7"
   }

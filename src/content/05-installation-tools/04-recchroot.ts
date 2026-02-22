@@ -62,21 +62,25 @@ export const recchrootContent: DocsContent = {
 			content: [
 				{
 					type: "command",
+					language: "bash",
 					description: "Enter interactive shell",
 					command: "recchroot /mnt",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Run single command",
 					command: "recchroot /mnt passwd",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Install bootloader",
 					command: "recchroot /mnt bootctl install",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Run multiple commands with shell",
 					command: "recchroot /mnt /bin/bash -c 'passwd && bootctl install'",
 				},

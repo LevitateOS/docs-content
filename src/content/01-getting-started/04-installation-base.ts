@@ -14,6 +14,7 @@ export const installationBaseContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Check for EROFS image",
 					command: "ls -la /media/cdrom/live/filesystem.erofs",
 				},
@@ -28,6 +29,7 @@ export const installationBaseContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Extract system to /mnt",
 					command: "recstrap /mnt",
 				},
@@ -42,6 +44,7 @@ export const installationBaseContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Verify extraction succeeded",
 					command: "ls /mnt/bin /mnt/usr /mnt/etc",
 				},
@@ -56,11 +59,13 @@ export const installationBaseContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Generate fstab from current mounts",
 					command: "recfstab /mnt >> /mnt/etc/fstab",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Verify the generated fstab",
 					command: "cat /mnt/etc/fstab",
 				},
@@ -83,6 +88,7 @@ export const installationBaseContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Enter the installed system",
 					command: "recchroot /mnt",
 				},

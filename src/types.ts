@@ -11,6 +11,8 @@ export interface DocsContent {
 	sections: Section[]
 }
 
+export type DocsSyntaxLanguage = "bash" | "rust" | "rhai" | "toml" | "text"
+
 export interface Section {
 	title: string
 	level?: 2 | 3
@@ -36,11 +38,13 @@ export interface TextBlock {
 
 export interface CodeBlock {
 	type: "code"
-	/** Language for syntax highlighting. If omitted, inferred from filename. */
-	language?: string
+	/** Language for syntax highlighting. */
+	language: DocsSyntaxLanguage
 	content: string
 	/** Optional filename - when present, shows file header with icon */
 	filename?: string
+	/** Build-time snapshot of syntax-colored lines for TUI rendering */
+	highlightedLines?: string[]
 }
 
 export interface TableBlock {
@@ -90,12 +94,16 @@ export interface InteractiveStep {
 
 export interface CommandBlock {
 	type: "command"
+	/** Language for syntax highlighting. */
+	language: DocsSyntaxLanguage
 	/** Description shown above the command */
 	description: string
 	/** The command(s) to run - single string or array for multiple lines */
 	command: string | string[]
 	/** Optional expected output (shown dimmer, not copied) */
 	output?: string
+	/** Build-time snapshot of syntax-colored command lines for TUI rendering */
+	highlightedCommandLines?: string[]
 }
 
 /** Navigation section for docs sidebar */

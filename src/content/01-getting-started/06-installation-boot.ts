@@ -20,21 +20,25 @@ export const installationBootContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Create the EFI Linux directory",
 					command: "mkdir -p /boot/EFI/Linux",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Copy slot A boot image (system-a)",
 					command: "cp /media/cdrom/boot/uki/levitateos-system-a.efi /boot/EFI/Linux/",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Copy slot B boot image (system-b)",
 					command: "cp /media/cdrom/boot/uki/levitateos-system-b.efi /boot/EFI/Linux/",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Copy recovery UKI (optional)",
 					command: "cp /media/cdrom/boot/uki/levitateos-recovery.efi /boot/EFI/Linux/",
 				},
@@ -49,11 +53,13 @@ export const installationBootContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Install systemd-boot to EFI partition",
 					command: "bootctl install",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Create slot A + slot B boot entries",
 					command: [
 						"mkdir -p /boot/loader/entries",
@@ -69,6 +75,7 @@ EOF`,
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Configure bootloader defaults",
 					command: `cat > /boot/loader/loader.conf << 'EOF'
 default levitate-a.conf
@@ -83,11 +90,13 @@ EOF`,
 			content: [
 				{
 					type: "command",
+					language: "bash",
 					description: "Initialize machine ID (required by systemd)",
 					command: "systemd-machine-id-setup",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Enable networking",
 					command: "systemctl enable NetworkManager",
 				},
@@ -98,16 +107,19 @@ EOF`,
 			content: [
 				{
 					type: "command",
+					language: "bash",
 					description: "Exit chroot",
 					command: "exit",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Unmount all partitions",
 					command: "umount -R /mnt",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Reboot",
 					command: "reboot",
 				},

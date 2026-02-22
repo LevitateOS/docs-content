@@ -74,21 +74,25 @@ export const recfstabContent: DocsContent = {
 			content: [
 				{
 					type: "command",
+					language: "bash",
 					description: "Generate fstab with UUIDs (default)",
 					command: "recfstab /mnt >> /mnt/etc/fstab",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Generate fstab with filesystem LABELs",
 					command: "recfstab -L /mnt >> /mnt/etc/fstab",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Generate fstab with partition UUIDs",
 					command: "recfstab -p /mnt >> /mnt/etc/fstab",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Preview output without writing",
 					command: "recfstab /mnt",
 				},

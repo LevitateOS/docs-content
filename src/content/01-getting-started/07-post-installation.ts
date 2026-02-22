@@ -20,16 +20,19 @@ export const postInstallationContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "List available packages",
 					command: "recipe list",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Install a package",
 					command: "recipe install ripgrep",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "View package info",
 					command: "recipe info firefox",
 				},
@@ -48,16 +51,19 @@ export const postInstallationContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Update package lists",
 					command: "recipe update",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Upgrade installed packages",
 					command: "recipe upgrade",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Reboot to trial-boot the updated slot (B)",
 					command: "reboot",
 				},
@@ -72,11 +78,13 @@ export const postInstallationContent: DocsContent = {
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Install NVIDIA proprietary drivers",
 					command: "recipe install nvidia-driver",
 				},
 				{
 					type: "command",
+					language: "bash",
 					description: "Reboot to load the driver",
 					command: "reboot",
 				},
