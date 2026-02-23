@@ -43,17 +43,21 @@ export type ContentBlock =
 	| QABlock
 	| NoteBlock
 
-export function defaultDocsBlockRendererKey(type: ContentBlock["type"]): string {
-	return `docs.block.${type}`
+export interface RenderableBlock {
+	/**
+	 * Optional renderer contract key.
+	 * When omitted, renderers should use the built-in key for this block type.
+	 */
+	rendererKey?: string
 }
 
-export interface TextBlock {
+export interface TextBlock extends RenderableBlock {
 	type: "text"
 	/** Plain string or rich text array from tagged template */
 	content: string | RichText
 }
 
-export interface CodeBlock {
+export interface CodeBlock extends RenderableBlock {
 	type: "code"
 	/** Language for syntax highlighting. */
 	language: DocsSyntaxLanguage
@@ -64,7 +68,7 @@ export interface CodeBlock {
 	highlightedLines?: string[]
 }
 
-export interface TableBlock {
+export interface TableBlock extends RenderableBlock {
 	type: "table"
 	headers: (string | RichText)[]
 	rows: (string | RichText)[][]
@@ -72,7 +76,7 @@ export interface TableBlock {
 	monospaceCol?: number
 }
 
-export interface ListBlock {
+export interface ListBlock extends RenderableBlock {
 	type: "list"
 	ordered?: boolean
 	items: (string | RichText | ListItem)[]
@@ -83,7 +87,7 @@ export interface ListItem {
 	children?: (string | RichText)[]
 }
 
-export interface ConversationBlock {
+export interface ConversationBlock extends RenderableBlock {
 	type: "conversation"
 	messages: ConversationMessage[]
 }
@@ -95,7 +99,7 @@ export interface ConversationMessage {
 	list?: (string | RichText)[]
 }
 
-export interface InteractiveBlock {
+export interface InteractiveBlock extends RenderableBlock {
 	type: "interactive"
 	/** Optional intro text before the steps */
 	intro?: string | RichText
@@ -109,7 +113,7 @@ export interface InteractiveStep {
 	description: string | RichText
 }
 
-export interface CommandBlock {
+export interface CommandBlock extends RenderableBlock {
 	type: "command"
 	/** Language for syntax highlighting. */
 	language: DocsSyntaxLanguage
@@ -142,7 +146,7 @@ export interface NavItemSection {
 	level: 2 | 3
 }
 
-export interface QABlock {
+export interface QABlock extends RenderableBlock {
 	type: "qa"
 	items: QAItem[]
 }
@@ -154,7 +158,7 @@ export interface QAItem {
 	answer: ContentBlock[]
 }
 
-export interface NoteBlock {
+export interface NoteBlock extends RenderableBlock {
 	type: "note"
 	/** Visual style: info (blue), warning (yellow), danger (red) */
 	variant: "info" | "warning" | "danger"
