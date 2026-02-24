@@ -15,6 +15,15 @@ interface ContentEntry {
 	content: DocsContent
 }
 
+function getNavSection(sectionName: string): { key: string; title: string } {
+	const title = sectionName
+		.split("-")
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(" ")
+
+	return { key: sectionName, title }
+}
+
 // Parse folder/file structure into ordered entries
 function parseContentModules(): ContentEntry[] {
 	const entries: ContentEntry[] = []
@@ -67,20 +76,20 @@ const sectionMap = new Map<
 >()
 
 for (const entry of entries) {
-	const sectionTitle = entry.sectionName
-		.split("-")
-		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-		.join(" ")
+	const navSection = getNavSection(entry.sectionName)
 
-	if (!sectionMap.has(entry.sectionName)) {
-		sectionMap.set(entry.sectionName, {
+	if (!sectionMap.has(navSection.key)) {
+		sectionMap.set(navSection.key, {
 			order: entry.sectionOrder,
-			title: sectionTitle,
+			title: navSection.title,
 			items: [],
 		})
 	}
 
-	sectionMap.get(entry.sectionName)!.items.push({
+	const section = sectionMap.get(navSection.key)!
+	section.order = Math.min(section.order, entry.sectionOrder)
+
+	section.items.push({
 		slug: entry.slug,
 		title: entry.content.title,
 		order: entry.pageOrder,

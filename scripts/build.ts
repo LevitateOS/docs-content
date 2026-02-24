@@ -79,6 +79,10 @@ function toTitleCase(str: string): string {
 		.join(" ")
 }
 
+function getNavSection(sectionName: string): { key: string; title: string } {
+	return { key: sectionName, title: toTitleCase(sectionName) }
+}
+
 async function loadContentEntries(): Promise<ContentEntry[]> {
 	const files = await discoverContentFiles()
 	const entries: ContentEntry[] = []
@@ -132,17 +136,20 @@ function buildNavigation(entries: ContentEntry[]): NavSection[] {
 	>()
 
 	for (const entry of entries) {
-		const sectionTitle = toTitleCase(entry.sectionName)
+		const navSection = getNavSection(entry.sectionName)
 
-		if (!sectionMap.has(entry.sectionName)) {
-			sectionMap.set(entry.sectionName, {
+		if (!sectionMap.has(navSection.key)) {
+			sectionMap.set(navSection.key, {
 				order: entry.sectionOrder,
-				title: sectionTitle,
+				title: navSection.title,
 				items: [],
 			})
 		}
 
-		sectionMap.get(entry.sectionName)!.items.push({
+		const section = sectionMap.get(navSection.key)!
+		section.order = Math.min(section.order, entry.sectionOrder)
+
+		section.items.push({
 			slug: entry.slug,
 			title: entry.content.title,
 			order: entry.pageOrder,

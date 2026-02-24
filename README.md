@@ -59,9 +59,10 @@ import { installContent, levitateContent } from '@levitate/docs-content';
 
 ## Adding Content
 
-1. Create content file in `src/content/`
-2. Export from `src/index.ts`
-3. Run `bun run build`
+1. Create content file in `src/content/<NN-section>/<NN-page>.ts`
+2. Export a `DocsContent` object from that file
+3. For website dev, just run `docs/website` dev server (live discovery picks it up)
+4. For production builds or publishing docs-content generated data, run `bun run build`
 
 ## Development
 
