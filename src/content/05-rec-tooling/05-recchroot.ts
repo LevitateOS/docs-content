@@ -3,6 +3,12 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const recchrootContent: DocsContent = {
 	title: "recchroot",
+	meta: {
+		product: "levitate",
+		scopes: ["install"],
+		audience: ["operator", "developer"],
+		stability: "stable",
+	},
 	intro: "Enter a chroot environment with proper bind mounts. Like arch-chroot for Arch Linux.",
 	sections: [
 		{

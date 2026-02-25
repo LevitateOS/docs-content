@@ -3,6 +3,7 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
+	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
 	intro: rich`Installation steps 6-9: Verify media, extract the system, generate fstab, and enter chroot. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
@@ -10,13 +11,14 @@ export const installationBaseContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "The live ISO is already mounted. Verify the EROFS image is accessible:",
+					content:
+						"The live media is already mounted. Verify the canonical EROFS payload path is accessible:",
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Check for EROFS image",
-					command: "ls -la /media/cdrom/live/filesystem.erofs",
+					command: "ls -la /run/live-rootfs.erofs",
 				},
 			],
 		},

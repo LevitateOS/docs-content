@@ -3,6 +3,12 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const recfstabContent: DocsContent = {
 	title: "recfstab",
+	meta: {
+		product: "levitate",
+		scopes: ["install"],
+		audience: ["operator", "developer"],
+		stability: "stable",
+	},
 	intro: "Generate fstab entries from mounted filesystems. Like genfstab for Arch Linux.",
 	sections: [
 		{
@@ -109,10 +115,10 @@ export const recfstabContent: DocsContent = {
 					type: "code",
 					language: "bash",
 					content: `# /dev/nvme0n1p2
-UUID=a1b2c3d4-e5f6-7890-abcd-ef1234567890	/	ext4	rw,relatime	0	1
+UUID=a1b2c3d4-e5f6-7890-abcd-ef1234567890	/	ext4	defaults	0	1
 
 # /dev/nvme0n1p1
-UUID=ABCD-1234	/boot	vfat	rw,relatime,fmask=0022,dmask=0022	0	2`,
+UUID=ABCD-1234	/boot	vfat	fmask=0022,dmask=0022	0	2`,
 				},
 				{
 					type: "text",
@@ -148,7 +154,8 @@ UUID=ABCD-1234	/boot	vfat	rw,relatime,fmask=0022,dmask=0022	0	2`,
 					items: [
 						rich`${code("rw")} / ${code("ro")} - Read-write/read-only (determined at mount time)`,
 						rich`${code("seclabel")} - SELinux label option`,
-						rich`${code("noatime")}, ${code("relatime")} - Access time options are preserved`,
+						rich`${code("noatime")}, ${code("relatime")}, ${code("lazytime")} - Runtime atime options removed`,
+						rich`${code("subvolid=<id>")} - Removed, while ${code("subvol=<path>")} is preserved`,
 					],
 				},
 			],
@@ -163,9 +170,10 @@ UUID=ABCD-1234	/boot	vfat	rw,relatime,fmask=0022,dmask=0022	0	2`,
 				{
 					type: "code",
 					language: "text",
-					content: `proc  sysfs  devtmpfs  tmpfs  devpts  securityfs  cgroup  cgroup2
-pstore  bpf  tracefs  debugfs  hugetlbfs  mqueue  fusectl  configfs
-efivarfs  autofs  fuse.gvfsd-fuse  overlay  squashfs  erofs`,
+					content: `autofs  binder  binfmt_misc  bpf  cgroup  cgroup2  configfs  debugfs
+devpts  devtmpfs  efivarfs  fuse.gvfsd-fuse  fuse.portal  fusectl
+hugetlbfs  mqueue  nsfs  overlay  proc  pstore  ramfs  rpc_pipefs
+securityfs  selinuxfs  sysfs  tmpfs  tracefs`,
 				},
 			],
 		},
@@ -199,7 +207,6 @@ efivarfs  autofs  fuse.gvfsd-fuse  overlay  squashfs  erofs`,
 						["E004", "findmnt command not found (util-linux not installed)"],
 						["E005", "findmnt command failed"],
 						["E006", "No filesystems found under specified root"],
-						["E007", "blkid command not found (util-linux not installed)"],
 					],
 					monospaceCol: 0,
 				},
@@ -212,8 +219,8 @@ efivarfs  autofs  fuse.gvfsd-fuse  overlay  squashfs  erofs`,
 					type: "list",
 					items: [
 						rich`${code("findmnt")} - Part of util-linux, used to enumerate mounts`,
-						rich`${code("blkid")} - Part of util-linux, used to look up device identifiers`,
-						"Root privileges (for blkid to read device UUIDs)",
+						rich`${code("blkid")} - Optional, used to look up UUID/LABEL/PARTUUID/PARTLABEL; missing ${code("blkid")} falls back to raw device paths`,
+						"Root privileges are recommended for reliable block metadata access",
 					],
 				},
 			],

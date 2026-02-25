@@ -13,6 +13,6 @@ export type {
 } from "./rich-text"
 
 // Navigation and content (pre-built)
-export { docsNav, contentBySlug } from "./generated"
+export { docsNav, contentBySlug, metaBySlug } from "./generated"
 
 export type { DocsContent, DocsSyntaxLanguage } from "./types"

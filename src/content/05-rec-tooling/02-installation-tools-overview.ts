@@ -1,8 +1,14 @@
 import type { DocsContent } from "../../types"
-import { rich, bold, link } from "../../rich-text"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const installationToolsOverviewContent: DocsContent = {
 	title: "Installation Tools Overview",
+	meta: {
+		product: "levitate",
+		scopes: ["install"],
+		audience: ["operator", "developer"],
+		stability: "stable",
+	},
 	intro:
 		"Command-line tools for manual LevitateOS installation, equivalent to Arch Linux's pacstrap, genfstab, and arch-chroot.",
 	sections: [
@@ -40,6 +46,10 @@ export const installationToolsOverviewContent: DocsContent = {
 					],
 					monospaceCol: 0,
 				},
+				{
+					type: "text",
+					content: rich`${bold("Scope note")}: this page documents the installer trio only. The repo also ships broader ${code("rec*")} tooling for build/test/runtime workflows. In canonical order: ${code("recab")}, ${code("recart")}, ${code("recguard")}, ${code("recinit")}, ${code("reciso")}, ${code("recpart")}, ${code("recqemu")}, ${code("recuki")}.`,
+				},
 			],
 		},
 		{
@@ -75,7 +85,7 @@ export const installationToolsOverviewContent: DocsContent = {
 						},
 						{
 							command:
-								"mkdir -p /mnt/boot/EFI/Linux && cp /media/cdrom/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/ && cp /media/cdrom/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/",
+								"mkdir -p /mnt/boot/EFI/Linux && cp /run/live-media/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/ && cp /run/live-media/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/",
 							description: "Copy A/B boot images (UKIs)",
 						},
 						{
@@ -83,7 +93,7 @@ export const installationToolsOverviewContent: DocsContent = {
 							description: "Enter the new system",
 						},
 						{
-							command: "passwd",
+							command: "passwd root",
 							description: "Set root password (inside chroot)",
 						},
 						{

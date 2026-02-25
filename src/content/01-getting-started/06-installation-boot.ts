@@ -3,6 +3,7 @@ import { rich, bold, link } from "../../rich-text"
 
 export const installationBootContent: DocsContent = {
 	title: "Bootloader & Finish",
+	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
 	intro: rich`Installation steps 15-18: Install A/B boot images, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
@@ -28,19 +29,19 @@ export const installationBootContent: DocsContent = {
 					type: "command",
 					language: "bash",
 					description: "Copy slot A boot image (system-a)",
-					command: "cp /media/cdrom/boot/uki/levitateos-system-a.efi /boot/EFI/Linux/",
+					command: "cp /run/live-media/boot/uki/levitateos-system-a.efi /boot/EFI/Linux/",
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Copy slot B boot image (system-b)",
-					command: "cp /media/cdrom/boot/uki/levitateos-system-b.efi /boot/EFI/Linux/",
+					command: "cp /run/live-media/boot/uki/levitateos-system-b.efi /boot/EFI/Linux/",
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Copy recovery UKI (optional)",
-					command: "cp /media/cdrom/boot/uki/levitateos-recovery.efi /boot/EFI/Linux/",
+					command: "cp /run/live-media/boot/uki/levitateos-recovery.efi /boot/EFI/Linux/",
 				},
 			],
 		},

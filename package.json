@@ -14,12 +14,13 @@
   "scripts": {
     "build": "bun scripts/build.ts",
     "syntax:validate": "bun scripts/validate-syntax.ts",
+    "generated:check": "bun scripts/build.ts --validate-only --check-generated",
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint src",
-    "lint:fix": "oxlint src --fix",
-    "format": "biome format --write src",
-    "format:check": "biome format src",
-    "check": "bun run syntax:validate && bun run typecheck && bun run lint && bun run format:check"
+    "lint": "bunx oxlint --config ../../.oxlintrc.json src scripts --deny-warnings",
+    "lint:fix": "bunx oxlint --config ../../.oxlintrc.json src scripts --fix",
+    "format": "bunx oxfmt --config ../../.oxfmtrc.json --write src scripts package.json tsconfig.json",
+    "format:check": "bunx oxfmt --config ../../.oxfmtrc.json --check src scripts package.json tsconfig.json",
+    "check": "bun run syntax:validate && bun run generated:check && bun run typecheck && bun run lint && bun run format:check"
   },
   "peerDependencies": {
     "react": ">=18"

@@ -10,9 +10,17 @@
  *   bun scripts/build.ts --validate-only
  */
 
-import { readdir, mkdir, writeFile } from "node:fs/promises"
+import { readdir, readFile, mkdir, writeFile } from "node:fs/promises"
 import { join } from "node:path"
-import type { DocsContent, NavSection } from "../src/types"
+import type {
+	DocsAudience,
+	DocsContent,
+	DocsPageMeta,
+	DocsProduct,
+	DocsScope,
+	DocsStability,
+	NavSection,
+} from "../src/types"
 import { snapshotDocsContent } from "./syntax"
 
 const SRC_DIR = join(import.meta.dir, "../src")
@@ -26,11 +34,33 @@ interface ContentEntry {
 	pageOrder: number
 	pageName: string
 	slug: string
+	meta: DocsPageMeta
 	content: DocsContent
 }
 
 type BuildOptions = {
 	validateOnly?: boolean
+	checkGenerated?: boolean
+}
+
+async function assertGeneratedOutput(outputPath: string, expectedOutput: string): Promise<void> {
+	let currentOutput: string
+	try {
+		currentOutput = await readFile(outputPath, "utf8")
+	} catch (err) {
+		if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+			throw new Error(
+				`Generated docs contract file is missing at '${outputPath}'. Remediation: bun run build (docs/content).`,
+			)
+		}
+		throw err
+	}
+
+	if (currentOutput !== expectedOutput) {
+		throw new Error(
+			`Generated docs contract file is stale at '${outputPath}'. Remediation: bun run build (docs/content) and commit updated src/generated/index.ts.`,
+		)
+	}
 }
 
 async function discoverContentFiles(): Promise<string[]> {
@@ -83,6 +113,117 @@ function getNavSection(sectionName: string): { key: string; title: string } {
 	return { key: sectionName, title: toTitleCase(sectionName) }
 }
 
+const PRODUCT_VALUES: DocsProduct[] = ["levitate", "acorn", "ralph", "shared"]
+const SCOPE_VALUES: DocsScope[] = ["install", "post_install", "architecture", "reference"]
+const AUDIENCE_VALUES: DocsAudience[] = ["beginner", "operator", "developer"]
+const STABILITY_VALUES: DocsStability[] = ["stable", "experimental"]
+
+function inferMetaFromSection(sectionName: string, pageName: string): DocsPageMeta {
+	if (sectionName === "getting-started") {
+		return {
+			product: "levitate",
+			scopes: pageName === "post-installation" ? ["install", "post_install"] : ["install"],
+			audience: ["beginner"],
+			stability: "stable",
+		}
+	}
+
+	if (sectionName === "installation-tools" || sectionName === "rec-tooling") {
+		return {
+			product: "levitate",
+			scopes: ["install"],
+			audience: ["operator", "developer"],
+			stability: "stable",
+		}
+	}
+
+	if (sectionName === "architecture") {
+		return {
+			product: "levitate",
+			scopes: ["architecture"],
+			audience: ["developer"],
+			stability: "stable",
+		}
+	}
+
+	return {
+		product: "levitate",
+		scopes: ["reference"],
+		stability: "stable",
+	}
+}
+
+function normalizeEnum<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+	if (typeof value !== "string") {
+		return fallback
+	}
+
+	return allowed.includes(value as T) ? (value as T) : fallback
+}
+
+function normalizeEnumArray<T extends string>(
+	value: unknown,
+	allowed: readonly T[],
+	fallback: readonly T[],
+): T[] {
+	if (!Array.isArray(value)) {
+		return [...fallback]
+	}
+
+	const normalized = value.filter((entry): entry is T => {
+		return typeof entry === "string" && allowed.includes(entry as T)
+	})
+
+	if (normalized.length === 0) {
+		return [...fallback]
+	}
+
+	return Array.from(new Set(normalized))
+}
+
+function normalizeMeta(rawMeta: unknown, inferred: DocsPageMeta): DocsPageMeta {
+	if (typeof rawMeta !== "object" || rawMeta === null) {
+		return inferred
+	}
+
+	const candidate = rawMeta as {
+		product?: unknown
+		scopes?: unknown
+		audience?: unknown
+		stability?: unknown
+	}
+
+	const meta: DocsPageMeta = {
+		product: normalizeEnum(candidate.product, PRODUCT_VALUES, inferred.product),
+		scopes: normalizeEnumArray(candidate.scopes, SCOPE_VALUES, inferred.scopes),
+	}
+
+	const audience = normalizeEnumArray(candidate.audience, AUDIENCE_VALUES, [])
+	if (audience.length > 0) {
+		meta.audience = audience
+	}
+
+	const stability = normalizeEnum(
+		candidate.stability,
+		STABILITY_VALUES,
+		inferred.stability ?? "stable",
+	)
+	if (stability.length > 0) {
+		meta.stability = stability
+	}
+
+	return meta
+}
+
+function resolvePageMeta(
+	content: DocsContent,
+	sectionName: string,
+	pageName: string,
+): DocsPageMeta {
+	const inferred = inferMetaFromSection(sectionName, pageName)
+	return normalizeMeta(content.meta, inferred)
+}
+
 async function loadContentEntries(): Promise<ContentEntry[]> {
 	const files = await discoverContentFiles()
 	const entries: ContentEntry[] = []
@@ -107,7 +248,13 @@ async function loadContentEntries(): Promise<ContentEntry[]> {
 			continue
 		}
 
-		const snapshotted = await snapshotDocsContent(content, {
+		const meta = resolvePageMeta(content, parsed.sectionName, parsed.pageName)
+		const contentWithMeta: DocsContent = {
+			...content,
+			meta,
+		}
+
+		const snapshotted = await snapshotDocsContent(contentWithMeta, {
 			filePath,
 			slug,
 		})
@@ -116,13 +263,12 @@ async function loadContentEntries(): Promise<ContentEntry[]> {
 			filePath,
 			...parsed,
 			slug,
+			meta,
 			content: snapshotted,
 		})
 	}
 
-	return entries.sort(
-		(a, b) => a.sectionOrder - b.sectionOrder || a.pageOrder - b.pageOrder,
-	)
+	return entries.sort((a, b) => a.sectionOrder - b.sectionOrder || a.pageOrder - b.pageOrder)
 }
 
 function buildNavigation(entries: ContentEntry[]): NavSection[] {
@@ -177,19 +323,27 @@ function buildContentMap(entries: ContentEntry[]): Record<string, DocsContent> {
 	return contentBySlug
 }
 
+function buildMetaMap(entries: ContentEntry[]): Record<string, DocsPageMeta> {
+	const metaBySlug: Record<string, DocsPageMeta> = {}
+	for (const entry of entries) {
+		metaBySlug[entry.slug] = entry.meta
+	}
+	return metaBySlug
+}
+
 async function generateOutput(entries: ContentEntry[]): Promise<string> {
 	const nav = buildNavigation(entries)
 	const contentBySlug = buildContentMap(entries)
+	const metaBySlug = buildMetaMap(entries)
 
 	const lines: string[] = [
 		"/**",
 		" * AUTO-GENERATED FILE - DO NOT EDIT",
 		" *",
 		" * Generated by: bun scripts/build.ts",
-		` * Generated at: ${new Date().toISOString()}`,
 		" */",
 		"",
-		'import type { NavSection, DocsContent } from "../types"',
+		'import type { NavSection, DocsContent, DocsPageMeta } from "../types"',
 		"",
 	]
 
@@ -204,6 +358,12 @@ async function generateOutput(entries: ContentEntry[]): Promise<string> {
 	)
 	lines.push("")
 
+	lines.push(
+		"export const metaBySlug: Record<string, DocsPageMeta> = " +
+			JSON.stringify(metaBySlug, null, "\t"),
+	)
+	lines.push("")
+
 	return lines.join("\n")
 }
 
@@ -213,15 +373,20 @@ export async function runBuild(options: BuildOptions = {}): Promise<void> {
 	const entries = await loadContentEntries()
 	console.log(`Loaded ${entries.length} content files`)
 
+	const output = await generateOutput(entries)
+	const outputPath = join(GENERATED_DIR, "index.ts")
+
+	if (options.checkGenerated) {
+		await assertGeneratedOutput(outputPath, output)
+		console.log("Generated contract is up to date")
+	}
+
 	if (options.validateOnly) {
 		console.log("Syntax validation passed")
 		return
 	}
 
-	const output = await generateOutput(entries)
-
 	await mkdir(GENERATED_DIR, { recursive: true })
-	const outputPath = join(GENERATED_DIR, "index.ts")
 	await writeFile(outputPath, output)
 
 	console.log(`Generated: ${outputPath}`)
@@ -230,7 +395,8 @@ export async function runBuild(options: BuildOptions = {}): Promise<void> {
 
 async function main() {
 	const validateOnly = process.argv.includes("--validate-only")
-	await runBuild({ validateOnly })
+	const checkGenerated = process.argv.includes("--check-generated")
+	await runBuild({ validateOnly, checkGenerated })
 }
 
 if (import.meta.main) {

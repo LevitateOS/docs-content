@@ -3,6 +3,7 @@ import { rich, bold, code, link } from "../../rich-text"
 
 export const installationDiskContent: DocsContent = {
 	title: "Disk Preparation",
+	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
 	intro: rich`Installation steps 1-5: Boot the live environment and prepare your disk. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{

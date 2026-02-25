@@ -3,6 +3,7 @@ import { rich, code, link } from "../../rich-text"
 
 export const installationConfigContent: DocsContent = {
 	title: "Configuration",
+	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
 	intro: rich`Installation steps 10-14: Configure timezone, locale, hostname, and user accounts. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{

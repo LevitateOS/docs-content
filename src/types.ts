@@ -5,8 +5,21 @@
 
 import type { RichText } from "./rich-text"
 
+export type DocsProduct = "levitate" | "acorn" | "ralph" | "shared"
+export type DocsScope = "install" | "post_install" | "architecture" | "reference"
+export type DocsAudience = "beginner" | "operator" | "developer"
+export type DocsStability = "stable" | "experimental"
+
+export interface DocsPageMeta {
+	product: DocsProduct
+	scopes: DocsScope[]
+	audience?: DocsAudience[]
+	stability?: DocsStability
+}
+
 export interface DocsContent {
 	title: string
+	meta?: DocsPageMeta
 	intro?: string | RichText
 	sections: Section[]
 }

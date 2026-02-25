@@ -3,6 +3,7 @@ import { rich, bold, link } from "../../rich-text"
 
 export const installationContent: DocsContent = {
 	title: "Installation",
+	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
 	intro: "Step-by-step guide to installing LevitateOS from the live environment.",
 	sections: [
 		{

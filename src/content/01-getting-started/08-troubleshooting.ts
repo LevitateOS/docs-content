@@ -2,6 +2,7 @@ import type { DocsContent } from "../../types"
 
 export const troubleshootingContent: DocsContent = {
 	title: "Troubleshooting",
+	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
 	intro: "Common issues and solutions for LevitateOS installation and usage.",
 	sections: [
 		{
@@ -51,8 +52,8 @@ export const troubleshootingContent: DocsContent = {
 									description: "Reinstall A/B boot images if missing",
 									command: [
 										"mkdir -p /mnt/boot/EFI/Linux",
-										"cp /media/cdrom/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/",
-										"cp /media/cdrom/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/",
+										"cp /run/live-media/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/",
+										"cp /run/live-media/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/",
 									],
 								},
 								{

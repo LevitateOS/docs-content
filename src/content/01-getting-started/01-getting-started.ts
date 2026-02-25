@@ -3,6 +3,7 @@ import { rich, bold, link } from "../../rich-text"
 
 export const gettingStartedContent: DocsContent = {
 	title: "Getting Started",
+	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
 	intro: "Download a LevitateOS variant and create bootable installation media (desktop variants).",
 	sections: [
 		{

@@ -3,6 +3,12 @@ import { rich, link } from "../../rich-text"
 
 export const postInstallationContent: DocsContent = {
 	title: "Post-Installation",
+	meta: {
+		product: "levitate",
+		scopes: ["install", "post_install"],
+		audience: ["beginner"],
+		stability: "stable",
+	},
 	intro: rich`After rebooting, log in with your user account and start using your new system.`,
 	sections: [
 		{
