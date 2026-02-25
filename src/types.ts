@@ -43,6 +43,10 @@ export type ContentBlock =
 	| QABlock
 	| NoteBlock
 
+export function defaultDocsBlockRendererKey(type: ContentBlock["type"]): string {
+	return `docs.block.${type}`
+}
+
 export interface TextBlock {
 	type: "text"
 	/** Plain string or rich text array from tagged template */
