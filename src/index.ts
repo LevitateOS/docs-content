@@ -15,5 +15,6 @@ export type {
 
 // Navigation and content (pre-built)
 export { docsNav, contentBySlug, metaBySlug } from "./generated"
+export { INDUSTRIAL_PASTEL_1984_THEMES } from "./syntax-theme"
 
 export type { DocsContent, DocsSyntaxLanguage } from "./types"

@@ -1,7 +1,9 @@
 import { createHighlighter, createJavaScriptRegexEngine } from "shiki"
 import type { ContentBlock, DocsContent, DocsSyntaxLanguage } from "../src/types"
+import { INDUSTRIAL_PASTEL_1984_THEMES } from "../src/syntax-theme"
 
-const SHIKI_THEME = "github-dark"
+const SNAPSHOT_THEME = INDUSTRIAL_PASTEL_1984_THEMES.dark
+const SNAPSHOT_THEME_NAME = SNAPSHOT_THEME.name
 const SHIKI_LANGUAGES = ["bash", "rust", "toml"] as const
 const DOCS_SYNTAX_LANGUAGES = ["bash", "rust", "rhai", "toml", "text"] as const
 
@@ -145,7 +147,7 @@ function normalizeTokenLines(result: ShikiTokenResult, context: SyntaxContext): 
 async function getHighlighter(): Promise<SyntaxHighlighter> {
 	if (!highlighterPromise) {
 		highlighterPromise = createHighlighter({
-			themes: [SHIKI_THEME],
+			themes: [SNAPSHOT_THEME],
 			langs: [...SHIKI_LANGUAGES],
 			engine: createJavaScriptRegexEngine(),
 		})
@@ -170,7 +172,7 @@ function highlightSource(
 
 	const tokens = highlighter.codeToTokens(source, {
 		lang: shikiLanguageFor(language),
-		theme: SHIKI_THEME,
+		theme: SNAPSHOT_THEME_NAME,
 	}) as ShikiTokenResult
 
 	return normalizeTokenLines(tokens, context)

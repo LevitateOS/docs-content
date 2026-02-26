@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./live": "./src/discovery.ts",
     "./types": "./src/types.ts",
+    "./syntax-theme": "./src/syntax-theme.ts",
     "./content/*": "./src/content/*.ts"
   },
   "scripts": {
