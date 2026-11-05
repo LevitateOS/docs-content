@@ -82,7 +82,7 @@ export const recartContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Current ingest paths in implementation still reference distro directories such as ${code("leviso/")}, ${code("AcornOS/")}, and ${code("IuppiterOS/")}. Treat behavior as implementation-detail while policy migration is in progress.`,
+					content: rich`Current ingest paths in implementation still reference distro directories such as ${code("leviso/")} and ${code("AcornOS/")}. Treat behavior as implementation-detail while policy migration is in progress.`,
 				},
 			],
 		},

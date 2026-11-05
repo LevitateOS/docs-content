@@ -68,10 +68,6 @@ export const atomicUpdatesContent: DocsContent = {
 						"Appliance variants are immutable-only. They ship primarily as installed-disk images and are designed to run unattended.",
 				},
 				{
-					type: "list",
-					items: [rich`${bold("RalphOS")}: agents-only automation host (disk images first)`],
-				},
-				{
 					type: "text",
 					content: rich`If you’re looking for a daily-driver desktop experience, start with ${link("Getting Started", "/docs/getting-started")}.`,
 				},

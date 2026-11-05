@@ -113,7 +113,7 @@ function getNavSection(sectionName: string): { key: string; title: string } {
 	return { key: sectionName, title: toTitleCase(sectionName) }
 }
 
-const PRODUCT_VALUES: DocsProduct[] = ["levitate", "acorn", "ralph", "shared"]
+const PRODUCT_VALUES: DocsProduct[] = ["levitate", "acorn", "shared"]
 const SCOPE_VALUES: DocsScope[] = ["install", "post_install", "architecture", "reference"]
 const AUDIENCE_VALUES: DocsAudience[] = ["beginner", "operator", "developer"]
 const STABILITY_VALUES: DocsStability[] = ["stable", "experimental"]
