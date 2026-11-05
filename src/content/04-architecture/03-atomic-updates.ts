@@ -39,7 +39,7 @@ export const atomicUpdatesContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`See also the checkpoint ladder in ${code("checkpoints.md")} (07Update Slot B Trial Boot).`,
+					content: rich`See also the build and scenario model in ${code("architecture.md")} (A/B update and rollback validation).`,
 				},
 			],
 		},
