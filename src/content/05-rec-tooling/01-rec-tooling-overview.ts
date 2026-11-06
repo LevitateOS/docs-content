@@ -38,12 +38,6 @@ export const recToolingOverviewContent: DocsContent = {
 					rows: [
 						[rich`${link("recab", "/docs/recab")}`, "CLI", "A/B slot state machine", "Scaffold"],
 						[
-							rich`${link("recart", "/docs/recart")}`,
-							"CLI",
-							"Artifact-store management",
-							"Experimental",
-						],
-						[
 							rich`${link("recchroot", "/docs/recchroot")}`,
 							"CLI",
 							"Chroot with bind mounts",
@@ -106,7 +100,7 @@ export const recToolingOverviewContent: DocsContent = {
 						rich`${bold("Installer-facing")}: ${code("recstrap")}, ${code("recfstab")}, ${code("recchroot")}`,
 						rich`${bold("Partition backend")}: ${code("recpart")} (plan/apply and handoff only)`,
 						rich`${bold("Build pipeline")}: ${code("recinit")}, ${code("recuki")}, ${code("reciso")}`,
-						rich`${bold("Infra/automation")}: ${code("recqemu")}, ${code("recart")}`,
+						rich`${bold("Infra/automation")}: ${code("recqemu")}`,
 						rich`${bold("A/B and policy control-plane")}: ${code("recab")}, ${code("recguard")}`,
 					],
 				},
