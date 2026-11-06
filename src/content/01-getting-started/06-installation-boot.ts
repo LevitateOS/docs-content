@@ -35,7 +35,7 @@ export const installationBootContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Install systemd-boot and write an entry for each slot. The entry's ${code("root=")} names the slot's partition by PARTUUID; ${code("recab")} reads these entries to know which partition is which slot. Replace ${code("/dev/sda2")} and ${code("/dev/sda3")} with your slot A and slot B partitions.`,
+					content: rich`Install systemd-boot and write an entry for each slot. The entry's ${code("root=")} names the slot's partition by PARTUUID; ${code("recab")} reads these entries to know which partition is which slot. ${code("panic=10")} makes a panicking kernel reboot, which returns a failed trial boot to the other slot. Replace ${code("/dev/sda2")} and ${code("/dev/sda3")} with your slot A and slot B partitions.`,
 				},
 				{
 					type: "command",
@@ -53,13 +53,13 @@ export const installationBootContent: DocsContent = {
 title   LevitateOS (Slot A)
 linux   /levitate-a/vmlinuz
 initrd  /levitate-a/initramfs.img
-options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda2) ro rootwait
+options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda2) ro rootwait panic=10
 EOF`,
 						`cat > /boot/loader/entries/levitate-b.conf << EOF
 title   LevitateOS (Slot B)
 linux   /levitate-b/vmlinuz
 initrd  /levitate-b/initramfs.img
-options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda3) ro rootwait
+options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda3) ro rootwait panic=10
 EOF`,
 					],
 				},
@@ -89,6 +89,12 @@ EOF`,
 					language: "bash",
 					description: "Enable networking",
 					command: "systemctl enable NetworkManager",
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Enable A/B trial supervision (commits a healthy update, reboots out of a failed one)",
+					command: "recab install-unit",
 				},
 			],
 		},

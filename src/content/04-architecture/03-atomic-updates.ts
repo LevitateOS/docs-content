@@ -33,7 +33,7 @@ export const atomicUpdatesContent: DocsContent = {
 					items: [
 						rich`Write the new system into the inactive slot: ${code("recab stage --rootfs <image> --kernel <vmlinuz> --initrd <initramfs>")}. The machine's hostname, accounts, enabled services and SSH host keys come along.`,
 						rich`Trial-boot it once: ${code("recab set-next B")}, then reboot`,
-						rich`Commit it if healthy: ${code("recab commit")}. If you reboot without committing, the machine falls back to slot A by itself.`,
+						rich`If slot B comes up with no failed services, ${code("recab-trial.service")} commits it. If services fail, startup never finishes, or the kernel panics, the machine reboots into slot A by itself.`,
 						rich`Later, ${code("recab rollback")} returns to the previous slot while it still holds that system`,
 					],
 				},
