@@ -50,7 +50,7 @@ export const cliReferenceContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`Inputs are imported read-only at ${code("/inputs/NAME")}. A named ${code("target")} input seeds owned ${code("/out")} for fresh state. Final JSON contains validated published host paths in ${code("ctx.outputs")}; diagnostics go to stderr. Use the same inputs, recipe and destination for retained checks/removal.`,
+					content: rich`Inputs are imported read-only at ${code("/inputs/NAME")}. A named ${code("target")} input seeds owned ${code("/out")} for fresh state. Final JSON contains validated published host paths in ${code("ctx.outputs")}; diagnostics go to stderr. Use the same inputs, recipe and destination for retained checks/removal. Published products retain coordinator ownership; privileged producers require matching consumer privileges or explicit product installation.`,
 				},
 			],
 		},

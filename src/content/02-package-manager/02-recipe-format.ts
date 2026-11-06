@@ -40,7 +40,7 @@ export const recipeFormatContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`After successful execution and archive validation, final JSON contains the published host paths in ${code("ctx.outputs")}. Consumers validate required names and kinds. Remove/cleanup changes owned files while imported inputs and earlier publications stay immutable. Current scope excludes live-system activation.`,
+					content: rich`After successful execution and archive validation, final JSON contains the published host paths in ${code("ctx.outputs")}. Consumers validate required names and kinds. Remove/cleanup changes owned files while imported inputs and earlier publications stay immutable. Products retain coordinator ownership/private export permissions; privileged producers need matching consumer privileges or explicit product installation. Current scope excludes live-system activation.`,
 				},
 				{
 					type: "text",
