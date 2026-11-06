@@ -17,7 +17,7 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: rich`LevitateOS is a daily driver Linux distribution competing directly with Arch Linux. It borrows Arch's philosophy (user maintains their own packages, minimal base that users build up) but substitutes hours of compilation with minutes of extraction from pre-built Rocky Linux packages.`,
+									content: rich`LevitateOS is a daily driver Linux distribution competing directly with Arch Linux. It borrows Arch's philosophy (user maintains their own packages, minimal base that users build up) but takes its core system (glibc, systemd, coreutils, OpenSSH and the rest of a minimal base) pre-built from Fedora instead of compiling it.`,
 								},
 								{
 									type: "table",
@@ -26,7 +26,7 @@ export const faqContent: DocsContent = {
 										["Target User", "Power users seeking control", "Same"],
 										["Philosophy", "Minimal base, user builds", "Same"],
 										["Package Manager", "pacman + AUR", "recipe (Rhai scripts)"],
-										["Binary Source", "Compiled from source", "Extracted from Rocky 10 RPMs"],
+										["Binary Source", "Compiled from source", "Core extracted from signed Fedora RPMs"],
 										["Build Time", "Hours (compiling)", "Minutes (extracting)"],
 									],
 								},
@@ -38,7 +38,7 @@ export const faqContent: DocsContent = {
 								{
 									type: "text",
 									content:
-										"Arch requires compiling AUR packages. That means build dependencies, compiler toolchains, and waiting. LevitateOS extracts enterprise-tested Rocky RPMs in minutes. Same philosophy, less waiting.",
+										"Arch requires compiling AUR packages. That means build dependencies, compiler toolchains, and waiting. LevitateOS extracts its core from signed Fedora RPMs in minutes. Same philosophy, less waiting.",
 								},
 								{
 									type: "text",
@@ -125,22 +125,22 @@ export const faqContent: DocsContent = {
 					type: "qa",
 					items: [
 						{
-							question: "Why use Rocky Linux 10 instead of building from source?",
+							question: "Why take the base from Fedora instead of building it from source?",
 							answer: [
 								{
 									type: "list",
 									items: [
-										rich`${bold("Enterprise-grade packages")} with security patches and stability`,
+										rich`${bold("Current, maintained packages")}: Fedora's release plus its security updates`,
 										rich`${bold("glibc-based")} (not musl) for maximum compatibility`,
 										rich`${bold("No compilation required")} - binaries are pre-built`,
 										rich`${bold("Builds in minutes")} instead of hours`,
-										rich`${bold("Direct RPM extraction")} using ${code("rpm --root --nodeps")}`,
+										rich`${bold("Direct RPM extraction")}: a locked set of 85 packages is unpacked with ${code("rpm2cpio")}, no package manager involved`,
 									],
 								},
 								{
 									type: "text",
 									content:
-										"Rocky packages are tested in enterprise deployments. You get RHEL stability without maintaining a build farm. This decision is non-negotiable.",
+										"Fedora keeps the toolchain and libraries current, which matters for a desktop where users build new software, and the A/B slots make moving to each new Fedora release cheap to undo.",
 								},
 							],
 						},
@@ -149,16 +149,12 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: rich`Same way you trust any distro - they're GPG-signed by Rocky Linux. Run ${code("rpm -K /path/to/package.rpm")} yourself.`,
+									content: rich`They're Fedora's own signed builds. ${code("cargo xtask base lock")} picks each package from Fedora's release and updates repositories and checks it against the repository checksum and the release's signing key before it is locked; builds then verify every RPM against the locked SHA256.`,
 								},
 								{
 									type: "text",
 									content:
-										"We don't recompile packages. We don't inject code. We don't modify binaries. We extract what Rocky ships and verify signatures match their public keys.",
-								},
-								{
-									type: "text",
-									content: rich`See ${code("SUPPLY_CHAIN.md")} in the repository root for full verification steps.`,
+										"We don't recompile packages. We don't inject code. We don't modify binaries. We extract what Fedora ships.",
 								},
 							],
 						},
@@ -555,7 +551,7 @@ let installed_files = [];        // List of installed file paths`,
 					type: "table",
 					headers: ["Decision", "Alternative", "Why Chosen"],
 					rows: [
-						["Rocky Linux 10", "Compile from source", "Minutes vs hours, stable packages"],
+						["Fedora base", "Compile from source", "Minutes vs hours, maintained packages"],
 						["EROFS", "Large initramfs", "RAM savings, scalability, single source"],
 						["Rhai recipes", "S-expressions/YAML", "Real programming, infinite extensibility"],
 						["State in files", "Database", "Self-contained, easy to sync, simple"],

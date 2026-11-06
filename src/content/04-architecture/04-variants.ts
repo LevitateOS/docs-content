@@ -16,7 +16,7 @@ export const variantsContent: DocsContent = {
 						[
 							"LevitateOS",
 							"Daily-driver desktop/workstation",
-							"Rocky RPM extraction (glibc)",
+							"Fedora RPM extraction (glibc)",
 							"systemd",
 							"ISO (installer/live)",
 							"Optional (unsafe)",

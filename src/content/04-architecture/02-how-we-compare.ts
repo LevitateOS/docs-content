@@ -21,7 +21,7 @@ export const howWeCompareContent: DocsContent = {
 						["Community size", "Huge", "Large", "Medium", "Growing"],
 						["Local AI integration", "No", "No", "No", "Yes"],
 						["Rolling release", "Yes", "No (6mo)", "Yes", "Yes"],
-						["Package source", "Compile AUR", "Fedora repos", "Nixpkgs", "Rocky RPMs"],
+						["Package source", "Compile AUR", "Fedora repos", "Nixpkgs", "Fedora RPMs (core) + recipes"],
 					],
 				},
 			],
@@ -33,7 +33,7 @@ export const howWeCompareContent: DocsContent = {
 					type: "list",
 					items: [
 						rich`${bold("Speed")}: Extract pre-built packages in minutes, not hours of compilation`,
-						rich`${bold("Enterprise packages")}: Rocky RPMs are tested in production RHEL deployments`,
+						rich`${bold("Maintained base")}: the core comes from Fedora's signed builds and their security updates`,
 						rich`${bold("Programmable recipes")}: Rhai scripts can do anything, not just declare dependencies`,
 						rich`${bold("No build dependencies")}: You don't need gcc to install software`,
 						rich`${bold("A/B immutable by default")}: atomic slot updates + rollback; mutable mode exists for daredevils and is unsafe if you let an LLM author recipes without review`,
@@ -54,7 +54,7 @@ export const howWeCompareContent: DocsContent = {
 					type: "list",
 					items: [
 						rich`${bold("Smaller community")}: We're new. Arch and Fedora have decades of community knowledge.`,
-						rich`${bold("Fewer packages than AUR")}: Rocky's repository is curated enterprise software. Niche packages require writing recipes.`,
+						rich`${bold("Fewer packages than AUR")}: only a small core comes from Fedora. Everything else needs a recipe.`,
 						rich`${bold("Not Nix-level reproducibility")}: A/B + lock files help, but we don't (yet) match NixOS generation semantics.`,
 						rich`${bold("Less documentation")}: Arch Wiki is comprehensive. Our docs are growing but not there yet.`,
 						rich`${bold("Younger project")}: Less battle-tested edge cases compared to established distros.`,
@@ -97,7 +97,7 @@ export const howWeCompareContent: DocsContent = {
 					type: "list",
 					items: [
 						rich`${bold("You need NixOS-style reproducibility")}: LevitateOS isn't trying to be NixOS`,
-						rich`${bold("You want a huge package ecosystem")}: AUR has more packages than Rocky repos`,
+						rich`${bold("You want a huge package ecosystem")}: AUR has far more packages than LevitateOS has recipes`,
 						rich`${bold("You prefer guided installation")}: Fedora and Ubuntu have better installers`,
 						rich`${bold("You need extensive documentation")}: Arch Wiki is unmatched`,
 						rich`${bold("You want a large support community")}: Our community is still growing`,
