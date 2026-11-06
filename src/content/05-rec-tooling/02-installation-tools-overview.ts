@@ -48,7 +48,7 @@ export const installationToolsOverviewContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`${bold("Scope note")}: this page documents the installer trio only. The repo also ships broader ${code("rec*")} tooling for build/test/runtime workflows. In canonical order: ${code("recab")}, ${code("recguard")}, ${code("recinit")}, ${code("reciso")}, ${code("recpart")}, ${code("recqemu")}, ${code("recuki")}.`,
+					content: rich`${bold("Scope note")}: this page documents the installer trio only. The repo also ships broader ${code("rec*")} tooling for build/test/runtime workflows. In canonical order: ${code("recab")}, ${code("recinit")}, ${code("reciso")}, ${code("recpart")}, ${code("recqemu")}, ${code("recuki")}.`,
 				},
 			],
 		},

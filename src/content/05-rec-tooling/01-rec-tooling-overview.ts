@@ -50,12 +50,6 @@ export const recToolingOverviewContent: DocsContent = {
 							"Stable (installer)",
 						],
 						[
-							rich`${link("recguard", "/docs/recguard")}`,
-							"Spec (no binary yet)",
-							"Mutability policy verification",
-							"Draft",
-						],
-						[
 							rich`${link("recinit", "/docs/recinit")}`,
 							"CLI + library",
 							"Initramfs builder",
@@ -101,7 +95,7 @@ export const recToolingOverviewContent: DocsContent = {
 						rich`${bold("Partition backend")}: ${code("recpart")} (plan/apply and handoff only)`,
 						rich`${bold("Build pipeline")}: ${code("recinit")}, ${code("recuki")}, ${code("reciso")}`,
 						rich`${bold("Infra/automation")}: ${code("recqemu")}`,
-						rich`${bold("A/B and policy control-plane")}: ${code("recab")}, ${code("recguard")}`,
+						rich`${bold("A/B control-plane")}: ${code("recab")}`,
 					],
 				},
 			],

@@ -54,7 +54,6 @@ export const recabContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${link("recguard", "/docs/recguard")} - Policy enforcement layer (draft)`,
 						rich`${link("recpart", "/docs/recpart")} - Install disk/backend handoff`,
 						rich`${link("Atomic Updates (A/B)", "/docs/atomic-updates")} - A/B model context`,
 					],
