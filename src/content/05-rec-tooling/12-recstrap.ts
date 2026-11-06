@@ -134,7 +134,7 @@ export const recstrapContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`The tool refuses host system directories as a target. The list is ${code("PROTECTED_PATHS")} in ${code("distro/spec/src/shared/paths.rs")}.`,
+					content: rich`The tool refuses host system directories as a target. The list is ${code("PROTECTED_PATHS")} in ${code("tools/recstrap/src/guard.rs")}.`,
 				},
 			],
 		},
