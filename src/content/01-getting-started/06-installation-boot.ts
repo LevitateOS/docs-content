@@ -4,15 +4,15 @@ import { rich, bold, code, link } from "../../rich-text"
 export const installationBootContent: DocsContent = {
 	title: "Bootloader & Finish",
 	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
-	intro: rich`Installation steps 15-18: Install the slot A kernel, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 15-18: Install the bootloader, set up the A/B boot layout, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
-			title: "15. Install the Kernel for Slot A",
+			title: "15. Install Bootloader",
 			content: [
 				{
 					type: "text",
 					content:
-						"LevitateOS boots with systemd-boot. Each slot keeps its own kernel in its own directory on the EFI partition, so an update to one slot never replaces the kernel the other slot boots. The installer fills slot A; slot B gets its kernel when you first update with recab.",
+						"LevitateOS boots with systemd-boot. Install it to the EFI partition mounted at /boot:",
 				},
 				{
 					type: "note",
@@ -22,56 +22,28 @@ export const installationBootContent: DocsContent = {
 				{
 					type: "command",
 					language: "bash",
-					description: "Copy the kernel and initramfs into slot A's directory",
-					command: [
-						"mkdir -p /boot/levitate-a",
-						"cp /run/live-media/boot/vmlinuz /run/live-media/boot/initramfs.img /boot/levitate-a/",
-					],
+					description: "Install systemd-boot to EFI partition",
+					command: "bootctl install",
 				},
 			],
 		},
 		{
-			title: "16. Install Bootloader",
+			title: "16. Set Up the A/B Boot Layout",
 			content: [
 				{
 					type: "text",
-					content: rich`Install systemd-boot and write an entry for each slot. The entry's ${code("root=")} names the slot's partition by PARTUUID; ${code("recab")} reads these entries to know which partition is which slot. ${code("panic=10")} makes a panicking kernel reboot, which returns a failed trial boot to the other slot. Replace ${code("/dev/sda2")} and ${code("/dev/sda3")} with your slot A and slot B partitions.`,
+					content: rich`${code("recab init")} writes a boot entry for each slot (each names its partition by PARTUUID, which is how ${code("recab")} tells the slots apart), copies the kernel into slot A's own directory on the EFI partition, makes slot A the default, records it as known-good, and enables ${code("recab-trial.service")}, which commits a healthy update and reboots out of a failed one. Slot B gets its kernel when you first update. Replace ${code("/dev/sda2")} and ${code("/dev/sda3")} with your slot A and slot B partitions.`,
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Install systemd-boot to EFI partition",
-					command: "bootctl install",
+					description: "Write the slot entries, slot A's kernel and recab's state",
+					command:
+						"recab init --root / --slot-a /dev/sda2 --slot-b /dev/sda3 --kernel /run/live-media/boot/vmlinuz --initrd /run/live-media/boot/initramfs.img",
 				},
 				{
-					type: "command",
-					language: "bash",
-					description: "Create slot A + slot B boot entries",
-					command: [
-						"mkdir -p /boot/loader/entries",
-						`cat > /boot/loader/entries/levitate-a.conf << EOF
-title   LevitateOS (Slot A)
-linux   /levitate-a/vmlinuz
-initrd  /levitate-a/initramfs.img
-options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda2) ro rootwait panic=10
-EOF`,
-						`cat > /boot/loader/entries/levitate-b.conf << EOF
-title   LevitateOS (Slot B)
-linux   /levitate-b/vmlinuz
-initrd  /levitate-b/initramfs.img
-options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda3) ro rootwait panic=10
-EOF`,
-					],
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Configure bootloader defaults",
-					command: `cat > /boot/loader/loader.conf << 'EOF'
-default levitate-a.conf
-timeout 3
-editor no
-EOF`,
+					type: "text",
+					content: rich`Add kernel options both slots should boot with, such as a serial console, with ${code("--options \"console=ttyS0,115200n8\"")}.`,
 				},
 			],
 		},
@@ -90,12 +62,7 @@ EOF`,
 					description: "Enable networking",
 					command: "systemctl enable NetworkManager",
 				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Enable A/B trial supervision (commits a healthy update, reboots out of a failed one)",
-					command: "recab install-unit",
-				},
+
 			],
 		},
 		{
