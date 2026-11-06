@@ -1,47 +1,32 @@
 import type { DocsContent } from "../../types"
-import { rich, bold, link } from "../../rich-text"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const installationBootContent: DocsContent = {
 	title: "Bootloader & Finish",
 	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
-	intro: rich`Installation steps 15-18: Install A/B boot images, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 15-18: Install the slot A kernel, install bootloader, enable services, and reboot. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
-			title: "15. Install Boot Images (A/B UKIs)",
+			title: "15. Install the Kernel for Slot A",
 			content: [
 				{
 					type: "text",
 					content:
-						"LevitateOS boots via Unified Kernel Images (UKI) and systemd-boot. The default install uses two boot images: slot A (system-a) and slot B (system-b).",
+						"LevitateOS boots with systemd-boot. Each slot keeps its own kernel in its own directory on the EFI partition, so an update to one slot never replaces the kernel the other slot boots. The installer fills slot A; slot B gets its kernel when you first update with recab.",
 				},
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
+					content: rich`${bold("Default update model:")} A/B (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Create the EFI Linux directory",
-					command: "mkdir -p /boot/EFI/Linux",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Copy slot A boot image (system-a)",
-					command: "cp /run/live-media/boot/uki/levitateos-system-a.efi /boot/EFI/Linux/",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Copy slot B boot image (system-b)",
-					command: "cp /run/live-media/boot/uki/levitateos-system-b.efi /boot/EFI/Linux/",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Copy recovery UKI (optional)",
-					command: "cp /run/live-media/boot/uki/levitateos-recovery.efi /boot/EFI/Linux/",
+					description: "Copy the kernel and initramfs into slot A's directory",
+					command: [
+						"mkdir -p /boot/levitate-a",
+						"cp /run/live-media/boot/vmlinuz /run/live-media/boot/initramfs.img /boot/levitate-a/",
+					],
 				},
 			],
 		},
@@ -50,7 +35,7 @@ export const installationBootContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Install systemd-boot and create explicit boot entries for slot A and slot B:",
+					content: rich`Install systemd-boot and write an entry for each slot. The entry's ${code("root=")} names the slot's partition by PARTUUID; ${code("recab")} reads these entries to know which partition is which slot. Replace ${code("/dev/sda2")} and ${code("/dev/sda3")} with your slot A and slot B partitions.`,
 				},
 				{
 					type: "command",
@@ -64,13 +49,17 @@ export const installationBootContent: DocsContent = {
 					description: "Create slot A + slot B boot entries",
 					command: [
 						"mkdir -p /boot/loader/entries",
-						`cat > /boot/loader/entries/levitate-a.conf << 'EOF'
+						`cat > /boot/loader/entries/levitate-a.conf << EOF
 title   LevitateOS (Slot A)
-efi     /EFI/Linux/levitateos-system-a.efi
+linux   /levitate-a/vmlinuz
+initrd  /levitate-a/initramfs.img
+options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda2) ro rootwait
 EOF`,
-						`cat > /boot/loader/entries/levitate-b.conf << 'EOF'
+						`cat > /boot/loader/entries/levitate-b.conf << EOF
 title   LevitateOS (Slot B)
-efi     /EFI/Linux/levitateos-system-b.efi
+linux   /levitate-b/vmlinuz
+initrd  /levitate-b/initramfs.img
+options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda3) ro rootwait
 EOF`,
 					],
 				},

@@ -31,11 +31,16 @@ export const atomicUpdatesContent: DocsContent = {
 					type: "list",
 					ordered: true,
 					items: [
-						"Compose slot B (recipes install into the inactive slot, not live /)",
-						"Validate slot B offline (sanity checks, expected files, services)",
-						"Reboot and trial-boot slot B once",
-						"Commit slot B if healthy, otherwise roll back to slot A",
+						rich`Write the new system into the inactive slot: ${code("recab stage --rootfs <image> --kernel <vmlinuz> --initrd <initramfs>")}. The machine's hostname, accounts, enabled services and SSH host keys come along.`,
+						rich`Trial-boot it once: ${code("recab set-next B")}, then reboot`,
+						rich`Commit it if healthy: ${code("recab commit")}. If you reboot without committing, the machine falls back to slot A by itself.`,
+						rich`Later, ${code("recab rollback")} returns to the previous slot while it still holds that system`,
 					],
+				},
+				{
+					type: "note",
+					variant: "info",
+					content: rich`Each slot's root is remounted read-write after boot; A/B gives you a second, untouched system to return to, not a read-only root.`,
 				},
 				{
 					type: "text",
