@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types"
 import { rich, bold, code, link } from "../../rich-text"
+import { TOOL_HELP } from "../../tool-help"
 
 export const recfstabContent: DocsContent = {
 	title: "recfstab",
@@ -34,44 +35,13 @@ export const recfstabContent: DocsContent = {
 			title: "Usage",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: "recfstab [OPTIONS] <ROOT>",
-				},
-				{
-					type: "table",
-					headers: ["Argument", "Description"],
-					rows: [
-						[rich`${code("ROOT")}`, "Root directory to scan for mounted filesystems (e.g., /mnt)"],
-					],
-					monospaceCol: 0,
-				},
-			],
-		},
-		{
-			title: "Options",
-			content: [
-				{
-					type: "table",
-					headers: ["Option", "Description"],
-					rows: [
-						[rich`${code("-L, --label")}`, "Use filesystem LABEL instead of UUID"],
-						[
-							rich`${code("-p, --partuuid")}`,
-							"Use partition UUID (PARTUUID) instead of filesystem UUID",
-						],
-						[
-							rich`${code("-t, --partlabel")}`,
-							"Use partition LABEL (PARTLABEL) instead of filesystem UUID",
-						],
-						[rich`${code("--version")}`, "Show version"],
-						[rich`${code("--help")}`, "Show help"],
-					],
-					monospaceCol: 0,
-				},
-				{
 					type: "text",
-					content: rich`The identifier options (${code("-L")}, ${code("-p")}, ${code("-t")}) are mutually exclusive. Default is UUID.`,
+					content: rich`Options as printed by ${code("recfstab --help")}:`,
+				},
+				{
+					type: "code",
+					language: "text",
+					content: TOOL_HELP.recfstab,
 				},
 			],
 		},
@@ -198,17 +168,8 @@ securityfs  selinuxfs  sysfs  tmpfs  tracefs`,
 			title: "Error Codes",
 			content: [
 				{
-					type: "table",
-					headers: ["Code", "Description"],
-					rows: [
-						["E001", "Root directory does not exist"],
-						["E002", "Path is not a directory"],
-						["E003", "Failed to determine current directory"],
-						["E004", "findmnt command not found (util-linux not installed)"],
-						["E005", "findmnt command failed"],
-						["E006", "No filesystems found under specified root"],
-					],
-					monospaceCol: 0,
+					type: "text",
+					content: rich`Every failure prints a code such as ${code("E004")}; the number is also the exit status. The codes and their meaning are the ${code("Code")} enum in ${code("tools/recstrap/src/error.rs")}.`,
 				},
 			],
 		},

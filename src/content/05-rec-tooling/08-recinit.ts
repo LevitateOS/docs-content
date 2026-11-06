@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types"
 import { rich, bold, code, link } from "../../rich-text"
+import { TOOL_HELP } from "../../tool-help"
 
 export const recinitContent: DocsContent = {
 	title: "recinit",
@@ -34,29 +35,13 @@ export const recinitContent: DocsContent = {
 			title: "Usage",
 			content: [
 				{
+					type: "text",
+					content: rich`Options as printed by ${code("recinit --help")}:`,
+				},
+				{
 					type: "code",
-					language: "bash",
-					content: "recinit [OPTIONS] <COMMAND>",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Build tiny/live initramfs",
-					command:
-						"recinit build-tiny --modules-dir /lib/modules/$(uname -r) --busybox /usr/bin/busybox --template templates/init_tiny.template --output initramfs.cpio.gz --iso-label LEVITATEOS --rootfs-path live/filesystem.erofs",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Build install initramfs",
-					command:
-						"recinit build-install --rootfs /path/to/rootfs-staging --output initramfs-installed.img --modules install",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "List module presets",
-					command: "recinit modules --list-presets",
+					language: "text",
+					content: TOOL_HELP.recinit,
 				},
 			],
 		},

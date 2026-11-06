@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types"
 import { rich, code, link } from "../../rich-text"
+import { TOOL_HELP } from "../../tool-help"
 
 export const recisoContent: DocsContent = {
 	title: "reciso",
@@ -29,51 +30,13 @@ export const recisoContent: DocsContent = {
 			title: "Usage",
 			content: [
 				{
+					type: "text",
+					content: rich`Options as printed by ${code("reciso --help")}:`,
+				},
+				{
 					type: "code",
-					language: "bash",
-					content: "reciso -k <KERNEL> -i <INITRD> -r <ROOTFS> -l <LABEL> -o <OUTPUT> [OPTIONS]",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Basic ISO build",
-					command:
-						"reciso -k vmlinuz -i initramfs.img -r filesystem.erofs -l LEVITATEOS -o levitate.iso",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Build ISO and inline UKIs",
-					command:
-						"reciso -k vmlinuz -i initramfs.img -r filesystem.erofs -l LEVITATEOS --build-uki 'Normal::levitateos.efi' --build-uki 'Emergency:emergency:levitateos-recovery.efi' -o levitate.iso",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Select payload layout explicitly",
-					command:
-						"reciso -k vmlinuz -i initramfs.img -r filesystem.erofs -l LEVITATEOS --live-payload-layout appended-partitions -o levitate.iso",
-				},
-			],
-		},
-		{
-			title: "Important Options",
-			content: [
-				{
-					type: "table",
-					headers: ["Option", "Description"],
-					rows: [
-						[rich`${code("--uki <PATH>")}`, "Include prebuilt UKI (repeatable)"],
-						[rich`${code("--build-uki <name:extra_cmdline:filename>")}`, "Build UKI inline"],
-						[rich`${code("--extra-file <SRC:DST>")}`, "Add extra payload file to ISO"],
-						[rich`${code("--overlay-image <PATH>")}`, "Include live overlay image (EROFS)"],
-						[
-							rich`${code("--live-payload-layout <iso-files|appended-partitions>")}`,
-							"Choose live payload placement strategy",
-						],
-						[rich`${code("--no-checksum")}`, "Skip checksum generation"],
-					],
-					monospaceCol: 0,
+					language: "text",
+					content: TOOL_HELP.reciso,
 				},
 			],
 		},

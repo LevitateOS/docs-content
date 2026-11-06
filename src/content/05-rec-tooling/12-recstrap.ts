@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types"
 import { rich, bold, code, link } from "../../rich-text"
+import { TOOL_HELP } from "../../tool-help"
 
 export const recstrapContent: DocsContent = {
 	title: "recstrap",
@@ -37,39 +38,13 @@ export const recstrapContent: DocsContent = {
 			title: "Usage",
 			content: [
 				{
+					type: "text",
+					content: rich`Options as printed by ${code("recstrap --help")}:`,
+				},
+				{
 					type: "code",
-					language: "bash",
-					content: "recstrap [OPTIONS] <TARGET>",
-				},
-				{
-					type: "table",
-					headers: ["Argument", "Description"],
-					rows: [[rich`${code("TARGET")}`, "Target directory (must be mounted, e.g., /mnt)"]],
-					monospaceCol: 0,
-				},
-			],
-		},
-		{
-			title: "Options",
-			content: [
-				{
-					type: "table",
-					headers: ["Option", "Description"],
-					rows: [
-						[
-							rich`${code("--rootfs <PATH>")}`,
-							"Custom rootfs image location (must end in .erofs; auto-detected from live media if not specified)",
-						],
-						[
-							rich`${code("-f, --force")}`,
-							"Allow extraction even if target is not empty or not a mount point",
-						],
-						[rich`${code("-q, --quiet")}`, "Minimal output for scripting"],
-						[rich`${code("-c, --check")}`, "Run pre-flight validation only, do not extract"],
-						[rich`${code("--version")}`, "Show version"],
-						[rich`${code("--help")}`, "Show help"],
-					],
-					monospaceCol: 0,
+					language: "text",
+					content: TOOL_HELP.recstrap,
 				},
 			],
 		},
@@ -159,16 +134,7 @@ export const recstrapContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`These paths are ${bold("always")} blocked as extraction targets, even with ${code("--force")}:`,
-				},
-				{
-					type: "code",
-					language: "text",
-					content: `/  /bin  /boot  /dev  /etc  /home  /lib  /lib64  /opt\n/proc  /root  /run  /sbin  /srv  /sys  /tmp  /usr  /var`,
-				},
-				{
-					type: "text",
-					content: rich`Use a mount point like ${code("/mnt")} instead.`,
+					content: rich`The tool refuses host system directories as a target. The list is ${code("PROTECTED_PATHS")} in ${code("distro-spec/src/shared/paths.rs")}.`,
 				},
 			],
 		},
@@ -176,27 +142,8 @@ export const recstrapContent: DocsContent = {
 			title: "Error Codes",
 			content: [
 				{
-					type: "table",
-					headers: ["Code", "Exit", "Description"],
-					rows: [
-						["E001", "1", "Target directory does not exist"],
-						["E002", "2", "Target is not a directory"],
-						["E003", "3", "Target directory not writable"],
-						["E004", "4", "EROFS image not found"],
-						["E005", "5", "EROFS extraction command failed"],
-						["E006", "6", "Extracted system verification failed"],
-						["E008", "8", "Must run as root"],
-						["E009", "9", "Target directory not empty (use --force)"],
-						["E010", "10", "Target is a protected system path"],
-						["E011", "11", "Target is not a mount point (use --force)"],
-						["E012", "12", "Insufficient disk space"],
-						["E013", "13", "EROFS image is not a regular file"],
-						["E014", "14", "EROFS image is not readable"],
-						["E015", "15", "EROFS image is inside target directory"],
-						["E016", "16", "Rootfs format is invalid (not a valid .erofs image)"],
-						["E017", "17", "Kernel EROFS support is unavailable"],
-					],
-					monospaceCol: 0,
+					type: "text",
+					content: rich`Every failure prints a code such as ${code("E004")}; the number is also the exit status. The codes and their meaning are the ${code("Code")} enum in ${code("tools/recstrap/src/error.rs")}.`,
 				},
 			],
 		},

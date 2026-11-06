@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types"
 import { rich, bold, code, link } from "../../rich-text"
+import { TOOL_HELP } from "../../tool-help"
 
 export const recchrootContent: DocsContent = {
 	title: "recchroot",
@@ -34,32 +35,13 @@ export const recchrootContent: DocsContent = {
 			title: "Usage",
 			content: [
 				{
+					type: "text",
+					content: rich`Options as printed by ${code("recchroot --help")}:`,
+				},
+				{
 					type: "code",
-					language: "bash",
-					content: "recchroot <CHROOT_DIR> [COMMAND]...",
-				},
-				{
-					type: "table",
-					headers: ["Argument", "Description"],
-					rows: [
-						[rich`${code("CHROOT_DIR")}`, "Directory to chroot into (e.g., /mnt)"],
-						[rich`${code("COMMAND")}`, "Command to run (default: /bin/bash)"],
-					],
-					monospaceCol: 0,
-				},
-			],
-		},
-		{
-			title: "Options",
-			content: [
-				{
-					type: "table",
-					headers: ["Option", "Description"],
-					rows: [
-						[rich`${code("--version")}`, "Show version"],
-						[rich`${code("--help")}`, "Show help"],
-					],
-					monospaceCol: 0,
+					language: "text",
+					content: TOOL_HELP.recchroot,
 				},
 			],
 		},
@@ -163,16 +145,7 @@ export const recchrootContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "These paths cannot be used as chroot targets:",
-				},
-				{
-					type: "code",
-					language: "text",
-					content: `/  /bin  /boot  /dev  /etc  /home  /lib  /lib64  /opt\n/proc  /root  /run  /sbin  /srv  /sys  /tmp  /usr  /var`,
-				},
-				{
-					type: "text",
-					content: rich`Use a mount point like ${code("/mnt")} instead.`,
+					content: rich`The tool refuses host system directories as a target. The list is ${code("PROTECTED_PATHS")} in ${code("distro-spec/src/shared/paths.rs")}.`,
 				},
 			],
 		},
@@ -180,19 +153,8 @@ export const recchrootContent: DocsContent = {
 			title: "Error Codes",
 			content: [
 				{
-					type: "table",
-					headers: ["Code", "Exit", "Description"],
-					rows: [
-						["E001", "1", "Target directory does not exist"],
-						["E002", "2", "Target is not a directory"],
-						["E003", "3", "Failed to create mount point directory"],
-						["E004", "4", "Mount operation failed"],
-						["E005", "5", "Unmount operation failed (warning only)"],
-						["E006", "6", "Command execution failed"],
-						["E007", "7", "Must run as root"],
-						["E008", "8", "Target is a protected system path"],
-					],
-					monospaceCol: 0,
+					type: "text",
+					content: rich`Every failure prints a code such as ${code("E004")}; the number is also the exit status. The codes and their meaning are the ${code("Code")} enum in ${code("tools/recstrap/src/error.rs")}.`,
 				},
 			],
 		},

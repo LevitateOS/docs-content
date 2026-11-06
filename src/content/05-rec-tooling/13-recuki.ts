@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types"
 import { rich, bold, code, link } from "../../rich-text"
+import { TOOL_HELP } from "../../tool-help"
 
 export const recukiContent: DocsContent = {
 	title: "recuki",
@@ -29,43 +30,13 @@ export const recukiContent: DocsContent = {
 			title: "Usage",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: "recuki -k <KERNEL> -i <INITRD> -c <CMDLINE> -o <OUTPUT> [OPTIONS]",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Basic UKI build",
-					command: "recuki -k vmlinuz -i initramfs.img -c 'root=LABEL=root rw' -o levitateos.efi",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "UKI build with OS branding metadata",
-					command:
-						"recuki -k vmlinuz -i initramfs.img -c 'root=LABEL=root rw' --os-name LevitateOS --os-id levitateos --os-version 1.0 -o levitateos.efi",
-				},
-			],
-		},
-		{
-			title: "Key Options",
-			content: [
-				{
-					type: "table",
-					headers: ["Option", "Description"],
-					rows: [
-						[rich`${code("-k, --kernel")}`, "Kernel image path (vmlinuz)"],
-						[rich`${code("-i, --initrd")}`, "Initramfs image path"],
-						[rich`${code("-c, --cmdline")}`, "Kernel command line"],
-						[rich`${code("-o, --output")}`, "Output UKI file path"],
-						[rich`${code("--os-name/--os-id/--os-version")}`, "Optional OS branding metadata"],
-					],
-					monospaceCol: 0,
-				},
-				{
 					type: "text",
-					content: rich`${bold("Requirement")}: ${code("ukify")} must be installed.`,
+					content: rich`Options as printed by ${code("recuki --help")}:`,
+				},
+				{
+					type: "code",
+					language: "text",
+					content: TOOL_HELP.recuki,
 				},
 			],
 		},

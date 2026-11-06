@@ -35,8 +35,8 @@ export const recqemuContent: DocsContent = {
 						[rich`${code("QemuBuilder")}`, "Fluent QEMU command construction"],
 						[rich`${code("find_ovmf/find_ovmf_vars")}`, "Firmware discovery across distros"],
 						[rich`${code("create_disk")}`, "Create qcow2 disks"],
-						[rich`${code("serial::Console")}`, "Serial console IO primitives"],
-						[rich`${code("process::*")}`, "QEMU process/lock utilities"],
+						[rich`${code("serial::Console")}`, "Serial console: exec, login, boot wait"],
+						[rich`${code("serial::protocol")}`, "Serial test protocol and the guest profile script"],
 					],
 					monospaceCol: 0,
 				},
@@ -53,15 +53,12 @@ use std::path::Path;
 
 create_disk(Path::new("disk.qcow2"), "20G")?;
 
-let ovmf = find_ovmf().expect("OVMF not found");
 let mut cmd = QemuBuilder::new()
-    .memory("4G")
-    .smp(4)
     .cdrom("levitate.iso")
     .disk("disk.qcow2")
-    .uefi(ovmf)
+    .uefi(find_ovmf()?)
     .user_network()
-    .build_interactive();
+    .build();
 
 cmd.status()?;`,
 				},

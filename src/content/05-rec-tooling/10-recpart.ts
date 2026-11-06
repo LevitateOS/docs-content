@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types"
 import { rich, bold, code, link } from "../../rich-text"
+import { TOOL_HELP } from "../../tool-help"
 
 export const recpartContent: DocsContent = {
 	title: "recpart",
@@ -29,19 +30,13 @@ export const recpartContent: DocsContent = {
 			title: "Usage",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: "recpart <COMMAND> [OPTIONS]",
+					type: "text",
+					content: rich`Options as printed by ${code("recpart --help")}:`,
 				},
 				{
-					type: "table",
-					headers: ["Command", "Purpose"],
-					rows: [
-						[rich`${code("list-disks")}`, "Enumerate candidate disks"],
-						[rich`${code("plan")}`, "Generate deterministic layout and script"],
-						[rich`${code("apply")}`, "Apply partition plan to disk"],
-					],
-					monospaceCol: 0,
+					type: "code",
+					language: "text",
+					content: TOOL_HELP.recpart,
 				},
 			],
 		},
@@ -92,23 +87,8 @@ export const recpartContent: DocsContent = {
 			title: "Error Codes",
 			content: [
 				{
-					type: "table",
-					headers: ["Code", "Description"],
-					rows: [
-						["E001", "Invalid target disk / safety failure"],
-						["E002", "Required tool missing"],
-						["E003", "Plan generation or policy validation failed"],
-						["E004", "Missing destructive confirmation"],
-						["E005", "Partition apply failed"],
-						["E006", "Filesystem format failed"],
-						["E007", "Mount operation failed"],
-						["E008", "Handoff generation failed"],
-						["E009", "JSON serialization failed"],
-						["E010", "Reserved not-implemented code"],
-						["E011", "Root privileges required"],
-						["E012", "Internal/runtime error"],
-					],
-					monospaceCol: 0,
+					type: "text",
+					content: rich`Every failure prints a code such as ${code("E004")}; the number is also the exit status. The codes and their meaning are the ${code("ErrorCode")} enum in ${code("tools/recpart/src/error.rs")}.`,
 				},
 			],
 		},
@@ -134,7 +114,7 @@ export const recpartContent: DocsContent = {
 						rich`${link("recstrap", "/docs/recstrap")} - Extract rootfs`,
 						rich`${link("recfstab", "/docs/recfstab")} - Generate fstab`,
 						rich`${link("recchroot", "/docs/recchroot")} - Enter target system`,
-						rich`${link("recab", "/docs/recab")} - A/B slot state machine scaffold`,
+						rich`${link("recab", "/docs/recab")} - A/B slot state machine`,
 					],
 				},
 			],

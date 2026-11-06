@@ -139,16 +139,7 @@ export const installationToolsOverviewContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"All three tools use consistent error code formatting. Error messages include a code like E001, E002, etc. These codes are unique per tool and documented in each tool's reference page.",
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `# Example error output
-recstrap: E001: target directory '/mnt' does not exist
-recfstab: E006: no filesystems found under '/mnt'
-recchroot: E007: must run as root`,
+					content: rich`recstrap, recfstab and recchroot share one error table: each failure prints a code such as ${code("E004")}, which is also the exit status. The table is the ${code("Code")} enum in ${code("tools/recstrap/src/error.rs")}.`,
 				},
 			],
 		},

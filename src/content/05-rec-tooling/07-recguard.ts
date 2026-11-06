@@ -55,7 +55,7 @@ export const recguardContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${link("recab", "/docs/recab")} - A/B state-machine scaffold`,
+						rich`${link("recab", "/docs/recab")} - A/B slot state machine`,
 						rich`${link("recpart", "/docs/recpart")} - Partition plan/apply backend`,
 					],
 				},

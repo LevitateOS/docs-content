@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types"
 import { rich, bold, code, link } from "../../rich-text"
+import { TOOL_HELP } from "../../tool-help"
 
 export const recabContent: DocsContent = {
 	title: "recab",
@@ -9,36 +10,28 @@ export const recabContent: DocsContent = {
 		audience: ["operator", "developer"],
 		stability: "experimental",
 	},
-	intro: "A/B slot management command surface (currently scaffold status).",
+	intro: "A/B slot management: which slot runs, which boots next, commit and rollback (systemd-boot backend).",
 	sections: [
 		{
 			title: "Status",
 			content: [
 				{
-					type: "note",
-					variant: "warning",
-					content: rich`${code("recab")} is currently a scaffold. The CLI shape exists, but backend behavior is marked TODO/TBD in implementation.`,
+					type: "text",
+					content: rich`${code("recab")} is implemented on systemd-boot: it finds the running slot by matching the kernel's ${code("root=")} against the slot entries, stages trial boots with ${code("bootctl set-oneshot")}, and keeps its state in ${code("/var/lib/recab")}. ${code("recab status --json")} prints the JSON described by ${code("tools/recab/docs/status.schema.json")}.`,
 				},
 			],
 		},
 		{
-			title: "Current CLI Shape",
+			title: "Usage",
 			content: [
 				{
-					type: "code",
-					language: "bash",
-					content: "recab <status|set-next|commit|rollback>",
+					type: "text",
+					content: rich`Options as printed by ${code("recab --help")}:`,
 				},
 				{
-					type: "table",
-					headers: ["Subcommand", "Intended Meaning", "Current State"],
-					rows: [
-						[rich`${code("status")}`, "Show active/inactive slot status", "Scaffold output"],
-						[rich`${code("set-next <a|b>")}`, "Mark next boot target", "Scaffold output"],
-						[rich`${code("commit")}`, "Commit currently booted slot", "Scaffold output"],
-						[rich`${code("rollback")}`, "Revert to previous slot", "Scaffold output"],
-					],
-					monospaceCol: 0,
+					type: "code",
+					language: "text",
+					content: TOOL_HELP.recab,
 				},
 			],
 		},
