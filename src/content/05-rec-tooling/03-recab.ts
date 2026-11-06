@@ -17,7 +17,7 @@ export const recabContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recab")} is implemented on systemd-boot: it finds the running slot by matching the kernel's ${code("root=")} against the slot entries, stages trial boots with ${code("bootctl set-oneshot")}, and keeps its state in ${code("/var/lib/recab")}. ${code("recab status --json")} prints the JSON described by ${code("tools/recab/docs/status.schema.json")}.`,
+					content: rich`${code("recab")} is implemented on systemd-boot, with systemd (LevitateOS) or OpenRC (AcornOS) as init: it finds the running slot by matching the kernel's ${code("root=")} against the slot entries, stages trial boots by writing systemd-boot's ${code("LoaderEntryOneShot")} variable itself (no ${code("bootctl")} needed), lets its trial service commit a healthy trial or reboot out of a failed one, and keeps its state in ${code("/var/lib/recab")}. ${code("recab status --json")} prints the JSON described by ${code("tools/recab/docs/status.schema.json")}.`,
 				},
 			],
 		},
