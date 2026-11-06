@@ -455,30 +455,6 @@ let installed_files = [];        // List of installed file paths`,
 								},
 							],
 						},
-						{
-							question: "How does LevitateOS prevent test cheating?",
-							answer: [
-								{
-									type: "text",
-									content: rich`Created ${code("cheat-test")} proc-macro to prevent false-positive tests:`,
-								},
-								{
-									type: "code",
-									language: "rust",
-									content: `#[cheat_aware(
-    protects = "users can boot installed system",
-    severity = "CRITICAL",
-    cheats = ["skip verification", "hardcode paths", "ignore errors"],
-    consequence = "Users get broken system, can't boot"
-)]
-fn test_bootloader_install() { ... }`,
-								},
-								{
-									type: "text",
-									content: rich`Key principle: If users need it → test fails when missing. No "optional" trash bin. Never move missing items from CRITICAL to OPTIONAL just to pass tests.`,
-								},
-							],
-						},
 					],
 				},
 			],
@@ -489,29 +465,6 @@ fn test_bootloader_install() { ... }`,
 				{
 					type: "qa",
 					items: [
-						{
-							question: 'What is "STOP. READ. THEN ACT"?',
-							answer: [
-								{
-									type: "text",
-									content: "The most important rule in the codebase:",
-								},
-								{
-									type: "list",
-									ordered: true,
-									items: [
-										rich`${bold("STOP")} - Don't assume you know where something goes`,
-										rich`${bold("READ")} - Read what already exists first`,
-										rich`${bold("ACT")} - Then make informed decisions`,
-									],
-								},
-								{
-									type: "text",
-									content:
-										"This exists because a previous development session broke tests, created code in the wrong location, and deleted it without checking - wasting significant time and resources. Five minutes reading saves hours of cleanup.",
-								},
-							],
-						},
 						{
 							question: "What happened with the bootstrap tarball approach?",
 							answer: [

@@ -17,7 +17,6 @@ Single source of truth for LevitateOS documentation. Consumed by both website an
 |----------------|-----------|
 | TUI rendering | `docs/tui/` |
 | Website rendering | `website/` (submodule) |
-| Developer docs | `.teams/KNOWLEDGE_*.md` |
 
 ## Key Rules
 
