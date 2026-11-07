@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types"
-import { rich, code, bold } from "../../rich-text"
+import { rich, code, bold, link } from "../../rich-text"
 
 export const faqContent: DocsContent = {
 	title: "Architecture FAQ",
@@ -17,7 +17,7 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: rich`LevitateOS is a daily driver Linux distribution competing directly with Arch Linux. It borrows Arch's philosophy (user maintains their own packages, minimal base that users build up) but takes its core system (glibc, systemd, coreutils, OpenSSH and the rest of a minimal base) pre-built from Fedora instead of compiling it.`,
+									content: rich`LevitateOS is a daily driver Linux distribution competing directly with Arch Linux. It borrows Arch's philosophy (you maintain your own packages on a minimal base) but takes its core system (glibc, systemd, coreutils, OpenSSH and the rest of a minimal base) pre-built from Fedora instead of compiling it, and it updates atomically: A/B slots by default, with a trial boot before each update is kept.`,
 								},
 								{
 									type: "table",
@@ -27,8 +27,13 @@ export const faqContent: DocsContent = {
 										["Philosophy", "Minimal base, user builds", "Same"],
 										["Package Manager", "pacman + AUR", "recipe (Rhai scripts)"],
 										["Binary Source", "Compiled from source", "Core extracted from signed Fedora RPMs"],
+										["Updates", "In place", "A/B slots, trial boot, rollback"],
 										["Build Time", "Hours (compiling)", "Minutes (extracting)"],
 									],
+								},
+								{
+									type: "text",
+									content: rich`Its sibling ${bold("AcornOS")} is built by the same pipeline on musl, OpenRC and busybox, from Alpine packages. See ${link("Variants", "/docs/variants")}.`,
 								},
 							],
 						},
@@ -86,18 +91,13 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "table",
-									headers: ["Component", "Minimum", "Recommended (LLM-ready)"],
+									headers: ["Component", "Baseline"],
 									rows: [
-										["CPU", "Intel Haswell / AMD Zen", "8+ cores, AVX2 support"],
-										["RAM", "16 GB", "32-64 GB"],
-										["Storage", "512 GB NVMe", "1-2 TB NVMe"],
-										["GPU", "Integrated / CPU inference", "NVIDIA RTX 3060+ (12GB VRAM)"],
+										["CPU", "x86-64-v3 (Intel Haswell, AMD Zen or newer)"],
+										["RAM", "16 GB"],
+										["Storage", "NVMe disk"],
+										["Firmware", "UEFI, with Secure Boot disabled"],
 									],
-								},
-								{
-									type: "text",
-									content:
-										"LevitateOS ships with local LLM capabilities. The recommended specs enable running 7B-13B parameter models for AI-assisted workflows. CPU-only inference works with 32GB+ RAM.",
 								},
 							],
 						},
@@ -106,11 +106,11 @@ export const faqContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: "Boot the ISO. Run the E2E tests. Read the commit history. Code speaks.",
+									content: "Boot the ISO. Run the scenarios. Read the commit history. Code speaks.",
 								},
 								{
 									type: "text",
-									content: rich`The test suite runs full installation workflows in QEMU VMs. The ISO boots on real hardware. Every commit is tested. If something doesn't work, open an issue with specifics.`,
+									content: rich`The scenarios boot the live ISO, install it, reboot into the installed system, log in and check it at runtime, and stage, trial-boot and roll back an A/B update, all in VMs. If something doesn't work, open an issue with specifics.`,
 								},
 							],
 						},
@@ -119,7 +119,7 @@ export const faqContent: DocsContent = {
 			],
 		},
 		{
-			title: "leviso (ISO Builder)",
+			title: "distro-builder (ISO Builder)",
 			content: [
 				{
 					type: "qa",
@@ -134,7 +134,7 @@ export const faqContent: DocsContent = {
 										rich`${bold("glibc-based")} (not musl) for maximum compatibility`,
 										rich`${bold("No compilation required")} - binaries are pre-built`,
 										rich`${bold("Builds in minutes")} instead of hours`,
-										rich`${bold("Direct RPM extraction")}: a locked set of 85 packages is unpacked with ${code("rpm2cpio")}, no package manager involved`,
+										rich`${bold("Direct RPM extraction")}: the system recipe unpacks a locked set of packages into the root filesystem itself, recording each file's owner and mode without root. No package manager is involved`,
 									],
 								},
 								{
@@ -164,34 +164,32 @@ export const faqContent: DocsContent = {
 								{
 									type: "text",
 									content:
-										"The old approach loaded a ~250MB initramfs entirely into RAM. The EROFS architecture provides:",
+										"Loading the whole system into RAM as one large initramfs wastes memory and duplicates the system. The EROFS architecture provides:",
 								},
 								{
 									type: "list",
 									items: [
-										rich`${bold("RAM savings")}: ~400MB → ~50MB at boot`,
+										rich`${bold("RAM savings")}: the system is read from the medium, not unpacked into memory`,
 										rich`${bold("Single source of truth")}: Live environment = Installed system (no duplication)`,
-										rich`${bold("Simpler installation")}: Extract to disk instead of complex copy logic`,
+										rich`${bold("Simpler installation")}: ${code("recstrap")} extracts the same image to disk`,
 										rich`${bold("Scalable")}: Easy to add packages without bloating initramfs`,
 									],
 								},
 								{
 									type: "text",
-									content: rich`The tiny initramfs (~5MB) contains just busybox and mount logic. The EROFS image (~350MB) is mounted read-only with a tmpfs overlay for live modifications.`,
+									content: rich`The live initramfs, built by ${code("recinit")}, contains just busybox, the boot modules and mount logic. It mounts the EROFS system image read-only, with the live overlay image and a tmpfs on top, and switches into it.`,
 								},
 							],
 						},
 						{
-							question: "Why UKI (Unified Kernel Images) instead of separate vmlinuz + initramfs?",
+							question: "How does LevitateOS boot?",
 							answer: [
 								{
 									type: "list",
 									items: [
-										rich`${bold("Single signed artifact")} - Kernel, initramfs, and cmdline in one PE binary`,
-										rich`${bold("Secure Boot ready")} - Single file to sign and verify`,
-										rich`${bold("Auto-discovery")} - systemd-boot auto-detects UKIs in /EFI/Linux/`,
-										rich`${bold("Simpler installation")} - Copy one file, no boot entry configuration needed`,
-										rich`${bold("Modern standard")} - Used by Fedora, Arch, and systemd-first distros`,
+										rich`${bold("systemd-boot everywhere")} - no GRUB or isolinux`,
+										rich`${bold("Live ISO")}: Unified Kernel Images built by ${code("recuki")}, each one PE binary holding the kernel, initramfs and command line, which systemd-boot finds on its own`,
+										rich`${bold("Installed system")}: one boot entry per slot, naming the slot's kernel and initramfs in ${code("/boot/levitateos-a/")} or ${code("/boot/levitateos-b/")} and its root by ${code("root=PARTUUID=")}. ${code("recab")} rewrites a slot's kernel and trial options without touching the other slot`,
 									],
 								},
 							],
@@ -207,8 +205,8 @@ export const faqContent: DocsContent = {
 								{
 									type: "list",
 									items: [
-										rich`${bold("Clean boot stack")} - systemd-boot + UKI only, no GRUB or isolinux complexity`,
-										rich`${bold("Secure Boot path")} - UKIs are Secure Boot compatible (signing support planned)`,
+										rich`${bold("Clean boot stack")} - systemd-boot only, no GRUB or isolinux complexity`,
+										rich`${bold("A/B boot selection")} - recab picks the next slot through systemd-boot's EFI variables`,
 										rich`${bold("Simpler code")} - One boot path to test and maintain`,
 									],
 								},
@@ -220,22 +218,22 @@ export const faqContent: DocsContent = {
 							],
 						},
 						{
-							question: "Why modprobe instead of insmod?",
+							question: "How are boot modules loaded?",
 							answer: [
 								{
 									type: "text",
-									content: rich`Originally used ${code("insmod")} with manual dependency ordering, which was fragile:`,
+									content: rich`${code("recinit")} reads the kernel's ${code("modules.dep")} when it builds the initramfs and stores the boot modules in dependency order, so the init simply loads them in that order:`,
 								},
 								{
 									type: "code",
 									language: "bash",
-									content: `# Before (fragile - order matters!)
+									content: `# Before (fragile - hand-maintained order)
 load_module mbcache
 load_module jbd2      # Must come after mbcache
 load_module ext4      # Must come after jbd2
 
-# After (robust - modprobe handles dependencies)
-load_module ext4      # modprobe loads mbcache, jbd2 automatically`,
+# After (resolved at build time against the exact kernel)
+recinit build-tiny --modules-dir /lib/modules/6.12.0 ...   # ext4 brings mbcache and jbd2, in order`,
 								},
 								{
 									type: "text",
@@ -294,16 +292,28 @@ let libs = get_all_dependencies(&ctx.rootfs, &bin_path)?;
 								{
 									type: "code",
 									language: "rhai",
-									content: `let pkg = #{
+									content: `const RECIPE_API = 2;
+let ctx = #{
     name: "ripgrep",
     version: "14.1.0",
+    sha256: "…",
+    src: join_path(RUNTIME.paths.build, "ripgrep-14.1.0-x86_64-unknown-linux-musl"),
 };
 
-fn install() {
-    let url = \`https://github.com/.../ripgrep-\${pkg.version}-x86_64-unknown-linux-musl.tar.gz\`;
-    download(url);
-    extract("tar.gz");
-    install_bin("rg");
+fn acquire(ctx) {
+    let url = \`https://github.com/BurntSushi/ripgrep/releases/download/\${ctx.version}/ripgrep-\${ctx.version}-x86_64-unknown-linux-musl.tar.gz\`;
+    let archive = download(url, join_path(ctx.runtime.paths.build, "rg.tar.gz"), ctx.sha256);
+    extract(archive, ctx.runtime.paths.build);
+    ctx
+}
+
+fn install(ctx) {
+    let rg = join_path(ctx.runtime.paths.output, "bin/rg");
+    mkdir(dirname(rg));
+    copy_file(join_path(ctx.src, "rg"), rg);
+    chmod(rg, 0o755);
+    ctx.outputs.rg = rg;
+    ctx
 }`,
 								},
 								{
@@ -311,40 +321,26 @@ fn install() {
 									items: [
 										rich`${bold("Real programming")} - Variables, conditionals, loops, functions`,
 										rich`${bold("Infinite extensibility")} - Recipes define logic, not just data`,
-										rich`${bold("Minimal implementation")} - Executor just provides helpers + calls acquire(), build(), install()`,
-										rich`${bold("Sandboxed")} - Runs in isolated Rhai VM`,
+										rich`${bold("Minimal implementation")} - The executor provides helpers, runs the readiness checks and calls acquire(), build() and install()`,
+										rich`${bold("Isolated")} - Every recipe runs inside a Ginux build domain, never on the host`,
 									],
 								},
 							],
 						},
 						{
-							question: "Why does state live in recipe files instead of a database?",
+							question: "Where does recipe keep its state?",
 							answer: [
 								{
 									type: "text",
-									content: "State lives IN the recipe file itself:",
-								},
-								{
-									type: "code",
-									language: "rhai",
-									content: `let installed = false;           // Set to true after install
-let installed_version = ();      // Version that was installed
-let installed_at = ();           // Unix timestamp
-let installed_files = [];        // List of installed file paths`,
+									content: rich`Recipe files are never rewritten. The only state a recipe carries between runs is ${code("ctx.state")}, saved by the coordinator together with a matching snapshot of the recipe's files under the state directory (${code("~/.local/state/recipe")} by default). State alone never proves work is done:`,
 								},
 								{
 									type: "list",
 									items: [
-										rich`${bold("No database needed")} - recipe file IS the source of truth`,
-										rich`${bold("Self-contained")} - Everything about a package in one file`,
-										rich`${bold("Easy to sync")} - Just copy recipe files between machines`,
-										rich`${bold("Simple to debug")} - Edit recipe directly to test`,
-										rich`${bold("Self-modifying")} - Engine updates state variables directly in files`,
+										rich`${bold("Readiness checks look at real files")} - ${code("is_installed")}, ${code("is_built")} and ${code("is_acquired")} inspect what is on disk`,
+										rich`${bold("Package facts come from the recipe")} - name, version and digests are read fresh on every run`,
+										rich`${bold("Outputs are published")} - a successful run returns the published paths in ${code("ctx.outputs")}`,
 									],
-								},
-								{
-									type: "text",
-									content: rich`To see what's installed: ${code('grep -l "installed = true" recipes/*.rhai')}`,
 								},
 							],
 						},
@@ -354,17 +350,17 @@ let installed_files = [];        // List of installed file paths`,
 								{
 									type: "code",
 									language: "text",
-									content: `Engine
-├── Context (ExecutionContext)
-├── Phases (first-class)
-│   ├── acquire() - download, copy, verify
-│   ├── build()   - extract, compile, configure
-│   └── install() - place files in filesystem
-└── Utilities (filesystem, io, env, command)`,
+									content: `recipe install foo
+├── is_installed(ctx)  ready? done, publish outputs
+├── is_built(ctx)      ready? skip to install
+├── is_acquired(ctx)   ready? skip to build
+├── acquire(ctx)       download, check out, verify
+├── build(ctx)         extract, configure, compile
+└── install(ctx)       place files in /out, select ctx.outputs`,
 								},
 								{
 									type: "text",
-									content: rich`Execution order: ${code("is_installed()")} check → ${code("acquire()")} → ${code("build()")} (optional) → ${code("install()")}`,
+									content: rich`Each check returns ${code("ready(ctx)")} or ${code("needs_work(ctx, reason)")}, and is run again after its phase. See ${link("Recipe Format", "/docs/recipe-format")}.`,
 								},
 							],
 						},
@@ -374,13 +370,11 @@ let installed_files = [];        // List of installed file paths`,
 								{
 									type: "list",
 									items: [
-										rich`${bold("Source checksums")}: verify_sha256, verify_sha512, verify_blake3`,
-										rich`${bold("Reverse dependency tracking")}: Find what depends on a package`,
-										rich`${bold("Dry run mode")}: ${code("--dry-run")} shows what would be installed`,
-										rich`${bold("Version constraints")}: Semver support (e.g., "openssl >= 1.1.0")`,
-										rich`${bold("Atomic installation")}: Staging + rollback on failure`,
-										rich`${bold("Orphan detection")}: Finds packages installed only as dependencies`,
-										rich`${bold("Lock file")}: TOML-based lockfile with ${code("--locked")} flag`,
+										rich`${bold("Literal declarations")}: ${code("let deps = [...]")} and ${code("let build_deps = [...]")}, read before launch without running the recipe`,
+										rich`${bold("Dependency order")}: dependencies install first, each with its own readiness checks`,
+										rich`${bold("Shared tools")}: dependency products land in ${code("/work/tools")} and their executables are on ${code("PATH")}`,
+										rich`${bold("Inheritance")}: ${code("//! extends: base.rhai")} reuses one base recipe`,
+										rich`${bold("Verified sources")}: downloads need a SHA256, Git checkouts a full commit id`,
 									],
 								},
 							],
@@ -391,17 +385,17 @@ let installed_files = [];        // List of installed file paths`,
 								{
 									type: "text",
 									content:
-										"Yes, recipes are trusted code. They can execute shell commands, download files, and install software. This is intentional.",
+										"Yes, recipes are trusted code. They can run commands, download files, and install software. This is intentional.",
 								},
 								{
 									type: "text",
 									content:
-										"By default, LevitateOS is A/B immutable: recipes compose the next system in the inactive slot and you trial-boot it before committing. Mutable mode exists as an explicit opt-in for daredevils.",
+										"They run inside a Ginux domain with bounded memory, storage and time, no network unless the caller grants a host, and no view of the host's files beyond the inputs they are given. By default, LevitateOS is A/B: changes are composed into the inactive slot and trial-booted before they are committed.",
 								},
 								{
 									type: "list",
 									items: [
-										"Recipes are code, not config - they can do anything",
+										"Recipes are code, not config - they can do anything inside their domain",
 										"Only use recipes from official LevitateOS sources",
 										"You write your own recipes - you control what they do",
 										"Never run recipes downloaded from untrusted sources",
@@ -410,7 +404,7 @@ let installed_files = [];        // List of installed file paths`,
 								{
 									type: "text",
 									content:
-										"This is the same trust model as Arch's PKGBUILD or Gentoo's ebuilds. The user is responsible for reviewing what they install. Immutable-by-default reduces drift, but it doesn't make untrusted recipes safe.",
+										"This is the same trust model as Arch's PKGBUILD or Gentoo's ebuilds. The user is responsible for reviewing what they install. Isolation and A/B updates limit the damage, but they don't make untrusted recipes safe.",
 								},
 							],
 						},
@@ -430,24 +424,27 @@ let installed_files = [];        // List of installed file paths`,
 								{
 									type: "text",
 									content:
-										"LevitateOS uses 6-phase E2E testing to validate the full installation flow:",
+										"LevitateOS tests the real artifacts with named scenarios. Each one runs on its own against existing build outputs:",
 								},
 								{
 									type: "table",
-									headers: ["Phase", "Description"],
+									headers: ["Scenario", "Checks"],
 									rows: [
-										["1. Boot", "Verify UEFI, sync clock"],
-										["2. Disk", "Partition, format (label root), mount"],
-										["3. Base System", "Mount media, extract EROFS, generate fstab, setup chroot"],
-										["4. Configuration", "Timezone, locale, hostname, users"],
-										["5. Boot Setup", "Copy UKI, install systemd-boot, enable services"],
-										["6. Verification", "Verify system boots from disk, user login, networking"],
+										["build-preflight", "The build inputs and host prerequisites"],
+										["live-boot", "The ISO boots to the live system"],
+										["live-tools", "The install tools work in the live system"],
+										["install", "Partition, extract, configure and install the bootloader on a VM disk"],
+										["installed-boot", "The installed disk boots"],
+										["automated-login", "Login on the installed system"],
+										["runtime", "The installed system's services and behavior at runtime"],
+										["ab-update", "Stage the release into slot B, then trial boot, fallback, commit and rollback"],
 									],
+									monospaceCol: 0,
 								},
 								{
 									type: "text",
 									content:
-										"Unit tests can't catch system integration issues. Installation is inherently end-to-end. Tests run in real QEMU VM with real hardware simulation.",
+										"Unit tests can't catch system integration issues. Installation is inherently end-to-end. The scenarios run in libvirt VMs with UEFI firmware, a virtual disk and a serial console.",
 								},
 							],
 						},
@@ -471,7 +468,7 @@ let installed_files = [];        // List of installed file paths`,
 								{
 									type: "code",
 									language: "text",
-									content: `leviso → bootstrap.tar.xz (~5MB) → Extract → recipe install base → Updates`,
+									content: `ISO builder → bootstrap.tar.xz (~5MB) → Extract → recipe install base → Updates`,
 								},
 								{
 									type: "text",
@@ -486,35 +483,11 @@ let installed_files = [];        // List of installed file paths`,
 								{
 									type: "code",
 									language: "text",
-									content: `Boot ISO → Mount /mnt → recstrap /mnt (extracts EROFS) → Done`,
+									content: `Boot ISO → recpart apply (mounts /mnt) → recstrap /mnt (extracts EROFS) → Done`,
 								},
 								{
 									type: "text",
 									content: rich`${bold("Lesson")}: Always ask "is this necessary?" before building. The simplest solution is usually correct.`,
-								},
-							],
-						},
-						{
-							question: "How should architecture decisions be made?",
-							answer: [
-								{
-									type: "text",
-									content: "Ask before implementing. Don't silently add workarounds.",
-								},
-								{
-									type: "list",
-									ordered: true,
-									items: [
-										"Document the problem",
-										"Propose solution in a team file",
-										"Ask for feedback",
-										"Don't silently implement",
-									],
-								},
-								{
-									type: "text",
-									content:
-										"Silent implementation can waste resources, add complexity, and create technical debt.",
 								},
 							],
 						},
@@ -529,8 +502,8 @@ let installed_files = [];        // List of installed file paths`,
 									type: "list",
 									items: [
 										rich`${bold("Autologin")}: archiso has autologin → LevitateOS has autologin`,
-										rich`${bold("Root shell")}: archiso boots to root shell → LevitateOS boots to root shell`,
-										rich`${bold("Installer")}: archiso requires manual install → LevitateOS uses recstrap (like pacstrap) + manual config`,
+										rich`${bold("Root shell")}: archiso boots to root shell → LevitateOS boots to a root shell beside the install guide`,
+										rich`${bold("Installer")}: archiso requires manual install → LevitateOS uses recpart, recstrap (like pacstrap), recfstab (like genfstab) and recsetup, with a TUI for each step`,
 									],
 								},
 								{
@@ -552,13 +525,13 @@ let installed_files = [];        // List of installed file paths`,
 					headers: ["Decision", "Alternative", "Why Chosen"],
 					rows: [
 						["Fedora base", "Compile from source", "Minutes vs hours, maintained packages"],
+						["A/B slots", "Update in place", "Trial boot before commit, rollback"],
 						["EROFS", "Large initramfs", "RAM savings, scalability, single source"],
 						["Rhai recipes", "S-expressions/YAML", "Real programming, infinite extensibility"],
-						["State in files", "Database", "Self-contained, easy to sync, simple"],
-						["E2E tests", "Unit tests", "Catches integration issues"],
-						["modprobe", "insmod", "No manual ordering, robust"],
+						["Ginux build domains", "Build on the host", "Isolation, explicit inputs, no network by default"],
+						["E2E scenarios", "Unit tests", "Catches integration issues"],
+						["Build-time module order", "Hand-ordered insmod", "No manual ordering, robust"],
 						["readelf", "ldd", "Cross-compilation safe"],
-						["TEAM files", "Comments in code", "Historical record, decision rationale"],
 					],
 				},
 			],

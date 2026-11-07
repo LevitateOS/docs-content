@@ -12,22 +12,22 @@ export const installationBootContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Use the slot A and B devices reported by ${code("recpart apply")}. Previewing with ${code("recsetup plan")} runs no installation commands.`,
+					content: rich`Use the slot A and B devices reported by ${code("recpart apply")} (step 4). Previewing with ${code("recsetup plan")} runs no installation commands.`,
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Install systemd-boot, write slot entries and initialize machine identity",
 					command:
-						"recsetup apply --root /mnt --boot ab --slot-a /dev/sda2 --slot-b /dev/sda3 --machine-id",
+						"recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3 --machine-id",
 				},
 				{
 					type: "text",
-					content: rich`The live media supplies the kernel and initramfs. ${code("recab init")} owns slot state and enables the trial service packaged by Recipe. Add ${code('--options "console=ttyS0,115200n8"')} if you need a serial console.`,
+					content: rich`This runs ${code("bootctl install")} in the target, then ${code("recab init")}: slot A's kernel and initramfs (from the live media) go to ${code("/boot/levitateos-a/")}, both slot entries are written to ${code("/boot/loader/entries/")} naming their partition by PARTUUID, slot A becomes the default and the known-good slot, and the trial service is enabled. Add ${code('--options "console=ttyS0,115200n8"')} if you need a serial console.`,
 				},
 				{
 					type: "text",
-					content: rich`For an explicitly selected mutable layout, use ${code("--boot mutable --root-device /dev/sda2")} instead of the A/B arguments.`,
+					content: rich`For an explicitly selected mutable layout, use ${code("--boot mutable --root-device /dev/nvme0n1p2")} instead of the A/B arguments.`,
 				},
 			],
 		},

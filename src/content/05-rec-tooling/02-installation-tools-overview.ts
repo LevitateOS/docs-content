@@ -10,45 +10,34 @@ export const installationToolsOverviewContent: DocsContent = {
 		stability: "stable",
 	},
 	intro:
-		"Command-line tools for manual LevitateOS installation, equivalent to Arch Linux's pacstrap, genfstab, and arch-chroot.",
+		"Command-line tools for manual LevitateOS installation, equivalent to Arch Linux's partitioning tools, pacstrap, genfstab and arch-chroot.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`LevitateOS provides three installation tools that mirror Arch Linux's manual installation workflow. These tools give you complete control over the installation process.`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
+					content: rich`LevitateOS provides five installation tools that mirror Arch Linux's manual installation workflow. They give you complete control over the installation process, and they are also the backends of the install screen's step apps, so the same commands work with or without a TUI.`,
 				},
 				{
 					type: "table",
 					headers: ["LevitateOS", "Arch Linux", "Purpose"],
 					rows: [
+						[rich`${link("recpart", "/docs/recpart")}`, "fdisk + mkfs + mount", "Partition, format and mount the target disk"],
+						[rich`${link("recstrap", "/docs/recstrap")}`, "pacstrap", "Extract the base system to the target directory"],
+						[rich`${link("recfstab", "/docs/recfstab")}`, "genfstab", "Generate fstab from mounted filesystems"],
 						[
-							rich`${link("recstrap", "/docs/recstrap")}`,
-							"pacstrap",
-							"Extract base system to target directory",
+							rich`${link("recsetup", "/docs/recsetup")}`,
+							"the configuration steps",
+							"Time zone, locale, keymap, hostname, users, bootloader and services",
 						],
-						[
-							rich`${link("recfstab", "/docs/recfstab")}`,
-							"genfstab",
-							"Generate fstab from mounted filesystems",
-						],
-						[
-							rich`${link("recchroot", "/docs/recchroot")}`,
-							"arch-chroot",
-							"Enter chroot with proper bind mounts",
-						],
+						[rich`${link("recchroot", "/docs/recchroot")}`, "arch-chroot", "Enter chroot with proper bind mounts"],
 					],
 					monospaceCol: 0,
 				},
 				{
 					type: "text",
-					content: rich`${bold("Scope note")}: this page documents the installer trio only. The repo also ships broader ${code("rec*")} tooling for build/test/runtime workflows. In canonical order: ${code("recab")}, ${code("recinit")}, ${code("reciso")}, ${code("recpart")}, ${code("recqemu")}, ${code("recuki")}.`,
+					content: rich`${bold("Scope note")}: the repo also ships ${code("rec*")} tooling for updates and for building and testing images: ${code("recab")}, ${code("recinit")}, ${code("reciso")}, ${code("recqemu")}, ${code("recuki")}. See the ${link("rec* Tooling Overview", "/docs/rec-tooling-overview")}.`,
 				},
 			],
 		},
@@ -57,23 +46,15 @@ export const installationToolsOverviewContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`The three tools are used in sequence during installation. This workflow assumes you have already ${link("prepared your disks", "/docs/installation-disk")}.`,
+					content: rich`The tools are used in sequence. The ${link("Installation Guide", "/docs/installation")} walks through each step.`,
 				},
 				{
 					type: "interactive",
 					intro: "Complete installation workflow:",
 					steps: [
 						{
-							command: "mount /dev/sda2 /mnt",
-							description: "Mount system slot A (system-a)",
-						},
-						{
-							command: "mount --mkdir /dev/sda1 /mnt/boot",
-							description: "Mount EFI System Partition",
-						},
-						{
-							command: "mount --mkdir /dev/sda4 /mnt/var",
-							description: "Mount persistent state partition (/var)",
+							command: "recpart apply --disk /dev/nvme0n1 --confirm DESTROY",
+							description: "Create the A/B layout and mount it at /mnt (--mode mutable for one root)",
 						},
 						{
 							command: "recstrap /mnt",
@@ -84,29 +65,29 @@ export const installationToolsOverviewContent: DocsContent = {
 							description: "Generate fstab entries",
 						},
 						{
+							command: "recsetup inspect --root /mnt --json",
+							description: "List the time zones, locales, keymaps and services the target offers",
+						},
+						{
+							command: "recsetup apply --root /mnt --timezone Europe/Amsterdam --locale en_US.UTF-8 --hostname myhostname",
+							description: "Apply the machine settings",
+						},
+						{
+							command: "recchroot /mnt -- passwd",
+							description: "Set the installed root password",
+						},
+						{
 							command:
-								"mkdir -p /mnt/boot/EFI/Linux && cp /run/live-media/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/ && cp /run/live-media/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/",
-							description: "Copy A/B boot images (UKIs)",
+								"recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3 --machine-id",
+							description: "Install systemd-boot and the A/B boot entries",
 						},
 						{
-							command: "recchroot /mnt",
-							description: "Enter the new system",
-						},
-						{
-							command: "passwd root",
-							description: "Set root password (inside chroot)",
-						},
-						{
-							command: "bootctl install",
-							description: "Install bootloader (inside chroot)",
-						},
-						{
-							command: "exit",
-							description: "Exit chroot",
+							command: "umount -R /mnt",
+							description: "Unmount the installed system",
 						},
 						{
 							command: "reboot",
-							description: "Reboot into installed system",
+							description: "Reboot into the installed system",
 						},
 					],
 				},
@@ -122,8 +103,10 @@ export const installationToolsOverviewContent: DocsContent = {
 				{
 					type: "list",
 					items: [
+						rich`${bold("recpart")} only prepares the disk. It plans, shows every command, refuses unsafe layouts, and applies the plan only with ${code("--confirm DESTROY")}.`,
 						rich`${bold("recstrap")} only extracts files. It does not partition, format, mount, configure, or install bootloaders.`,
 						rich`${bold("recfstab")} only generates fstab. It outputs to stdout; you redirect to a file.`,
+						rich`${bold("recsetup")} only configures and boots the extracted system. It plans first and prints the exact commands it runs.`,
 						rich`${bold("recchroot")} only enters chroot. It sets up mounts, runs your command, and cleans up.`,
 					],
 				},
@@ -139,7 +122,7 @@ export const installationToolsOverviewContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`recstrap, recfstab and recchroot share one error table: each failure prints a code such as ${code("E004")}, which is also the exit status. The table is the ${code("Code")} enum in ${code("tools/recstrap/src/error.rs")}.`,
+					content: rich`recstrap, recfstab, recchroot and recsetup share one error table: each failure prints a code such as ${code("E004")}, which is also the exit status. The table is the ${code("Code")} enum in ${code("tools/recstrap/src/error.rs")}. recpart has its own (${code("tools/recpart/src/error.rs")}).`,
 				},
 			],
 		},
@@ -149,8 +132,10 @@ export const installationToolsOverviewContent: DocsContent = {
 				{
 					type: "list",
 					items: [
+						rich`${link("recpart Reference", "/docs/recpart")} - Prepare the disk`,
 						rich`${link("recstrap Reference", "/docs/recstrap")} - Extract the base system`,
 						rich`${link("recfstab Reference", "/docs/recfstab")} - Generate fstab entries`,
+						rich`${link("recsetup Reference", "/docs/recsetup")} - Configure and boot the system`,
 						rich`${link("recchroot Reference", "/docs/recchroot")} - Enter chroot environment`,
 						rich`${link("Installation Guide", "/docs/installation")} - Complete installation walkthrough`,
 					],

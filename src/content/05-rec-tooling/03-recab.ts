@@ -13,11 +13,28 @@ export const recabContent: DocsContent = {
 	intro: "A/B slot management: which slot runs, which boots next, commit and rollback (systemd-boot backend).",
 	sections: [
 		{
-			title: "Status",
+			title: "How It Works",
 			content: [
 				{
 					type: "text",
 					content: rich`${code("recab")} is implemented on systemd-boot, with systemd (LevitateOS) or OpenRC (AcornOS) as init: it finds the running slot by matching the kernel's ${code("root=")} against the slot entries, stages trial boots by writing systemd-boot's ${code("LoaderEntryOneShot")} variable itself (no ${code("bootctl")} needed), lets its trial service commit a healthy trial or reboot out of a failed one, and keeps its state in ${code("/var/lib/recab")}. ${code("recab status --json")} prints the JSON described by ${code("tools/recab/docs/status.schema.json")}.`,
+				},
+			],
+		},
+		{
+			title: "An Update",
+			content: [
+				{
+					type: "code",
+					language: "bash",
+					content: `recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz --initrd /mnt/boot/initramfs.img
+recab set-next B      # one trial boot of the staged slot
+reboot                # into B: committed if it comes up healthy, else back to A
+recab rollback        # later, if wanted: back to A, while A still holds its system`,
+				},
+				{
+					type: "text",
+					content: rich`${code("stage")} formats the inactive slot, extracts the image with ${code("recstrap")}, and carries over the hostname, machine id, locale, time settings, accounts (merged by name), SSH host keys, enabled services and network connections. It refuses while the running slot is uncommitted or while the target slot is the next boot.`,
 				},
 			],
 		},
@@ -41,9 +58,9 @@ export const recabContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("Slot state machine glue")}: intended to be called by higher-level tooling`,
-						rich`${bold("Non-goal")}: full updater or package manager`,
-						rich`${bold("Future integrations")}: boot try/commit semantics and persistent slot state`,
+						rich`${bold("Slot state machine")}: called by people, installers (${code("recsetup")} runs ${code("recab init")}) and the update scenarios`,
+						rich`${bold("Never selects an unbootable slot")}: ${code("set-next")}, ${code("commit")} and ${code("rollback")} refuse a slot whose entry names files missing from the ESP`,
+						rich`${bold("Non-goal")}: building the system it stages, or package management`,
 					],
 				},
 			],

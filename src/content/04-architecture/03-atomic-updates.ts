@@ -4,7 +4,7 @@ import { rich, bold, code, link } from "../../rich-text"
 export const atomicUpdatesContent: DocsContent = {
 	title: "Atomic Updates (A/B)",
 	intro:
-		"LevitateOS variants default to an A/B immutable system layout: build the next system in slot B, trial-boot it, then commit. Roll back by booting the previous slot.",
+		"LevitateOS and AcornOS default to an A/B system layout: write the next system into the inactive slot, trial-boot it, then commit. Roll back by booting the previous slot.",
 	sections: [
 		{
 			title: "What “A/B” Means",
@@ -17,9 +17,10 @@ export const atomicUpdatesContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("Slot A")}: current system`,
-						rich`${bold("Slot B")}: next system (built before activation)`,
-						rich`${bold("Persistent state")}: mounted at ${code("/var")} (includes ${code("/var/home")})`,
+						rich`${bold("Slot A")} (label ${code("ROOT_A")}): the installed system after a fresh install`,
+						rich`${bold("Slot B")} (label ${code("ROOT_B")}): where the next system is written`,
+						rich`${bold("Persistent state")} (label ${code("STATE")}): mounted at ${code("/var")} (includes ${code("/var/home")}), shared by both slots`,
+						rich`${bold("EFI partition")}: systemd-boot, one boot entry per slot, and each slot's kernel and initramfs`,
 					],
 				},
 			],
@@ -32,7 +33,7 @@ export const atomicUpdatesContent: DocsContent = {
 					ordered: true,
 					items: [
 						rich`Write the new system into the inactive slot: ${code("recab stage --rootfs <image> --kernel <vmlinuz> --initrd <initramfs>")}. The machine's hostname, accounts, enabled services and SSH host keys come along.`,
-						rich`Trial-boot it once: ${code("recab set-next B")}, then reboot`,
+						rich`Trial-boot it once: ${code("recab set-next B")} (the inactive slot), then reboot`,
 						rich`If slot B comes up with no failed services, ${code("recab-trial.service")} commits it. If services fail, startup never finishes, the new system cannot mount its root, or its kernel or init crashes, the machine reboots into slot A by itself. ${code("recab status")} shows how the last trial ended.`,
 						rich`Later, ${code("recab rollback")} returns to the previous slot while it still holds that system`,
 					],
@@ -44,7 +45,7 @@ export const atomicUpdatesContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`See also the build and scenario model in ${code("architecture.md")} (A/B update and rollback validation).`,
+					content: rich`See ${link("recab", "/docs/recab")} for every command, and ${link("Post-Installation", "/docs/post-installation")} for an update from a new release.`,
 				},
 			],
 		},
@@ -53,28 +54,13 @@ export const atomicUpdatesContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content:
-						"Mutable mode exists for daredevils on public-facing desktop variants (LevitateOS/AcornOS). It allows in-place system mutation, at the cost of drift and a much larger blast radius for recipe changes.",
+					content: rich`Mutable mode is one root partition changed in place, chosen at install time with ${code("recpart --mode mutable")} and ${code("recsetup apply --boot mutable")}. It has no second slot, so there is no trial boot and no rollback, and every change lands on the running system.`,
 				},
 				{
 					type: "note",
 					variant: "warning",
 					content:
-						"Mutable mode is explicitly unsafe when combined with LLM-assisted recipe authoring. Expect breakage. Prefer A/B unless you are debugging or experimenting.",
-				},
-			],
-		},
-		{
-			title: "Appliance Variants",
-			content: [
-				{
-					type: "text",
-					content:
-						"Appliance variants are immutable-only. They ship primarily as installed-disk images and are designed to run unattended.",
-				},
-				{
-					type: "text",
-					content: rich`If you’re looking for a daily-driver desktop experience, start with ${link("Getting Started", "/docs/getting-started")}.`,
+						"Mutable mode is an explicit opt-in. Prefer A/B unless you have a reason to change the running system directly.",
 				},
 			],
 		},

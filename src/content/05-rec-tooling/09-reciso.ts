@@ -17,12 +17,7 @@ export const recisoContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("reciso")} builds UEFI bootable media and can include prebuilt UKIs or build UKIs inline.`,
-				},
-				{
-					type: "note",
-					variant: "info",
-					content: rich`Current implementation is marked beta in tool-local docs.`,
+					content: rich`${code("reciso")} builds UEFI bootable media with systemd-boot, and can include prebuilt UKIs or build them inline. By default the rootfs and live overlay images are appended to the ISO as GPT partitions, which the live initramfs mounts directly; ${code("--live-payload-layout iso-files")} keeps them as files under ${code("live/")} instead. A ${code(".sha512")} checksum is written next to the ISO unless ${code("--no-checksum")}.`,
 				},
 			],
 		},

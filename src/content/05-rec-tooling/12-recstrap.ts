@@ -17,20 +17,15 @@ export const recstrapContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recstrap")} extracts the LevitateOS EROFS image from the live ISO to a mounted target directory. This is the equivalent of Arch Linux's ${code("pacstrap")} command.`,
+					content: rich`${code("recstrap")} extracts the LevitateOS EROFS image from the live ISO to a mounted target directory. This is the equivalent of Arch Linux's ${code("pacstrap")} command. ${code("recab stage")} uses it on the installed system to write a new system into the inactive slot.`,
 				},
 				{
 					type: "text",
-					content: rich`${code("recstrap")} is ${bold("EROFS-only")}. Files that are not ${code(".erofs")} images (including ${code(".squashfs")}) are rejected.`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
+					content: rich`${code("recstrap")} is ${bold("EROFS-only")}. The rootfs is an ${code(".erofs")} image file or a partition holding one; anything else (including ${code(".squashfs")}) is rejected. It mounts the image read-only and copies its files into the target.`,
 				},
 				{
 					type: "text",
-					content: rich`After running recstrap, you must manually complete the installation: generate ${code("/etc/fstab")}, install a bootloader, set passwords, and configure the system.`,
+					content: rich`After running recstrap, complete the installation: generate ${code("/etc/fstab")} with ${code("recfstab")}, then configure the system, set passwords and install the bootloader with ${code("recsetup")}.`,
 				},
 			],
 		},
@@ -61,19 +56,19 @@ export const recstrapContent: DocsContent = {
 					type: "command",
 					language: "bash",
 					description: "Use custom EROFS image location",
-					command: "recstrap /mnt --rootfs /media/usb/filesystem.erofs",
+					command: "recstrap --rootfs /media/usb/filesystem.erofs /mnt",
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Run pre-flight checks only (no extraction)",
-					command: "recstrap /mnt --check",
+					command: "recstrap --check /mnt",
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Force extraction to non-empty directory",
-					command: "recstrap /mnt --force",
+					description: "Skip the mount point and empty-target checks",
+					command: "recstrap --force /mnt",
 				},
 			],
 		},
@@ -89,23 +84,23 @@ export const recstrapContent: DocsContent = {
 					type: "list",
 					ordered: true,
 					items: [
+						"Target is not a protected system path (never overridable)",
 						"Running as root",
-						"fsck.erofs is available",
-						"Target directory exists",
-						"Target is a directory (not a file)",
-						"Target is not a protected system path",
 						"Target is writable",
-						"Target is a mount point (skipped with --force)",
-						"Target is empty (skipped with --force; lost+found ignored)",
-						"Sufficient disk space (minimum 2GB)",
-						"EROFS image exists",
-						"EROFS image is a regular file",
-						"Rootfs filename ends with .erofs",
-						"EROFS image is readable",
-						"EROFS image is not inside the target directory",
-						"EROFS superblock magic is valid",
-						"Kernel has EROFS support available",
+						rich`Target is not on the running system's root filesystem or another host system directory (only ${code("--allow-host-root-fs")}, never implied by ${code("--force")})`,
+						rich`Target is a mount point (${code("--allow-non-mountpoint")} or ${code("--force")})`,
+						rich`Target is empty, ${code("lost+found")} aside (${code("--allow-nonempty")} or ${code("--force")})`,
+						"At least 2 GB free on the target",
+						"A rootfs image was found",
+						"The rootfs is an image file or a partition, not a directory",
+						"The rootfs is not inside the target",
+						rich`The rootfs is EROFS: an image file named ${code(".erofs")}, with the EROFS superblock magic`,
+						"The running kernel supports EROFS (built in or loadable)",
 					],
+				},
+				{
+					type: "text",
+					content: rich`After extraction, recstrap checks that ${code("bin")}, ${code("etc")}, ${code("lib")}, ${code("sbin")}, ${code("usr")} and ${code("var")} exist in the target before it reports success.`,
 				},
 			],
 		},
@@ -119,12 +114,8 @@ export const recstrapContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${code("/run/live-rootfs.erofs")}`,
-						rich`${code("/run/live-media/live/filesystem.erofs")}`,
-						rich`${code("/run/initramfs/live/filesystem.erofs")}`,
-						rich`${code("/run/archiso/bootmnt/live/filesystem.erofs")}`,
-						rich`${code("/mnt/cdrom/live/filesystem.erofs")}`,
-						rich`${code("/media/cdrom/live/filesystem.erofs")}`,
+						rich`${code("/run/live-rootfs.erofs")} - the live system's handle to the rootfs payload partition or image file`,
+						rich`${code("/run/live-media/live/filesystem.erofs")} - the image file on the mounted boot medium`,
 					],
 				},
 			],
@@ -160,25 +151,17 @@ export const recstrapContent: DocsContent = {
 					content: `# Generate fstab
 recfstab /mnt >> /mnt/etc/fstab
 
-# Copy pre-built UKIs from live media
-mkdir -p /mnt/boot/EFI/Linux
-cp /run/live-media/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/
-cp /run/live-media/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/
+# Configure the system
+recsetup apply --root /mnt --timezone Europe/Amsterdam --locale en_US.UTF-8 --hostname myhostname
 
-# Enter chroot
-recchroot /mnt
+# Set the root password (root is locked by default)
+recchroot /mnt -- passwd
 
-# Optional: apply user setup script generated by recstrap
-bash /root/setup-initial-user.sh
+# Install systemd-boot and the A/B boot entries
+recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3 --machine-id
 
-# Or set root password directly (root is locked by default)
-passwd root
-
-# Install bootloader (auto-discovers UKI)
-bootctl install
-
-# Exit and reboot
-exit
+# Unmount and reboot
+umount -R /mnt
 reboot`,
 				},
 			],

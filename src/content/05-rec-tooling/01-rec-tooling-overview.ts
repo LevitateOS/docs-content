@@ -9,19 +9,14 @@ export const recToolingOverviewContent: DocsContent = {
 		audience: ["operator", "developer"],
 		stability: "experimental",
 	},
-	intro: "Repository-wide inventory of rec* tooling, with explicit status and boundaries.",
+	intro: "Inventory of the rec* tools: what each one does and where it runs.",
 	sections: [
 		{
 			title: "Context",
 			content: [
 				{
 					type: "text",
-					content: rich`The installer trio (${code("recstrap")}, ${code("recfstab")}, ${code("recchroot")}) remains the primary manual install path. This section covers the broader ${code("rec*")} tool surface so the docs reflect the real repository.`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Status matters")}: not all tools here are equally mature. Each page calls out whether the tool is stable, beta, experimental, scaffold, or draft.`,
+					content: rich`The install tools (${code("recpart")}, ${code("recstrap")}, ${code("recfstab")}, ${code("recsetup")}, ${code("recchroot")}) are the manual install path, and the backends of the install screen's step apps. ${code("recab")} manages A/B updates on the installed system. The rest build the boot artifacts and drive the test VMs.`,
 				},
 			],
 		},
@@ -34,58 +29,19 @@ export const recToolingOverviewContent: DocsContent = {
 				},
 				{
 					type: "table",
-					headers: ["Tool", "Surface", "Primary Use", "Status"],
+					headers: ["Tool", "Surface", "Primary Use", "Runs On"],
 					rows: [
-						[rich`${link("recab", "/docs/recab")}`, "CLI", "A/B slot state machine", "Scaffold"],
-						[
-							rich`${link("recchroot", "/docs/recchroot")}`,
-							"CLI",
-							"Chroot with bind mounts",
-							"Stable (installer)",
-						],
-						[
-							rich`${link("recfstab", "/docs/recfstab")}`,
-							"CLI",
-							"Generate fstab entries",
-							"Stable (installer)",
-						],
-						[
-							rich`${link("recinit", "/docs/recinit")}`,
-							"CLI + library",
-							"Initramfs builder",
-							"Experimental",
-						],
-						[rich`${link("reciso", "/docs/reciso")}`, "CLI + library", "UEFI ISO builder", "Beta"],
-						[
-							rich`${link("recpart", "/docs/recpart")}`,
-							"CLI + backend",
-							"Disk plan/apply backend",
-							"Experimental",
-						],
-						[
-							rich`${link("recqemu", "/docs/recqemu")}`,
-							"Library",
-							"QEMU command/process helpers",
-							"Beta (library-only)",
-						],
-						[
-							rich`${link("recsetup", "/docs/recsetup")}`,
-							"CLI + backend",
-							"Configure and boot the installed system",
-							"Experimental",
-						],
-						[
-							rich`${link("recstrap", "/docs/recstrap")}`,
-							"CLI",
-							"Extract installed rootfs",
-							"Stable (installer)",
-						],
-						[
-							rich`${link("recuki", "/docs/recuki")}`,
-							"CLI + library",
-							"Unified Kernel Image builder",
-							"Beta",
-						],
+						[rich`${link("recab", "/docs/recab")}`, "CLI", "A/B slot state machine", "Installed system"],
+						[rich`${link("recchroot", "/docs/recchroot")}`, "CLI", "Chroot with bind mounts", "Live ISO"],
+						[rich`${link("recfstab", "/docs/recfstab")}`, "CLI", "Generate fstab entries", "Live ISO"],
+						[rich`${link("recinit", "/docs/recinit")}`, "CLI + library", "Initramfs builder", "Build host"],
+						[rich`${link("reciso", "/docs/reciso")}`, "CLI + library", "UEFI ISO builder", "Build host"],
+						[rich`${link("recpart", "/docs/recpart")}`, "CLI + backend", "Disk inspect/plan/apply backend", "Live ISO"],
+						[rich`${link("recqemu", "/docs/recqemu")}`, "Library", "Scenario VMs as libvirt domains, serial console", "Build host"],
+						[rich`${link("recsetup", "/docs/recsetup")}`, "CLI + backend", "Configure and boot the installed system", "Live ISO"],
+						["recshuttle", "Library", "SSH transport to scenario VMs", "Build host"],
+						[rich`${link("recstrap", "/docs/recstrap")}`, "CLI", "Extract the system image", "Live ISO and installed system (used by recab stage)"],
+						[rich`${link("recuki", "/docs/recuki")}`, "CLI + library", "Unified Kernel Image builder", "Build host"],
 					],
 					monospaceCol: 0,
 				},
@@ -98,9 +54,9 @@ export const recToolingOverviewContent: DocsContent = {
 					type: "list",
 					items: [
 						rich`${bold("Installer-facing")}: ${code("recstrap")}, ${code("recfstab")}, ${code("recchroot")}, ${code("recsetup")}`,
-						rich`${bold("Partition backend")}: ${code("recpart")} (plan/apply and handoff only)`,
+						rich`${bold("Partition backend")}: ${code("recpart")} (inspect/plan/apply and handoff only)`,
 						rich`${bold("Build pipeline")}: ${code("recinit")}, ${code("recuki")}, ${code("reciso")}`,
-						rich`${bold("Infra/automation")}: ${code("recqemu")}`,
+						rich`${bold("Test VMs")}: ${code("recqemu")}, ${code("recshuttle")}`,
 						rich`${bold("A/B control-plane")}: ${code("recab")}`,
 					],
 				},
@@ -112,7 +68,7 @@ export const recToolingOverviewContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${link("Installation Tools Overview", "/docs/installation-tools-overview")} - Installer trio`,
+						rich`${link("Installation Tools Overview", "/docs/installation-tools-overview")} - The install tools in order`,
 						rich`${link("recipe CLI Reference", "/docs/cli-reference")} - Package manager CLI`,
 					],
 				},

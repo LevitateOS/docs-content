@@ -10,22 +10,22 @@ export const recinitContent: DocsContent = {
 		audience: ["developer"],
 		stability: "experimental",
 	},
-	intro: "Rootless initramfs builder for live and installed-system boot paths.",
+	intro: "Rootless initramfs builder for the live ISO and installed systems.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recinit")} builds initramfs images without requiring root or external generator frameworks.`,
+					content: rich`${code("recinit")} builds initramfs images without requiring root or external generators such as dracut or mkinitcpio. It writes the CPIO archive itself, resolves boot modules against the kernel's ${code("modules.dep")}, and stores them in load order.`,
 				},
 				{
 					type: "table",
 					headers: ["Command", "Purpose"],
 					rows: [
-						[rich`${code("build-tiny")}`, "Build live/tiny initramfs (busybox-based)"],
-						[rich`${code("build-install")}`, "Build install initramfs (systemd-based)"],
-						[rich`${code("modules")}`, "Inspect module presets"],
+						[rich`${code("build-tiny")}`, "Build the live ISO initramfs (busybox-based): find the boot medium, mount the EROFS rootfs and live overlay, switch_root"],
+						[rich`${code("build-install")}`, "Build an initramfs for booting an installed system from disk (systemd-based)"],
+						[rich`${code("modules")}`, "List module presets and the modules in each"],
 					],
 					monospaceCol: 0,
 				},
@@ -51,9 +51,9 @@ export const recinitContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("Tiny/live")}: expects busybox + init template inputs`,
-						rich`${bold("Install")}: expects staged rootfs and module set`,
-						rich`${bold("Preset control")}: supports named presets plus custom comma-separated module lists`,
+						rich`${bold("Tiny/live")}: takes the kernel's module tree, a static busybox and the ISO label; the init template is built in (${code("--template")} replaces it)`,
+						rich`${bold("Install")}: takes the staged rootfs, its module tree and a static busybox for the emergency shell; firmware is copied unless ${code("--no-firmware")}`,
+						rich`${bold("Preset control")}: named presets (${code("live")}, ${code("install")}) or a comma-separated module list`,
 					],
 				},
 			],

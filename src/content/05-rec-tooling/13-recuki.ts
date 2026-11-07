@@ -17,12 +17,7 @@ export const recukiContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recuki")} wraps ${code("ukify")} to produce a single ${code(".efi")} artifact that bundles kernel, initramfs, and command line.`,
-				},
-				{
-					type: "note",
-					variant: "info",
-					content: rich`Current implementation is marked beta in tool-local docs; keep production rollout explicit.`,
+					content: rich`${code("recuki")} wraps ${code("ukify")} to produce a single ${code(".efi")} artifact that bundles kernel, initramfs, and command line. The live ISO's boot menu entries are UKIs built this way; systemd-boot finds them on its own.`,
 				},
 			],
 		},

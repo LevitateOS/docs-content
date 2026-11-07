@@ -4,14 +4,14 @@ import { rich, code, link } from "../../rich-text"
 export const helpersHttpContent: DocsContent = {
 	title: "HTTP Helpers",
 	intro:
-		"Functions for HTTP requests and GitHub API access, useful for update checking and downloading.",
+		"Bounded metadata requests: release versions, tags and small text documents. Payload downloads use the verified Acquire helpers.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`Timeout defaults to 30 seconds (configurable via ${code("RECIPE_HTTP_TIMEOUT")} env var). For downloading files, see ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
+					content: rich`Each request times out after 30 seconds and needs a network grant for its host, such as ${code("--network-host api.github.com:443")}. Metadata tells a recipe author what is new; it never makes an unverified payload trustworthy. For downloading files, see ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
 				},
 			],
 		},
@@ -20,49 +20,27 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Fetch content from a URL. Returns the response body as a string.",
+					content: "Fetch a URL and return the response body as text. The response size is bounded.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let page = http_get("https://api.example.com/version");`,
+					content: `let page = http_get("https://example.com/releases/latest.txt");`,
 				},
 			],
 		},
 		{
-			title: "github_latest_release",
+			title: "github_latest_release / github_latest_tag",
 			content: [
 				{
 					type: "text",
-					content: rich`Get the latest release version from a GitHub repository. Strips the ${code("v")} prefix automatically.`,
+					content: rich`Return the version of a repository's latest release, or its latest tag, with a leading ${code("v")} removed.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `fn check_update() {
-    let latest = github_latest_release("BurntSushi/ripgrep");
-    // Returns "14.1.0" (not "v14.1.0")
-    if latest != ctx.version {
-        latest
-    } else {
-        ()
-    }
-}`,
-				},
-			],
-		},
-		{
-			title: "github_latest_tag",
-			content: [
-				{
-					type: "text",
-					content: rich`Get the latest tag from a GitHub repository. Strips the ${code("v")} prefix automatically. Useful for projects that use tags instead of releases.`,
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let latest = github_latest_tag("torvalds/linux");
-// Returns "6.7" for tag "v6.7"`,
+					content: `let latest = github_latest_release("BurntSushi/ripgrep");   // "14.1.0", not "v14.1.0"
+let tag = github_latest_tag("torvalds/linux");`,
 				},
 			],
 		},
@@ -71,16 +49,7 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Download a release asset from GitHub. Takes the repo, version, and a glob pattern for the asset name. Returns the downloaded file path. See ${link("Acquire Helpers", "/docs/helpers-acquire")} for more details.`,
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let archive = github_download_release(
-    "BurntSushi/ripgrep",
-    "14.1.0",
-    "ripgrep-*-x86_64-unknown-linux-musl.tar.gz"
-);`,
+					content: rich`Download a matching asset of the latest release, verified against a required SHA256. See ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
 				},
 			],
 		},
@@ -89,7 +58,7 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Strip common prefixes from version strings (${code("v")}, ${code("release-")}, ${code("version-")}).`,
+					content: rich`Strip a common prefix from a version string (${code("v")}, ${code("release-")} or ${code("version-")}).`,
 				},
 				{
 					type: "code",

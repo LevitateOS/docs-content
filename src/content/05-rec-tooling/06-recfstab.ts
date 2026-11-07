@@ -20,14 +20,9 @@ export const recfstabContent: DocsContent = {
 					content: rich`${code("recfstab")} reads mounted filesystems under a root directory and outputs properly formatted fstab entries to stdout. This is the equivalent of Arch Linux's ${code("genfstab")} command.`,
 				},
 				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
-				},
-				{
 					type: "text",
 					content:
-						"The output is suitable for appending to /etc/fstab. Pseudo-filesystems (proc, sysfs, tmpfs) are automatically filtered out.",
+						"The output is suitable for appending to /etc/fstab. Only storage the target owns is listed: filesystems under the root backed by a block device or a network share, and the target's swap. Mount points are written relative to the root.",
 				},
 			],
 		},
@@ -85,14 +80,17 @@ export const recfstabContent: DocsContent = {
 					type: "code",
 					language: "bash",
 					content: `# /dev/nvme0n1p2
-UUID=a1b2c3d4-e5f6-7890-abcd-ef1234567890	/	ext4	defaults	0	1
+UUID=a1b2c3d4-e5f6-7890-abcd-ef1234567890	/	ext4	relatime	0	1
 
 # /dev/nvme0n1p1
-UUID=ABCD-1234	/boot	vfat	fmask=0022,dmask=0022	0	2`,
+UUID=ABCD-1234	/boot	vfat	relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0	0
+
+# /dev/nvme0n1p4
+UUID=0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0	/var	ext4	relatime	0	2`,
 				},
 				{
 					type: "text",
-					content: "Fields: device identifier, mount point, filesystem type, options, dump, pass",
+					content: rich`Fields: device identifier, mount point, filesystem type, options, dump, pass. Pass is 1 for ${code("/")}, 2 for other ext2/3/4, XFS and F2FS filesystems, and 0 for the rest (vfat and btrfs are not checked at boot).`,
 				},
 			],
 		},
@@ -104,7 +102,7 @@ UUID=ABCD-1234	/boot	vfat	fmask=0022,dmask=0022	0	2`,
 					headers: ["Type", "Flag", "Example", "Use Case"],
 					rows: [
 						["UUID", "(default)", "UUID=a1b2c3d4-...", "Most reliable for single-disk systems"],
-						["LABEL", "-L", "LABEL=system-a", "Human-readable if you label filesystems"],
+						["LABEL", "-L", "LABEL=ROOT_A", "Human-readable if you label filesystems"],
 						["PARTUUID", "-p", "PARTUUID=12345678-01", "GPT partition UUID, survives reformatting"],
 						["PARTLABEL", "-t", "PARTLABEL=EFI", "GPT partition label if set during partitioning"],
 					],
@@ -117,33 +115,29 @@ UUID=ABCD-1234	/boot	vfat	fmask=0022,dmask=0022	0	2`,
 				{
 					type: "text",
 					content:
-						"Runtime-only mount options are automatically removed from the output since they should not persist in fstab:",
+						"Options the kernel adds at mount time are removed, since they should not be pinned in fstab. Everything else is kept as mounted:",
 				},
 				{
 					type: "list",
 					items: [
-						rich`${code("rw")} / ${code("ro")} - Read-write/read-only (determined at mount time)`,
-						rich`${code("seclabel")} - SELinux label option`,
-						rich`${code("noatime")}, ${code("relatime")}, ${code("lazytime")} - Runtime atime options removed`,
-						rich`${code("subvolid=<id>")} - Removed, while ${code("subvol=<path>")} is preserved`,
+						rich`${code("rw")} - the default`,
+						rich`${code("seclabel")} - SELinux runtime state`,
+						rich`${code("subvolid=<id>")} - changes when a btrfs subvolume is recreated, while ${code("subvol=<path>")} is preserved`,
 					],
+				},
+				{
+					type: "text",
+					content: rich`An entry left with no options gets ${code("defaults")}.`,
 				},
 			],
 		},
 		{
-			title: "Pseudo-Filesystems",
+			title: "What Is Left Out",
 			content: [
 				{
 					type: "text",
-					content: "These filesystem types are automatically excluded:",
-				},
-				{
-					type: "code",
-					language: "text",
-					content: `autofs  binder  binfmt_misc  bpf  cgroup  cgroup2  configfs  debugfs
-devpts  devtmpfs  efivarfs  fuse.gvfsd-fuse  fuse.portal  fusectl
-hugetlbfs  mqueue  nsfs  overlay  proc  pstore  ramfs  rpc_pipefs
-securityfs  selinuxfs  sysfs  tmpfs  tracefs`,
+					content:
+						"Pseudo filesystems (proc, sysfs, devpts, cgroup, efivarfs and the like), tmpfs, overlays and FUSE daemons are not the target's storage, so they are never listed. When a path is mounted twice, only the visible (last) mount is used.",
 				},
 			],
 		},
@@ -152,14 +146,14 @@ securityfs  selinuxfs  sysfs  tmpfs  tracefs`,
 			content: [
 				{
 					type: "text",
-					content: "Swap partitions and files under the root are included automatically:",
+					content: rich`Active swap (from ${code("swapon --show")}) is included when it belongs to the target:`,
 				},
 				{
 					type: "list",
 					items: [
-						rich`${bold("Swap partitions")} - Detected from ${code("/proc/swaps")}, included with priority if set`,
-						rich`${bold("Swap files")} - Detected and path adjusted relative to root`,
-						rich`${bold("zram")} - Excluded (runtime-only compressed RAM swap)`,
+						rich`${bold("Swap files")} under the root, with the path written relative to the root`,
+						rich`${bold("Swap partitions")} on one of the disks that hold the target's filesystems`,
+						rich`${bold("The live system's own swap")}, on any other disk (including zram), is left out`,
 					],
 				},
 			],
@@ -179,9 +173,9 @@ securityfs  selinuxfs  sysfs  tmpfs  tracefs`,
 				{
 					type: "list",
 					items: [
-						rich`${code("findmnt")} - Part of util-linux, used to enumerate mounts`,
-						rich`${code("blkid")} - Optional, used to look up UUID/LABEL/PARTUUID/PARTLABEL; missing ${code("blkid")} falls back to raw device paths`,
-						"Root privileges are recommended for reliable block metadata access",
+						rich`${code("findmnt")}, ${code("swapon")} and ${code("blkid")} from util-linux`,
+						rich`A device without the chosen identifier (for example no filesystem label with ${code("-L")}) is an error, not a fallback to the raw device path`,
+						"Root privileges, for reliable block metadata access",
 					],
 				},
 			],
@@ -196,6 +190,7 @@ securityfs  selinuxfs  sysfs  tmpfs  tracefs`,
 						["Identifier types", "UUID, LABEL, PARTUUID, PARTLABEL", "Same"],
 						["Output to stdout", "Yes", "Yes"],
 						["Pseudo-filesystem filtering", "Automatic", "Automatic"],
+						["Network filesystems", "Included", "Included"],
 						["btrfs subvolumes", "Supported", "Supported"],
 						["Swap detection", "Automatic", "Automatic"],
 					],

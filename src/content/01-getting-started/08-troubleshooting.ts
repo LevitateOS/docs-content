@@ -1,4 +1,5 @@
 import type { DocsContent } from "../../types"
+import { rich, code } from "../../rich-text"
 
 export const troubleshootingContent: DocsContent = {
 	title: "Troubleshooting",
@@ -9,12 +10,6 @@ export const troubleshootingContent: DocsContent = {
 			title: "Boot Issues",
 			content: [
 				{
-					type: "note",
-					variant: "warning",
-					content:
-						"Default update model is A/B immutable (slot updates + rollback). Mutable mode is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.",
-				},
-				{
 					type: "qa",
 					items: [
 						{
@@ -22,45 +17,34 @@ export const troubleshootingContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: "Boot from the ISO again and verify your installation:",
+									content: "Boot from the ISO again and check the installed boot files:",
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Mount your partitions",
+									description: "Mount slot A, the EFI partition and the state partition",
 									command: [
-										"mount /dev/sda2 /mnt",
-										"mount /dev/sda1 /mnt/boot",
-										"mount /dev/sda4 /mnt/var",
+										"mount /dev/nvme0n1p2 /mnt",
+										"mount /dev/nvme0n1p1 /mnt/boot",
+										"mount /dev/nvme0n1p4 /mnt/var",
 									],
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Verify slot A partition is labeled 'system-a'",
-									command: "blkid /dev/sda2 | grep 'LABEL=\"system-a\"'",
+									description: "Check that both slot entries and slot A's kernel are on the EFI partition",
+									command: ["ls /mnt/boot/loader/entries", "ls /mnt/boot/levitateos-a"],
+								},
+								{
+									type: "text",
+									content: rich`You should see ${code("levitateos-a.conf")} and ${code("levitateos-b.conf")}, and ${code("vmlinuz")} and ${code("initramfs.img")} for slot A. Each entry's ${code("options")} line names its slot by ${code("root=PARTUUID=")}; compare it with ${code("blkid -s PARTUUID /dev/nvme0n1p2")}.`,
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Verify slot A boot image exists",
-									command: "ls -la /mnt/boot/EFI/Linux/levitateos-system-a.efi",
-								},
-								{
-									type: "command",
-									language: "bash",
-									description: "Reinstall A/B boot images if missing",
-									command: [
-										"mkdir -p /mnt/boot/EFI/Linux",
-										"cp /run/live-media/boot/uki/levitateos-system-a.efi /mnt/boot/EFI/Linux/",
-										"cp /run/live-media/boot/uki/levitateos-system-b.efi /mnt/boot/EFI/Linux/",
-									],
-								},
-								{
-									type: "command",
-									language: "bash",
-									description: "Re-enter chroot and reinstall bootloader",
-									command: ["recchroot /mnt", "bootctl install", "exit"],
+									description: "Reinstall systemd-boot and the A/B boot layout",
+									command:
+										"recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3",
 								},
 							],
 						},
@@ -81,7 +65,22 @@ export const troubleshootingContent: DocsContent = {
 									type: "command",
 									language: "bash",
 									description: "Verify ESP is mounted at /boot",
-									command: "mount | grep boot",
+									command: "findmnt /boot",
+								},
+							],
+						},
+						{
+							question: "An update did not stay",
+							answer: [
+								{
+									type: "text",
+									content: rich`A trial boot that fails, or does not finish starting, is not committed: the machine reboots into the known-good slot. ${code("recab status")} shows the running and known-good slots and how the last trial ended. Fix the cause, then stage and trial the slot again.`,
+								},
+								{
+									type: "command",
+									language: "bash",
+									description: "Show the slots and the last trial",
+									command: "recab status",
 								},
 							],
 						},
@@ -159,19 +158,27 @@ export const troubleshootingContent: DocsContent = {
 							answer: [
 								{
 									type: "text",
-									content: "Try updating the package database first:",
+									content: rich`The error names the failing phase and the recipe's reason. Each phase's readiness check can be run on its own:`,
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Update package lists",
-									command: "recipe update",
+									description: "See which phase still needs work",
+									command: [
+										"recipe isacquired packagename",
+										"recipe isbuilt packagename",
+										"recipe isinstalled packagename",
+									],
+								},
+								{
+									type: "text",
+									content: rich`Networking is off unless granted: a recipe that downloads needs ${code("--network-host HOST:443")} for each server it uses. The full log of every run is under ${code("~/.local/state/recipe/logs/")}.`,
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Retry installation",
-									command: "recipe install packagename",
+									description: "Retry, redoing acquisition and build",
+									command: "recipe install packagename --force-acquire",
 								},
 							],
 						},

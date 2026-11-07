@@ -9,7 +9,7 @@ export const cliReferenceContent: DocsContent = {
 		audience: ["developer"],
 		stability: "experimental",
 	},
-	intro: rich`The Recipe CLI executes build-time Rhai recipes inside a configured Ginux domain and returns named published products. Prepare the launcher, verified image and worker first using the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/main/README.md")}.`,
+	intro: rich`The Recipe CLI executes build-time Rhai recipes inside a configured Ginux domain and returns named published products. Prepare the launcher, verified image and worker first using the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")}.`,
 	sections: [
 		{
 			title: "Commands",
@@ -32,7 +32,7 @@ export const cliReferenceContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`${code("RECIPE")} is a path or name resolved using ${code("--recipes-path")}. Current scope covers managed build products and owned target views; live-system activation is outside this interface. Run ${code("recipe --help")} and ${code("recipe install --help")} for current syntax.`,
+					content: rich`${code("RECIPE")} is a path to a ${code(".rhai")} file, or a name looked up in ${code("--recipes-path")} (default ${code("$RECIPE_PATH")}, else ${code("~/.local/share/recipe/recipes")}), with ${code(".rhai")} appended if needed. Run ${code("recipe --help")} and ${code("recipe <command> --help")} for the full syntax.`,
 				},
 			],
 		},
@@ -62,6 +62,10 @@ export const cliReferenceContent: DocsContent = {
 					headers: ["Option", "Purpose"],
 					rows: [
 						["--recipes-path DIR", "Name/module/dependency search directory."],
+						["--build-dir DIR", "Logical build destination and lock; default a stable directory under the state directory."],
+						["--state-dir DIR", "Where resumable state is kept; default ~/.local/state/recipe."],
+						["--input NAME=PATH", "Import a file or tree read-only at /inputs/NAME (repeatable)."],
+						["--json-output FILE", "Write the final ctx JSON to a file instead of stdout."],
 						["--define KEY=VALUE", "Recipe-specific constant; not a host filesystem import."],
 						["--jobs N", "Requested jobs, 1–16, default 1."],
 						["--force-install / --force-build / --force-acquire", "Rerun progressively more work for the main recipe."],
@@ -81,11 +85,11 @@ export const cliReferenceContent: DocsContent = {
 			],
 		},
 		{
-			title: "Optional Repair and Authoring",
+			title: "Writing Recipes",
 			content: [
 				{
 					type: "text",
-					content: rich`Normal execution needs no AI provider. ${code("install --autofix")} explicitly enables bounded coordinator-side patch/retry with configured provider/profile and allowed paths; readiness checks stay protected. See the ${link("current author guide", "https://github.com/LevitateOS/recipe/blob/main/WRITING_RECIPES.md")} for the sole API 2 contract and runnable example.`,
+					content: rich`See the ${link("Recipe Format", "/docs/recipe-format")} and the ${link("author guide", "https://github.com/LevitateOS/recipe/blob/master/WRITING_RECIPES.md")} for the API 2 contract and a runnable example.`,
 				},
 			],
 		},

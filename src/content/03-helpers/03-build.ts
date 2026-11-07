@@ -1,34 +1,25 @@
 import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import { rich, code, link } from "../../rich-text"
 
 export const helpersBuildContent: DocsContent = {
 	title: "Build Helpers",
-	intro: "Functions for extracting archives. For running commands, see the Commands helpers.",
+	intro: "Functions for extracting archives and assembling root filesystem trees. For running compilers and build tools, see the Commands helpers.",
 	sections: [
-		{
-			title: "Overview",
-			content: [
-				{
-					type: "text",
-					content: rich`Build helpers extract archives to prepare sources for compilation. Use ${code("shell()")} or ${code("shell_in()")} from the Commands helpers to run build commands.`,
-				},
-			],
-		},
 		{
 			title: "extract",
 			content: [
 				{
 					type: "text",
-					content: rich`Extract an archive to a destination directory. Takes the archive path and destination directory as arguments. Format is auto-detected from the file extension.`,
+					content: rich`${code("extract(archive, dest)")} unpacks an archive into ${code("dest")}, detecting the format from the file name. Every member path is validated; an entry that would escape ${code("dest")} fails the extraction.`,
 				},
 				{
 					type: "table",
 					headers: ["Format", "Extensions"],
 					rows: [
-						["tar.gz / tgz", ".tar.gz, .tgz"],
-						["tar.xz / txz", ".tar.xz, .txz"],
-						["tar.bz2 / tbz2", ".tar.bz2, .tbz2"],
-						["tar.zst", ".tar.zst"],
+						["tar.gz", ".tar.gz, .tgz"],
+						["tar.xz", ".tar.xz, .txz"],
+						["tar.bz2", ".tar.bz2, .tbz2"],
+						["tar.zst", ".tar.zst, .tzst"],
 						["zip", ".zip"],
 					],
 					monospaceCol: 0,
@@ -36,9 +27,9 @@ export const helpersBuildContent: DocsContent = {
 				{
 					type: "code",
 					language: "rhai",
-					content: `let archive = download(url, join_path(BUILD_DIR, "foo-1.0.tar.xz"));
-extract(archive, BUILD_DIR);
-// Creates BUILD_DIR/foo-1.0/`,
+					content: `let archive = download(ctx.url, join_path(ctx.runtime.paths.build, "foo-1.0.tar.xz"), ctx.sha256);
+extract(archive, ctx.runtime.paths.build);
+// creates /work/build/foo-1.0/`,
 				},
 			],
 		},
@@ -47,14 +38,42 @@ extract(archive, BUILD_DIR);
 			content: [
 				{
 					type: "text",
-					content:
-						"Extract an archive with an explicit format. Useful when the file extension doesn't match the actual format.",
+					content: rich`${code("extract_with_format(archive, dest, format)")} names the format explicitly (${code("tar.gz")}, ${code("tar.xz")}, ${code("tar.bz2")}, ${code("tar.zst")} or ${code("zip")}), for files whose name doesn't say.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `// Force tar.gz extraction even if extension is wrong
-extract_with_format(archive, BUILD_DIR, "tar.gz");`,
+					content: `extract_with_format(archive, ctx.runtime.paths.build, "tar.gz");`,
+				},
+			],
+		},
+		{
+			title: "Root Filesystem Helpers",
+			content: [
+				{
+					type: "text",
+					content: rich`System recipes assemble a complete root filesystem without build-host privileges. These helpers unpack packages into a root directory and record each file's intended owner, mode and extended attributes in the root's target manifest; the image writer applies that metadata, not the build user's.`,
+				},
+				{
+					type: "table",
+					headers: ["Helper", "Behavior"],
+					rows: [
+						["target_extract_rpm(rpm, root)", "Unpack an RPM into root, recording its ownership, modes and capabilities."],
+						["target_extract_tar(archive, root)", "Unpack a tar archive into root the same way."],
+						["target_capture_apks(root, archives)", "Record the metadata of the packages apk installed under root, read from their pinned .apk archives."],
+						["target_mode(root, path, mode)", "Set the recorded mode of one path, such as 0o440 for a sudoers file."],
+						["target_finalize(root)", "Finish the manifest after the recipe's own changes: paths that no longer exist are dropped and files the recipe created are owned by root."],
+					],
+					monospaceCol: 0,
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `for rpm in glob_list(join_path("/inputs/rpms", "*.rpm")) {
+    target_extract_rpm(rpm, rootfs);
+}
+target_mode(rootfs, "etc/sudoers.d/10-wheel", 0o440);
+target_finalize(rootfs);`,
 				},
 			],
 		},
@@ -63,26 +82,20 @@ extract_with_format(archive, BUILD_DIR, "tar.gz");`,
 			content: [
 				{
 					type: "text",
-					content: rich`Use ${code("shell_in()")} to run commands in a specific directory. This is the recommended pattern instead of changing directories:`,
+					content: rich`Run build tools with ${code("exec_checked")}, setting the working directory and environment for that command only:`,
 				},
 				{
 					type: "code",
 					language: "rhai",
 					content: `fn build(ctx) {
-    let src = ctx.source_dir;
-
-    // Run configure in the source directory
-    shell_in(src, "./configure --prefix=" + PREFIX);
-
-    // Run make in the source directory
-    shell_in(src, "make -j" + NPROC);
-
+    exec_checked("./configure", ["--prefix=/usr"], #{ cwd: ctx.src });
+    exec_checked("make", ["-j" + ctx.runtime.options.jobs], #{ cwd: ctx.src });
     ctx
 }`,
 				},
 				{
 					type: "text",
-					content: rich`See ${code("shell()")}, ${code("shell_in()")}, ${code("shell_output()")} in the Commands helpers for more options.`,
+					content: rich`See the ${link("Command Helpers", "/docs/helpers-commands")} for ${code("exec")}, ${code("exec_output")} and the shell variants.`,
 				},
 			],
 		},

@@ -3,131 +3,44 @@ import { rich, code } from "../../rich-text"
 
 export const helpersCommandsContent: DocsContent = {
 	title: "Command Helpers",
-	intro: "Functions for executing shell commands with different return types and behaviors.",
+	intro: "Functions for running programs and shell commands inside the recipe's domain.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`These functions have ${code("PREFIX")} and ${code("BUILD_DIR")} environment variables set automatically. The ${code("shell_in()")} variants run commands in a specific directory.`,
+					content: rich`Commands run inside Ginux and need their binaries in the selected image or in dependency tools, whose executables are on ${code("PATH")}. Prefer the ${code("exec")} family: arguments are an array, so nothing is reparsed by a shell. Their output goes to stderr with the rest of the diagnostics.`,
+				},
+				{
+					type: "table",
+					headers: ["Helper", "On nonzero exit", "Returns"],
+					rows: [
+						["exec_checked(cmd, args[, options])", "Throws", "()"],
+						["exec_output(cmd, args[, options])", "Throws", "stdout as a string"],
+						["exec(cmd, args[, options])", "Returns the status", "exit status (int)"],
+						["shell(cmd) / shell_in(dir, cmd)", "Throws", "()"],
+						["shell_output(cmd) / shell_output_in(dir, cmd)", "Throws", "stdout as a string"],
+						["shell_status(cmd) / shell_status_in(dir, cmd)", "Returns the status", "exit status, or -1 if it could not run"],
+					],
+					monospaceCol: 0,
 				},
 			],
 		},
 		{
-			title: "shell",
+			title: "exec_checked",
 			content: [
 				{
 					type: "text",
-					content: "Run a shell command. Throws an error if the command fails (non-zero exit).",
+					content: rich`Run a program and throw if it exits nonzero. The optional map sets ${code("cwd")} and ${code("env")} for this command only; the worker's own directory and environment don't change.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `shell("make -j" + NPROC);
-shell("install -Dm755 myapp " + join_path(PREFIX, "bin/myapp"));`,
-				},
-			],
-		},
-		{
-			title: "shell_in",
-			content: [
-				{
-					type: "text",
-					content: rich`Run a shell command in a specific directory. This is the recommended way to run commands in a source directory instead of changing directories.`,
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `// Run configure and make in the source directory
-shell_in(ctx.source_dir, "./configure --prefix=" + PREFIX);
-shell_in(ctx.source_dir, "make -j" + NPROC);
-shell_in(ctx.source_dir, "make install");`,
-				},
-			],
-		},
-		{
-			title: "shell_output",
-			content: [
-				{
-					type: "text",
-					content: "Run a command and return its stdout. Throws if the command fails.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let version = shell_output("git describe --tags");
-let arch = trim(shell_output("uname -m"));
-let cpus = trim(shell_output("nproc"));`,
-				},
-			],
-		},
-		{
-			title: "shell_output_in",
-			content: [
-				{
-					type: "text",
-					content: "Run a command in a specific directory and return its stdout.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let version = shell_output_in(ctx.source_dir, "git describe --tags");`,
-				},
-			],
-		},
-		{
-			title: "shell_status",
-			content: [
-				{
-					type: "text",
-					content: "Run a command and return its exit code. Does not throw on non-zero exit.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let status = shell_status("command -v clang");
-if status == 0 {
-    set_env("CC", "clang");
-}
-
-// Check if a command exists
-if shell_status("which rustc") == 0 {
-    log("Rust is installed");
-}`,
-				},
-			],
-		},
-		{
-			title: "shell_status_in",
-			content: [
-				{
-					type: "text",
-					content: "Run a command in a specific directory and return its exit code.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let status = shell_status_in(ctx.source_dir, "test -f Makefile");
-if status != 0 {
-    shell_in(ctx.source_dir, "./configure");
-}`,
-				},
-			],
-		},
-		{
-			title: "exec",
-			content: [
-				{
-					type: "text",
-					content:
-						"Execute a command with an array of arguments (no shell interpretation). Returns the exit code. Useful when arguments contain special characters.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let code = exec("git", ["clone", "--depth", "1", url]);
-let code = exec("cp", ["-r", src, dest]);`,
+					content: `exec_checked("cargo", ["build", "--release", "--locked", "--offline"], #{
+    cwd: "/inputs/source",
+    env: #{ CARGO_HOME: join_path(ctx.runtime.paths.build, "cargo") },
+});`,
 				},
 			],
 		},
@@ -136,14 +49,57 @@ let code = exec("cp", ["-r", src, dest]);`,
 			content: [
 				{
 					type: "text",
-					content:
-						"Execute a command with array arguments and return its stdout. Throws if exit code is non-zero.",
+					content: "Run a program and return its stdout. Throws if it exits nonzero.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let output = exec_output("rustc", ["--version"]);
-let files = exec_output("find", [src, "-name", "*.c"]);`,
+					content: `let version = trim(exec_output("rustc", ["--version"]));
+let files = exec_output("find", [ctx.src, "-name", "*.c"]);`,
+				},
+			],
+		},
+		{
+			title: "exec",
+			content: [
+				{
+					type: "text",
+					content: "Run a program and return its exit status, for a recipe that handles failure itself.",
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `if exec("make", ["check"], #{ cwd: ctx.src }) != 0 {
+    warn("test suite failed");
+}`,
+				},
+			],
+		},
+		{
+			title: "shell / shell_in",
+			content: [
+				{
+					type: "text",
+					content: rich`Run a command string with ${code("sh -c")}, in the current or the given directory. Use them only when you need shell syntax, and quote any data you put in the string. For a pipeline, check every stage: ${code("bash -o pipefail -c …")} or separate checked steps.`,
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `shell_in(ctx.src, "./configure --prefix=/usr CFLAGS='-O2 -g'");
+exec_checked("bash", ["-o", "pipefail", "-c", "rpm2archive - < pkg.rpm | tar -x"], #{ cwd: ctx.runtime.paths.build });`,
+				},
+			],
+		},
+		{
+			title: "shell_output / shell_status",
+			content: [
+				{
+					type: "code",
+					language: "rhai",
+					content: `let commit = trim(shell_output_in(ctx.src, "git rev-parse HEAD"));
+if shell_status_in(ctx.src, "test -f Makefile") != 0 {
+    exec_checked("./configure", [], #{ cwd: ctx.src });
+}`,
 				},
 			],
 		},

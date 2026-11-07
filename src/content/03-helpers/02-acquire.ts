@@ -4,22 +4,24 @@ import { rich, code } from "../../rich-text"
 export const helpersAcquireContent: DocsContent = {
 	title: "Acquire Helpers",
 	intro:
-		"Functions for downloading, cloning, and verifying source materials. All functions take explicit paths and return paths.",
+		"Functions for downloading, checking out and verifying source materials. Every payload is pinned: downloads need a SHA256, Git checkouts a full commit id.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`All acquire helpers are pure functions. ${code("download()")} returns the path where the file was saved, which you pass to ${code("verify_sha256()")} and ${code("extract()")}.`,
+					content: rich`Source facts (URL, version, digest) belong in the recipe. Acquire into ${code("ctx.runtime.paths.build")} and let ${code("is_acquired")} check the real files. Every server a recipe contacts, including each redirect target, needs a caller grant such as ${code("--network-host example.com:443")}; networking is off otherwise.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `// Explicit data flow
-let archive = download(url, join_path(BUILD_DIR, "foo.tar.gz"));
-verify_sha256(archive, "abc123...");
-extract(archive, BUILD_DIR);`,
+					content: `fn acquire(ctx) {
+    let archive = join_path(ctx.runtime.paths.build, "foo.tar.gz");
+    download(ctx.url, archive, ctx.sha256);
+    extract(archive, ctx.runtime.paths.build);
+    ctx
+}`,
 				},
 			],
 		},
@@ -28,31 +30,34 @@ extract(archive, BUILD_DIR);`,
 			content: [
 				{
 					type: "text",
-					content: rich`Download a file from a URL to a specific path. Returns the destination path. Shows a progress bar for large files.`,
+					content: rich`${code("download(url, dest, sha256[, resume])")} downloads to the exact path ${code("dest")} and returns it. The full 64-hex SHA256 is required. Bytes are staged and checked (status, length, hash) and replace ${code("dest")} only after they verify, so a failed or truncated transfer never replaces a valid file. Pass ${code("true")} as the fourth argument to resume a partial download; the resumed response's identity and ranges are checked too.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let dest = join_path(BUILD_DIR, "foo-1.0.tar.gz");
-let archive = download("https://example.com/foo-1.0.tar.gz", dest);
-// archive == dest`,
+					content: `let iso = download(
+    "https://example.com/large-file.tar.xz",
+    join_path(ctx.runtime.paths.build, "large-file.tar.xz"),
+    ctx.sha256,
+    true
+);`,
 				},
 			],
 		},
 		{
-			title: "download_with_resume",
+			title: "git_checkout",
 			content: [
 				{
 					type: "text",
-					content:
-						"Download a file with resume support. If the download is interrupted, it will continue from where it left off.",
+					content: rich`${code("git_checkout(url, dest, commit)")} checks out a pinned commit into the exact directory ${code("dest")} and returns it. ${code("commit")} is a full 40- or 64-hex object id; the origin and the checked-out tree are validated. The URL must name the repository directly (Git redirects are disabled), and hooks, fsmonitor, replacement objects and submodule recursion are off. A local repository must be an imported input.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let archive = download_with_resume(
-    "https://example.com/large-file.tar.gz",
-    join_path(BUILD_DIR, "large-file.tar.gz")
+					content: `let src = git_checkout(
+    "https://github.com/neovim/neovim.git",
+    join_path(ctx.runtime.paths.build, "neovim"),
+    ctx.commit
 );`,
 				},
 			],
@@ -62,132 +67,52 @@ let archive = download("https://example.com/foo-1.0.tar.gz", dest);
 			content: [
 				{
 					type: "text",
-					content: rich`Download a release asset from GitHub. Takes a repo (${code("owner/repo")}), version, and glob pattern for the asset name. Returns the downloaded file path.`,
+					content: rich`${code("github_download_release(repo, pattern, dest_dir, sha256)")} picks the asset of the repository's latest release whose name matches the glob ${code("pattern")}, downloads it to ${code("dest_dir/<asset name>")} with the same verified download as ${code("download")}, and returns the path. The digest is required.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `// Download ripgrep release for current architecture
-let pattern = "ripgrep-*-" + ARCH + "-unknown-linux-musl.tar.gz";
-let archive = github_download_release("BurntSushi/ripgrep", "14.1.0", pattern);
-
-// Download any .tar.gz asset
-let archive = github_download_release("jqlang/jq", "1.7.1", "*.tar.gz");`,
-				},
-			],
-		},
-		{
-			title: "git_clone",
-			content: [
-				{
-					type: "text",
-					content:
-						"Clone a git repository to a destination directory. Returns the cloned directory path.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let src = git_clone(
-    "https://github.com/neovim/neovim.git",
-    join_path(BUILD_DIR, "neovim")
+					content: `let archive = github_download_release(
+    "BurntSushi/ripgrep",
+    "ripgrep-*-x86_64-unknown-linux-musl.tar.gz",
+    ctx.runtime.paths.build,
+    ctx.sha256
 );`,
 				},
 			],
 		},
 		{
-			title: "git_clone_depth",
+			title: "verify_sha256 / verify_sha512 / verify_blake3",
 			content: [
 				{
 					type: "text",
+					content: "Check an existing file against an expected digest. Each throws if the digest is malformed or does not match.",
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `verify_sha256(archive, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
+verify_sha512(archive, ctx.sha512);
+verify_blake3(archive, ctx.blake3);`,
+				},
+				{
+					type: "text",
+					content: rich`${code("recipe hash FILE")} prints all three digests for a file you are pinning.`,
+				},
+			],
+		},
+		{
+			title: "fetch_sha256",
+			content: [
+				{
+					type: "text",
+					content: rich`${code("fetch_sha256(url, filename)")} reads a remote checksum file (${code("sha256sum")} format or ${code("SHA256 (filename) = …")}) and returns the hash listed for ${code("filename")}. It throws if there is none.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
 					content:
-						"Shallow clone a git repository with limited history. Much faster for large repos.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `// Clone with depth 1 (only latest commit)
-let src = git_clone_depth(
-    "https://github.com/torvalds/linux.git",
-    join_path(BUILD_DIR, "linux"),
-    1
-);`,
-				},
-			],
-		},
-		{
-			title: "extract_from_tarball",
-			content: [
-				{
-					type: "text",
-					content:
-						"Extract specific files from a tarball matching a glob pattern. Useful for extracting just binaries without full extraction.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `// Extract only the binary from a release tarball
-extract_from_tarball(archive, "*/bin/myapp");`,
-				},
-			],
-		},
-		{
-			title: "torrent",
-			content: [
-				{
-					type: "text",
-					content: "Download a file via BitTorrent. Useful for large files that may be mirrored.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let iso = torrent(
-    "magnet:?xt=urn:btih:...",
-    join_path(BUILD_DIR, "download")
-);`,
-				},
-			],
-		},
-		{
-			title: "verify_sha256",
-			content: [
-				{
-					type: "text",
-					content: "Verify the SHA256 hash of a file. Throws an error if the hash doesn't match.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `let archive = download(url, join_path(BUILD_DIR, "foo.tar.gz"));
-verify_sha256(archive, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");`,
-				},
-			],
-		},
-		{
-			title: "verify_sha512",
-			content: [
-				{
-					type: "text",
-					content: "Verify the SHA512 hash of a file.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `verify_sha512(archive, "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce...");`,
-				},
-			],
-		},
-		{
-			title: "verify_blake3",
-			content: [
-				{
-					type: "text",
-					content:
-						"Verify the BLAKE3 hash of a file. BLAKE3 is faster than SHA256 for large files.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `verify_blake3(archive, "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262");`,
+						"A digest fetched from the same unauthenticated source as the payload is not source verification. Pin the digest in the recipe when the publisher offers no signed checksum.",
 				},
 			],
 		},

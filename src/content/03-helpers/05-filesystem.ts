@@ -3,170 +3,99 @@ import { rich, code } from "../../rich-text"
 
 export const helpersFilesystemContent: DocsContent = {
 	title: "Filesystem Helpers",
-	intro: "File and directory operations including path checks, manipulation, and reading.",
+	intro: "File and directory operations: path checks, directories, links, permissions, file contents and globs. Paths are in the domain's filesystem.",
 	sections: [
 		{
 			title: "exists / is_file / is_dir",
 			content: [
 				{
 					type: "text",
-					content:
-						"Check if paths exist. These are essential for the is_* check functions in recipes.",
+					content: rich`${code("exists(path)")} is true for anything at the path, ${code("is_file(path)")} only for a regular file and ${code("is_dir(path)")} only for a directory.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `// Check if anything exists at path
-if exists("/usr/bin/gcc") {
-    set_env("CC", "gcc");
+					content: `if is_file(join_path(ctx.src, "configure")) {
+    exec_checked("./configure", ["--prefix=/usr"], #{ cwd: ctx.src });
 }
-
-// Check specifically for a file
-if is_file(join_path(ctx.source_dir, "configure")) {
-    shell_in(ctx.source_dir, "./configure");
-}
-
-// Check specifically for a directory
-if is_dir(join_path(BUILD_DIR, "vendor")) {
-    log("Vendor directory exists");
-}`,
-				},
-				{
-					type: "text",
-					content: rich`Aliases: ${code("file_exists()")} = ${code("is_file()")}, ${code("dir_exists()")} = ${code("is_dir()")}`,
-				},
-			],
-		},
-		{
-			title: "mkdir",
-			content: [
-				{
-					type: "text",
-					content: "Create a directory and all parent directories (like mkdir -p).",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `mkdir(BUILD_DIR);
-mkdir(join_path(PREFIX, "bin"));
-mkdir(join_path(PREFIX, "share/man/man1"));`,
-				},
-			],
-		},
-		{
-			title: "rm",
-			content: [
-				{
-					type: "text",
-					content: "Remove files or directories. Accepts a path string.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `rm(join_path(BUILD_DIR, "tmp"));
-rm(join_path(ctx.source_dir, "build"));`,
-				},
-			],
-		},
-		{
-			title: "mv",
-			content: [
-				{
-					type: "text",
-					content: "Move or rename a file.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `mv(
-    join_path(ctx.source_dir, "config.example"),
-    join_path(ctx.source_dir, "config.toml")
-);`,
-				},
-			],
-		},
-		{
-			title: "ln",
-			content: [
-				{
-					type: "text",
-					content: "Create a symbolic link. First argument is the target, second is the link name.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `// Create symlink: /usr/local/bin/python -> python3
-ln(
-    join_path(PREFIX, "bin/python3"),
-    join_path(PREFIX, "bin/python")
-);`,
-				},
-			],
-		},
-		{
-			title: "chmod",
-			content: [
-				{
-					type: "text",
-					content: "Change file permissions. Takes octal mode as integer.",
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `chmod(join_path(PREFIX, "bin/myapp"), 0o755);   // rwxr-xr-x
-chmod(join_path(PREFIX, "etc/secret.key"), 0o600);  // rw-------`,
-				},
-			],
-		},
-		{
-			title: "read_file / read_file_or_empty",
-			content: [
-				{
-					type: "text",
-					content: rich`Read a file's contents as a string. ${code("read_file_or_empty()")} returns empty string if file doesn't exist instead of throwing.`,
-				},
-				{
-					type: "code",
-					language: "rhai",
-					content: `// Read kernel version from file
-let version = trim(read_file(join_path(build_dir, "include/config/kernel.release")));
-
-// Read with fallback to empty
-let cached_hash = read_file_or_empty(join_path(build_dir, ".hash"));
-if cached_hash == "" {
-    // No cached hash, need to rebuild
+if is_dir(join_path(ctx.runtime.paths.build, "vendor")) {
+    log("vendor directory present");
 }`,
 				},
 			],
 		},
 		{
-			title: "write_file / append_file",
+			title: "mkdir / rm / mv",
 			content: [
 				{
-					type: "text",
-					content: "Write or append content to a file.",
+					type: "list",
+					items: [
+						rich`${code("mkdir(path)")} creates the directory and its parents, like ${code("mkdir -p")}.`,
+						rich`${code("rm(pattern)")} removes every path matching a glob; directories are removed with their contents.`,
+						rich`${code("mv(src, dst)")} renames a file or directory.`,
+					],
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `write_file(join_path(build_dir, ".hash"), new_hash);
-append_file(join_path(PREFIX, "etc/shells"), "/bin/zsh\\n");`,
+					content: `mkdir(join_path(ctx.runtime.paths.output, "share/man/man1"));
+rm(join_path(ctx.runtime.paths.build, "*.tmp"));
+mv(join_path(ctx.src, "config.example"), join_path(ctx.src, "config.toml"));`,
 				},
 			],
 		},
 		{
-			title: "glob_list",
+			title: "ln / ln_force / chmod",
 			content: [
 				{
 					type: "text",
-					content: "List files matching a glob pattern. Returns an array of paths.",
+					content: rich`${code("ln(target, link)")} creates a symbolic link; ${code("ln_force")} replaces whatever is at ${code("link")}. ${code("chmod(path, mode)")} takes an octal mode.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let sources = glob_list(join_path(ctx.source_dir, "src/*.c"));
-for file in sources {
-    log("Found: " + file);
+					content: `let bin = join_path(ctx.runtime.paths.output, "bin");
+ln("python3", join_path(bin, "python"));
+chmod(join_path(bin, "myapp"), 0o755);`,
+				},
+			],
+		},
+		{
+			title: "Reading and Writing Files",
+			content: [
+				{
+					type: "table",
+					headers: ["Helper", "Behavior"],
+					rows: [
+						["read_file(path)", "Contents as a string; throws if unreadable."],
+						["read_file_or_empty(path)", "Contents, or an empty string if the file can't be read."],
+						["write_file(path, content)", "Replace the file's contents."],
+						["append_file(path, content)", "Append to the file."],
+						["append_line_if_missing(path, line)", "Append the exact line once; returns true if it was added."],
+						["replace_in_file(path, from, to)", "Replace every occurrence of from in the file."],
+					],
+					monospaceCol: 0,
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `let release = trim(read_file(join_path(ctx.src, "include/config/kernel.release")));
+append_line_if_missing(join_path(ctx.runtime.paths.output, "etc/shells"), "/bin/zsh");`,
+				},
+			],
+		},
+		{
+			title: "glob_list / glob_exists",
+			content: [
+				{
+					type: "text",
+					content: rich`${code("glob_list(pattern)")} returns the matching paths, sorted; no match is an empty array. ${code("glob_exists(pattern)")} is true if anything matches. An invalid pattern or an unreadable directory is an error.`,
+				},
+				{
+					type: "code",
+					language: "rhai",
+					content: `for file in glob_list(join_path(ctx.src, "src/*.c")) {
+    log("found " + file);
 }`,
 				},
 			],

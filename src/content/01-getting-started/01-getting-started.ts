@@ -1,10 +1,10 @@
 import type { DocsContent } from "../../types"
-import { rich, bold, link } from "../../rich-text"
+import { rich, bold, code, link } from "../../rich-text"
 
 export const gettingStartedContent: DocsContent = {
 	title: "Getting Started",
 	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
-	intro: "Download a LevitateOS variant and create bootable installation media (desktop variants).",
+	intro: "Download the LevitateOS live ISO and create bootable installation media.",
 	sections: [
 		{
 			title: "Requirements",
@@ -12,17 +12,16 @@ export const gettingStartedContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("CPU:")} x86_64, Intel Haswell (2013) or AMD Zen (2017) or newer`,
-						rich`${bold("RAM:")} 16GB minimum, 32GB+ recommended for local LLM inference`,
-						rich`${bold("Storage:")} 512GB NVMe SSD minimum (1TB+ recommended for AI models)`,
-						rich`${bold("GPU:")} NVIDIA RTX 3060+ (12GB VRAM) for LLM acceleration, or CPU-only with 32GB+ RAM`,
-						rich`${bold("Boot:")} UEFI required (Secure Boot must be disabled)`,
+						rich`${bold("CPU:")} x86-64-v3 (Intel Haswell or newer, AMD Zen or newer)`,
+						rich`${bold("RAM:")} 16 GB`,
+						rich`${bold("Storage:")} an NVMe disk. The default A/B layout uses 1 GB for EFI and 20 GB for each system slot, and gives the rest to ${code("/var")}`,
+						rich`${bold("Boot:")} UEFI. LevitateOS's boot files are unsigned, so Secure Boot must be disabled`,
 					],
 				},
 				{
 					type: "note",
-					variant: "warning",
-					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					variant: "info",
+					content: rich`${bold("A/B by default:")} the system lives in two root slots. An update is written to the inactive slot, trial-booted once, and kept only if that boot is healthy; you can roll back to the previous slot. ${bold("Mutable mode")}, one root changed in place, is an explicit opt-in without that safety net. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
 		},
@@ -31,15 +30,15 @@ export const gettingStartedContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Download the variant you want from ${link("Download", "/download")}. Desktop variants ship as live ISOs; appliance variants ship as disk images.`,
+					content: rich`Download the variant you want from ${link("Download", "/download")}. LevitateOS and AcornOS each ship as an x86_64 live ISO that boots into the install environment.`,
 				},
-				{ type: "text", content: "Example: download the LevitateOS ISO and verify the checksum:" },
+				{ type: "text", content: "Example: download the LevitateOS ISO and verify its checksum:" },
 				{
 					type: "code",
 					language: "bash",
-					content: `curl -LO https://releases.levitateos.org/latest/LevitateOS.iso
-curl -LO https://releases.levitateos.org/latest/SHA256SUMS
-sha256sum -c SHA256SUMS`,
+					content: `curl -LO https://releases.levitateos.org/latest/levitateos-x86_64.iso
+curl -LO https://releases.levitateos.org/latest/levitateos-x86_64.iso.sha512
+sha512sum -c levitateos-x86_64.iso.sha512`,
 				},
 			],
 		},
@@ -59,7 +58,7 @@ lsblk  # Linux
 diskutil list  # macOS
 
 # Write the ISO (CAUTION: this erases the drive)
-sudo dd if=LevitateOS.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
+sudo dd if=levitateos-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
 				},
 			],
 		},
@@ -80,18 +79,19 @@ sudo dd if=LevitateOS.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
 				{
 					type: "code",
 					language: "bash",
-					content: `# Create a 256GB virtual disk
-qemu-img create -f qcow2 disk.qcow2 256G
+					content: `# Create a 64GB virtual disk
+qemu-img create -f qcow2 disk.qcow2 64G
 
-# Boot the installer
+# Boot the installer (the OVMF firmware path varies by distribution)
 qemu-system-x86_64 \\
-  -m 8G \\
+  -m 16G \\
   -smp 4 \\
   -enable-kvm \\
   -cpu host \\
   -bios /usr/share/ovmf/OVMF.fd \\
-  -cdrom LevitateOS.iso \\
-  -drive file=disk.qcow2,format=qcow2,if=virtio \\
+  -cdrom levitateos-x86_64.iso \\
+  -drive file=disk.qcow2,format=qcow2,if=none,id=disk0 \\
+  -device nvme,drive=disk0,serial=levitate \\
   -boot d`,
 				},
 			],

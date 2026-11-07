@@ -4,14 +4,14 @@ import { rich, code } from "../../rich-text"
 export const helpersPathsContent: DocsContent = {
 	title: "Path Helpers",
 	intro:
-		"Functions for manipulating file paths. These are essential for building paths to sources, archives, and install destinations.",
+		"Pure functions for building paths and working with strings. They have no effects and never touch the filesystem.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`Path helpers let you build paths programmatically instead of string concatenation. Use ${code("join_path()")} to combine path segments safely.`,
+					content: rich`Build paths from the runtime's paths with ${code("join_path()")} instead of string concatenation, and keep them in ${code("ctx")} fields so every hook uses the same ones.`,
 				},
 			],
 		},
@@ -20,56 +20,56 @@ export const helpersPathsContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Join two path segments. Handles trailing slashes correctly.",
+					content: "Join two path segments.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let src = join_path(BUILD_DIR, "foo-1.0");
-// BUILD_DIR/foo-1.0
-
-let binary = join_path(src, "target/release/myapp");
-// BUILD_DIR/foo-1.0/target/release/myapp
-
-let dest = join_path(PREFIX, "bin/myapp");
-// /usr/local/bin/myapp`,
+					content: `let src = join_path(ctx.runtime.paths.build, "foo-1.0");
+// "/work/build/foo-1.0"
+let program = join_path(ctx.runtime.paths.output, "bin/myapp");
+// "/out/bin/myapp"`,
 				},
 			],
 		},
 		{
-			title: "dirname",
+			title: "dirname / basename",
 			content: [
 				{
 					type: "text",
-					content: "Get the parent directory of a path.",
+					content: "Get the parent directory, or the final component, of a path.",
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let parent = dirname("/home/user/foo/bar");
-// "/home/user/foo"
-
-// Useful for finding monorepo root from BUILD_DIR
-let leviso_dir = dirname(BUILD_DIR);
-let monorepo = dirname(leviso_dir);`,
+					content: `dirname("/out/bin/myapp");          // "/out/bin"
+basename("/work/build/foo.tar.gz");  // "foo.tar.gz"`,
 				},
 			],
 		},
 		{
-			title: "basename",
+			title: "String Helpers",
 			content: [
 				{
-					type: "text",
-					content: "Get the final component of a path (filename or directory name).",
+					type: "table",
+					headers: ["Helper", "Returns"],
+					rows: [
+						["trim(s)", "s without leading and trailing whitespace"],
+						["starts_with(s, prefix) / ends_with(s, suffix)", "bool"],
+						["contains(s, pattern)", "bool"],
+						["replace(s, from, to)", "s with every from replaced"],
+						["split(s, sep)", "Array of strings"],
+					],
+					monospaceCol: 0,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let name = basename("/home/user/foo.tar.gz");
-// "foo.tar.gz"
-
-let dir = basename("/home/user/projects/myapp");
-// "myapp"`,
+					content: `let release = trim(read_file(join_path(ctx.src, "VERSION")));
+if ends_with(ctx.url, ".zip") {
+    extract_with_format(ctx.archive, ctx.runtime.paths.build, "zip");
+}
+let parts = split(ctx.version, ".");`,
 				},
 			],
 		},
@@ -77,26 +77,16 @@ let dir = basename("/home/user/projects/myapp");
 			title: "Common Patterns",
 			content: [
 				{
-					type: "text",
-					content: "Path helpers are commonly used to:",
-				},
-				{
 					type: "code",
 					language: "rhai",
-					content: `// Build archive destination path
-let archive = download(url, join_path(BUILD_DIR, ctx.name + ".tar.gz"));
-
-// Build source directory path after extraction
-ctx.source_dir = join_path(BUILD_DIR, ctx.name + "-" + ctx.version);
-
-// Build install destination paths
-let bin_dest = join_path(PREFIX, "bin/" + ctx.name);
-let man_dest = join_path(PREFIX, "share/man/man1/" + ctx.name + ".1");
-
-// Navigate relative to BUILD_DIR
-let leviso_dir = dirname(BUILD_DIR);
-let output_dir = join_path(leviso_dir, "output");
-let staging = join_path(output_dir, "staging");`,
+					content: `let ctx = #{
+    name: "foo",
+    version: "1.0",
+    archive: join_path(RUNTIME.paths.build, "foo-1.0.tar.gz"),
+    src: join_path(RUNTIME.paths.build, "foo-1.0"),
+    program: join_path(RUNTIME.paths.output, "bin/foo"),
+    manpage: join_path(RUNTIME.paths.output, "share/man/man1/foo.1"),
+};`,
 				},
 			],
 		},

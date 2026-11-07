@@ -77,13 +77,13 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 					description:
 						"Install systemd-boot and the A/B boot layout (use the slot devices recpart reported)",
 					command:
-						"recsetup apply --root /mnt --boot ab --slot-a /dev/sda2 --slot-b /dev/sda3 --machine-id",
+						"recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3 --machine-id",
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Mutable layout: one boot entry for the root partition",
-					command: "recsetup apply --root /mnt --boot mutable --root-device /dev/sda2 --machine-id",
+					command: "recsetup apply --root /mnt --boot mutable --root-device /dev/nvme0n1p2 --machine-id",
 				},
 			],
 		},
@@ -104,7 +104,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
   "hostname": "mypc",
   "root_password": true,
   "users": [{ "name": "yourname", "groups": ["audio"], "shell": "/bin/bash" }],
-  "boot": { "mode": "ab", "slot_a": "/dev/sda2", "slot_b": "/dev/sda3", "options": "console=ttyS0,115200n8" },
+  "boot": { "mode": "ab", "slot_a": "/dev/nvme0n1p2", "slot_b": "/dev/nvme0n1p3", "options": "console=ttyS0,115200n8" },
   "machine_id": true,
   "services": ["sshd"]
 }`,
@@ -129,7 +129,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recsetup")} reads the target, not the live system: the init system from ${code("openrc-run")} or ${code("/usr/lib/systemd/systemd")}, the libc from musl's loader, and each command from what the target ships. ${code("inspect --json")} reports what it found.`,
+					content: rich`${code("recsetup")} reads the target, not the live system: the init system from ${code("openrc-run")} or ${code("/usr/lib/systemd/systemd")}, the libc from musl's loader, and each command from what the target ships. ${code("inspect --json")} reports what it found. The machine settings (time zone, locale, keymap, hostname, users, machine id and services) are applied by the target's own setup program, ${code("/usr/libexec/recipe-system-setup")}, which the system recipe installs; recsetup checks each choice and runs it through ${code("recchroot")}. The bootloader and boot entries are recsetup's and ${code("recab")}'s.`,
 				},
 				{
 					type: "table",
@@ -139,7 +139,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 						[
 							"Locale",
 							"locale-gen, else localedef, else the compiled locales only; then LANG in /etc/locale.conf",
-							"musl compiles nothing: LANG in /etc/locale.conf, exported by /etc/profile.d/locale.sh",
+							"musl compiles nothing: LANG in /etc/locale.conf",
 						],
 						[
 							"Keymap",
@@ -154,8 +154,8 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 						],
 						[
 							"Admin",
-							"sudo: %wheel in /etc/sudoers.d/10-wheel",
-							"doas: permit persist :wheel in /etc/doas.conf",
+							"wheel; the sudo rule in /etc/sudoers.d/10-wheel ships with the system",
+							"wheel; the doas rule in /etc/doas.conf ships with the system",
 						],
 						["Passwords", "chpasswd in the target", "Same (busybox chpasswd)"],
 						[

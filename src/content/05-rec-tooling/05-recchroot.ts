@@ -17,12 +17,7 @@ export const recchrootContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recchroot")} sets up the necessary bind mounts (/dev, /proc, /sys, /run), enters the chroot, runs your command (or an interactive shell), and cleans up on exit. This is the equivalent of Arch Linux's ${code("arch-chroot")} command.`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
+					content: rich`${code("recchroot")} sets up the necessary bind mounts (/proc, /sys, /dev, /run), enters the chroot, runs your command (or root's login shell in the target), and cleans up on exit. This is the equivalent of Arch Linux's ${code("arch-chroot")} command.`,
 				},
 				{
 					type: "text",
@@ -58,19 +53,19 @@ export const recchrootContent: DocsContent = {
 					type: "command",
 					language: "bash",
 					description: "Run single command",
-					command: "recchroot /mnt passwd",
+					command: "recchroot /mnt -- passwd",
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Install bootloader",
-					command: "recchroot /mnt bootctl install",
+					description: "Check the installed bootloader",
+					command: "recchroot /mnt -- bootctl status",
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Run multiple commands with shell",
-					command: "recchroot /mnt /bin/bash -c 'passwd && bootctl install'",
+					description: "Set a user's password",
+					command: "recchroot /mnt -- passwd yourname",
 				},
 			],
 		},
@@ -78,19 +73,15 @@ export const recchrootContent: DocsContent = {
 			title: "Mount Handling",
 			content: [
 				{
-					type: "text",
-					content: rich`${bold("Required mounts")} (always created):`,
-				},
-				{
 					type: "table",
 					headers: ["Source", "Target", "Purpose"],
 					rows: [
+						[rich`${code("/proc")}`, rich`${code("<chroot>/proc")}`, "Process information filesystem"],
 						[
-							rich`${code("/proc")}`,
-							rich`${code("<chroot>/proc")}`,
-							"Process information filesystem",
+							rich`${code("/sys")}`,
+							rich`${code("<chroot>/sys")}`,
+							"Kernel/hardware information; bound recursively, so EFI variables come along on UEFI",
 						],
-						[rich`${code("/sys")}`, rich`${code("<chroot>/sys")}`, "Kernel/hardware information"],
 						[rich`${code("/dev")}`, rich`${code("<chroot>/dev")}`, "Device nodes"],
 						[rich`${code("/run")}`, rich`${code("<chroot>/run")}`, "Runtime data (udev, systemd)"],
 					],
@@ -98,23 +89,7 @@ export const recchrootContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`${bold("Optional mounts")} (created if source exists):`,
-				},
-				{
-					type: "table",
-					headers: ["Source", "Target", "Purpose"],
-					rows: [
-						[
-							rich`${code("/sys/firmware/efi/efivars")}`,
-							rich`${code("<chroot>/sys/firmware/efi/efivars")}`,
-							"EFI variables (for bootloader installation)",
-						],
-					],
-					monospaceCol: 0,
-				},
-				{
-					type: "text",
-					content: rich`${bold("DNS resolution")}: ${code("/etc/resolv.conf")} is copied into the chroot so network operations work.`,
+					content: rich`${bold("DNS resolution")}: the live system's ${code("/etc/resolv.conf")} is bind-mounted over the target's for the session, so network operations work without writing into the target. A target ${code("resolv.conf")} that is a symlink is left alone; it resolves inside the chroot.`,
 				},
 			],
 		},
@@ -136,7 +111,7 @@ export const recchrootContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`Unmounts are performed in reverse order with ${code("MNT_DETACH")} to handle busy filesystems. Unmount failures are warnings, not errors.`,
+					content: rich`While the session is open, recchroot itself ignores those signals (the command gets the default handling), so an interrupt stops the command and recchroot still undoes its mounts. Unmounts run in reverse order with ${code("MNT_DETACH")}; a mount that cannot be removed is reported as an error.`,
 				},
 			],
 		},
@@ -164,7 +139,7 @@ export const recchrootContent: DocsContent = {
 				{
 					type: "text",
 					content:
-						"recchroot returns the exit status of the command run inside the chroot. If the command exits with status 0, recchroot exits with 0. If the command exits with status 5, recchroot exits with 5.",
+						"recchroot returns the exit status of the command run inside the chroot: 0 for 0, 5 for 5. A command killed by signal N gives 128+N, as shells report it.",
 				},
 				{
 					type: "text",
@@ -179,9 +154,10 @@ export const recchrootContent: DocsContent = {
 					type: "table",
 					headers: ["Feature", "recchroot", "arch-chroot"],
 					rows: [
-						["Bind mounts", "/proc, /sys, /dev, /run", "Same + /sys/firmware/efi/efivars"],
-						["efivars mount", "Automatic if UEFI", "Automatic if UEFI"],
-						["resolv.conf", "Copied", "Bind mounted"],
+						["Bind mounts", "/proc, /sys, /dev, /run", "Same"],
+						["efivars", "Included with /sys on UEFI", "Mounted on UEFI"],
+						["resolv.conf", "Bind mounted for the session", "Bind mounted"],
+						["Default command", "Root's login shell in the target", "/bin/bash"],
 						["Cleanup on signal", "Yes", "Yes"],
 						["Implementation", "Rust", "Bash script"],
 					],

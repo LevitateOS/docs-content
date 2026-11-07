@@ -1,41 +1,38 @@
 import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import { rich, code, link } from "../../rich-text"
 
 export const helpersEnvironmentContent: DocsContent = {
 	title: "Environment Helpers",
-	intro: "Functions for reading and setting environment variables.",
+	intro: "Reading the worker's environment, finding programs, and logging.",
 	sections: [
 		{
 			title: "env",
 			content: [
 				{
 					type: "text",
-					content: "Get an environment variable. Returns empty string if not set.",
+					content: rich`${code("env(name)")} reads a variable from the worker's explicit environment and returns an empty string when it is not set. Recipes don't change the worker's environment: give a command its own variables with the ${code("env")} option of ${code("exec")}, ${code("exec_checked")} or ${code("exec_output")} (see ${link("Command Helpers", "/docs/helpers-commands")}).`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `let home = env("HOME");
-let cc = env("CC");
-if cc == "" {
-    cc = "gcc";
-}`,
+					content: `let path = env("PATH");
+exec_checked("make", [], #{ cwd: ctx.src, env: #{ CC: "clang", CFLAGS: "-O2" } });`,
 				},
 			],
 		},
 		{
-			title: "set_env",
+			title: "command_exists",
 			content: [
 				{
 					type: "text",
-					content: rich`Set an environment variable for the current process and all subsequent ${code("shell()")} calls.`,
+					content: rich`${code("command_exists(name)")} is true if the program is on the domain's ${code("PATH")}, which includes the executables of the recipe's dependencies.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `set_env("CFLAGS", "-O2 -march=native");
-set_env("CC", "clang");
-shell_in(ctx.source_dir, "make");`,
+					content: `if !command_exists("cargo") {
+    throw "this recipe needs cargo in the image or a build dependency";
+}`,
 				},
 			],
 		},
@@ -44,14 +41,15 @@ shell_in(ctx.source_dir, "make");`,
 			content: [
 				{
 					type: "text",
-					content: "Log messages at different levels:",
+					content: rich`All diagnostics go to stderr, so stdout carries only the final JSON.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `log("Building kernel...");           // Info level
-debug("Source dir: " + ctx.source_dir); // Debug level (hidden by default)
-warn("Config changed, rebuilding");     // Warning level`,
+					content: `log("Building kernel...");             // [recipe] message
+warn("Config changed, rebuilding");    // [recipe:warn] message
+debug("source: " + ctx.src);           // with the recipe's source position
+print("plain line");                   // stderr as well`,
 				},
 			],
 		},

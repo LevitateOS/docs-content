@@ -11,12 +11,12 @@ export const installationDiskContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Boot from the LevitateOS ISO (see ${link("Getting Started", "/docs/getting-started")}). You'll be dropped into a root shell.`,
+					content: rich`Boot from the LevitateOS ISO (see ${link("Getting Started", "/docs/getting-started")}). The install screen opens: a root shell beside this guide.`,
 				},
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("Secure Boot:")} If your system won't boot, disable Secure Boot in your UEFI firmware settings. LevitateOS does not currently ship with signed bootloaders.`,
+					content: rich`${bold("Secure Boot:")} LevitateOS's boot files are unsigned. If your system won't boot the ISO, disable Secure Boot in your UEFI firmware settings.`,
 				},
 				{
 					type: "command",
@@ -70,7 +70,7 @@ export const installationDiskContent: DocsContent = {
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("Steps 2-5 in one tool:")} ${code("disk-plan")} lists the disks, shows the partition plan and every command, runs recpart's safety checks, and partitions, formats and mounts the disk once you confirm. Its last page shows where the new system is mounted (${code("/mnt/sysroot")}) and the commands that come next. The steps below do the same by hand.`,
+					content: rich`${bold("Steps 2-5 in one tool:")} ${code("disk-plan")} lists the disks, lets you choose A/B or mutable and erase the whole disk or edit its partitions (for example to keep Windows), shows the plan and every command, runs recpart's safety checks, and partitions, formats and mounts the disk once you confirm. The steps below do the same with ${code("recpart")} directly.`,
 				},
 				{
 					type: "command",
@@ -81,75 +81,145 @@ export const installationDiskContent: DocsContent = {
 				{
 					type: "command",
 					language: "bash",
-					description: "List all disks and identify your installation target",
-					command: "lsblk -d -o NAME,SIZE,MODEL,TRAN",
-					output: `NAME      SIZE MODEL                     TRAN
-nvme0n1     2T Samsung 990 PRO 2TB      nvme
-nvme1n1     1T WD Black SN850X 1TB      nvme
-sda       4.0T Seagate Barracuda        sata`,
+					description: "List candidate disks",
+					command: "recpart list-disks",
+					output: `recpart candidate disks
+  /dev/nvme0n1
+    size: 2000398934016 bytes (logical 512 / physical 512)
+    model: Samsung SSD 990 PRO 2TB | transport: nvme | read-only: no`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Show what is on a disk now: partitions, filesystems, used space, mounts and free gaps",
+					command: "recpart inspect --disk /dev/nvme0n1",
 				},
 				{
 					type: "text",
-					content: rich`This guide uses ${code("/dev/sda")} as an example. ${bold("Replace with your actual device.")} Most modern systems use NVMe (${code("/dev/nvme0n1")}) - partitions are named ${code("nvme0n1p1")}, ${code("nvme0n1p2")}, etc.`,
+					content: rich`This guide uses ${code("/dev/nvme0n1")} as an example. ${bold("Replace it with your actual device.")} NVMe partitions are named ${code("nvme0n1p1")}, ${code("nvme0n1p2")} and so on; SATA disks are ${code("/dev/sda")} with partitions ${code("sda1")}, ${code("sda2")}.`,
 				},
 			],
 		},
 		{
-			title: "3. Partition the Disk",
+			title: "3. Plan the Partitions",
 			content: [
 				{
 					type: "text",
-					content: rich`${bold("WARNING: This will erase all data on the disk.")} We'll create the default A/B layout:`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Why this layout:")} LevitateOS is A/B immutable by default. Slot B is the inactive target for atomic updates and rollback. ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review.`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Dual-boot:")} If keeping Windows, do NOT create a new EFI partition. Use your existing EFI partition (usually the first partition on your Windows disk). Create the LevitateOS partitions (system-a, system-b, var) in free space.`,
+					content: rich`${code("recpart plan")} shows the layout, the exact sfdisk script and every command, without touching the disk. The default A/B layout:`,
 				},
 				{
 					type: "table",
-					headers: ["Partition", "Size", "Type", "Mount"],
+					headers: ["Partition", "Size", "Filesystem (label)", "Mount"],
 					rows: [
-						["/dev/sda1", "1 GB", "EFI System", "/boot"],
-						["/dev/sda2", "64 GB", "Linux filesystem", "/ (system-a)"],
-						["/dev/sda3", "64 GB", "Linux filesystem", "(system-b)"],
-						["/dev/sda4", "Remainder", "Linux filesystem", "/var"],
+						["/dev/nvme0n1p1", "1 GiB", "FAT (EFI)", "/boot"],
+						["/dev/nvme0n1p2", "20 GiB", "ext4 (ROOT_A)", "/ (system slot A)"],
+						["/dev/nvme0n1p3", "20 GiB", "ext4 (ROOT_B)", "not mounted (system slot B)"],
+						["/dev/nvme0n1p4", "Remainder", "ext4 (STATE)", "/var"],
 					],
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Start fdisk",
-					command: "fdisk /dev/sda",
+					description: "Preview the default A/B layout",
+					command: "recpart plan --disk /dev/nvme0n1",
+				},
+				{
+					type: "note",
+					variant: "info",
+					content: rich`${bold("Why this layout:")} slot A holds the installed system and slot B is where the next system is written, so an update never touches the running one and rollback is a reboot. Everything that must survive an update lives in ${code("/var")}, including user homes under ${code("/var/home")}.`,
+				},
+				{
+					type: "list",
+					items: [
+						rich`${bold("Sizes:")} ${code("--efi-size-mb")}, ${code("--root-a-size-mb")}, ${code("--root-b-size-mb")} and ${code("--state-size-mb")} change them; both slots must be the same size.`,
+						rich`${bold("Mutable layout:")} ${code("--mode mutable")} creates only EFI and one root (label ROOT).`,
+						rich`${bold("Dual boot:")} don't erase the disk. Use ${code("disk-plan")}'s editor, or pass an explicit layout with ${code("--layout layout.json")}, to keep the existing EFI partition and Windows, shrink a partition to make room, and create the slots and state partition in the free space.`,
+					],
+				},
+			],
+		},
+		{
+			title: "4. Partition, Format and Mount",
+			content: [
+				{
+					type: "text",
+					content: rich`${bold("WARNING: the default layout erases all data on the disk.")} Review the steps with ${code("--dry-run")} first; the real run needs the confirmation token ${code("DESTROY")}.`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Show every step apply would run, and anything it would refuse",
+					command: "recpart apply --disk /dev/nvme0n1 --dry-run",
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Partition, format and mount the disk",
+					command: "recpart apply --disk /dev/nvme0n1 --confirm DESTROY",
 				},
 				{
 					type: "text",
-					content: "Inside fdisk, enter these commands:",
+					content: rich`recpart writes the partition table, formats each partition with its label, and mounts the new system: slot A at ${code("/mnt")}, the EFI partition at ${code("/mnt/boot")} and the state partition at ${code("/mnt/var")}. Slot B stays unmounted. Its output ends with the install target and each mount.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Write down the slot devices:")} with the default layout, slot A is ${code("/dev/nvme0n1p2")} and slot B ${code("/dev/nvme0n1p3")}. Step 15 needs both. ${code("recpart apply --json")} reports them as ${code("slot_a_device")} and ${code("slot_b_device")}.`,
+				},
+			],
+		},
+		{
+			title: "5. Check the Mounts",
+			content: [
+				{
+					type: "command",
+					language: "bash",
+					description: "Confirm the new system's filesystems are mounted",
+					command: "findmnt -R /mnt",
+				},
+				{
+					type: "text",
+					content: rich`You should see slot A on ${code("/mnt")}, the EFI partition on ${code("/mnt/boot")} and the state partition on ${code("/mnt/var")}.`,
+				},
+				{
+					type: "text",
+					content: rich`Continue to ${link("Base System", "/docs/installation-base")} (steps 6-9).`,
+				},
+			],
+		},
+		{
+			title: "Manual Partitioning (Alternative)",
+			content: [
+				{
+					type: "text",
+					content: rich`If you would rather partition by hand, do this instead of steps 3 and 4. It creates the same layout and labels as ${code("recpart")}.`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Start fdisk",
+					command: "fdisk /dev/nvme0n1",
 				},
 				{
 					type: "interactive",
+					intro: "Inside fdisk, enter these commands:",
 					steps: [
 						{ command: "g", description: "Create new GPT partition table" },
 						{ command: "n", description: "New partition (EFI)" },
 						{ command: "1", description: "Partition number" },
 						{ command: "Enter", description: "Default first sector" },
-						{ command: "+1G", description: "Size (room for multiple kernels)" },
+						{ command: "+1G", description: "Size (room for both slots' kernels)" },
 						{ command: "t", description: "Change partition type" },
 						{ command: "1", description: "EFI System" },
-						{ command: "n", description: "New partition (system-a)" },
+						{ command: "n", description: "New partition (slot A)" },
 						{ command: "2", description: "Partition number" },
 						{ command: "Enter", description: "Default first sector" },
-						{ command: "+64G", description: "Size (slot A)" },
-						{ command: "n", description: "New partition (system-b)" },
+						{ command: "+20G", description: "Size (slot A)" },
+						{ command: "n", description: "New partition (slot B)" },
 						{ command: "3", description: "Partition number" },
 						{ command: "Enter", description: "Default first sector" },
-						{ command: "+64G", description: "Size (slot B)" },
-						{ command: "n", description: "New partition (var)" },
+						{ command: "+20G", description: "Size (slot B, the same as slot A)" },
+						{ command: "n", description: "New partition (state, /var)" },
 						{ command: "4", description: "Partition number" },
 						{ command: "Enter", description: "Default first sector" },
 						{ command: "Enter", description: "Use remaining space" },
@@ -157,74 +227,29 @@ sda       4.0T Seagate Barracuda        sata`,
 					],
 				},
 				{
-					type: "text",
-					content: rich`Verify with ${code("lsblk /dev/sda")}. For NVMe drives, partitions are named ${code("/dev/nvme0n1p1")}, ${code("/dev/nvme0n1p2")}, etc.`,
-				},
-			],
-		},
-		{
-			title: "4. Format Partitions",
-			content: [
-				{
 					type: "command",
 					language: "bash",
-					description: "Format EFI partition",
-					command: "mkfs.fat -F32 -n EFI /dev/sda1",
+					description: "Format the four partitions",
+					command: [
+						"mkfs.fat -F32 -n EFI /dev/nvme0n1p1",
+						"mkfs.ext4 -L ROOT_A /dev/nvme0n1p2",
+						"mkfs.ext4 -L ROOT_B /dev/nvme0n1p3",
+						"mkfs.ext4 -L STATE /dev/nvme0n1p4",
+					],
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Format system slot A",
-					command: "mkfs.ext4 -L system-a /dev/sda2",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Format system slot B",
-					command: "mkfs.ext4 -L system-b /dev/sda3",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Format persistent state partition (/var)",
-					command: "mkfs.ext4 -L var /dev/sda4",
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Important:")} Labels matter. Slot A boots with ${code("root=LABEL=system-a")}, slot B boots with ${code("root=LABEL=system-b")}. Persistent data lives in ${code("/var")} (label ${code("var")}); user homes live under ${code("/var/home")}.`,
-				},
-			],
-		},
-		{
-			title: "5. Mount Filesystems",
-			content: [
-				{
-					type: "command",
-					language: "bash",
-					description: "Mount system slot A (system-a) at /mnt",
-					command: "mount /dev/sda2 /mnt",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Create mount point and mount EFI",
-					command: ["mkdir -p /mnt/boot", "mount /dev/sda1 /mnt/boot"],
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Mount persistent state partition (var) at /mnt/var",
-					command: ["mkdir -p /mnt/var", "mount /dev/sda4 /mnt/var"],
+					description: "Mount slot A, then the EFI and state partitions inside it",
+					command: [
+						"mount /dev/nvme0n1p2 /mnt",
+						"mount --mkdir /dev/nvme0n1p1 /mnt/boot",
+						"mount --mkdir /dev/nvme0n1p4 /mnt/var",
+					],
 				},
 				{
 					type: "text",
-					content:
-						"Leave system-b unmounted for now. It will be used as the inactive slot for atomic updates.",
-				},
-				{
-					type: "text",
-					content: rich`Continue to ${link("Base System", "/docs/installation-base")} (steps 6-9).`,
+					content: "Leave slot B unmounted. It is the inactive slot that updates are written to.",
 				},
 			],
 		},

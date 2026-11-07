@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types";
-import { rich, bold, code, link } from "../../rich-text";
+import { rich, code, link } from "../../rich-text";
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
@@ -37,12 +37,7 @@ export const installationBaseContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`This extracts the complete system: kernel, systemd, coreutils, networking, and the ${code("recipe")} package manager.`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Default update model:")} A/B immutable (slot updates + rollback). ${bold("Mutable mode")} is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`This extracts the complete base system: systemd, the GNU userland, kernel modules, NetworkManager, ${code("recab")} for A/B updates and the ${code("recipe")} package manager. It checks the target first and the extracted system afterwards, before it reports success.`,
 				},
 				{
 					type: "command",
@@ -77,7 +72,7 @@ export const installationBaseContent: DocsContent = {
 				},
 				{
 					type: "text",
-					content: rich`With the default A/B layout, you should also see an entry for ${code("/var")} (ext4). Persistent state (including ${code("/var/home")}) lives there.`,
+					content: rich`With the default A/B layout, you should also see an entry for ${code("/var")} (ext4). Persistent state (including ${code("/var/home")}) lives there. Slot B has no entry: it is not mounted.`,
 				},
 			],
 		},

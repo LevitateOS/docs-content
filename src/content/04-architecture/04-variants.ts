@@ -4,37 +4,52 @@ import { rich, bold, code, link } from "../../rich-text"
 export const variantsContent: DocsContent = {
 	title: "Variants",
 	intro:
-		"LevitateOS is a shared build system with multiple OS variants. They share the recipe engine and tooling, but differ in base, init, and intended deployment.",
+		"LevitateOS is a shared build system with two OS variants. They share the recipe engine, the build pipeline and the install and update tools, but differ in their base, libc and init.",
 	sections: [
 		{
 			title: "Variant Matrix",
 			content: [
 				{
 					type: "table",
-					headers: ["Variant", "Goal", "Base", "Init", "Primary Artifact", "Mutable?"],
+					headers: ["Variant", "Goal", "Base", "Stack", "Admin", "Artifact"],
 					rows: [
 						[
 							"LevitateOS",
-							"Daily-driver desktop/workstation",
-							"Fedora RPM extraction (glibc)",
-							"systemd",
-							"ISO (installer/live)",
-							"Optional (unsafe)",
+							"Daily-driver desktop/workstation, maximum compatibility",
+							"Locked, signed Fedora RPMs",
+							"glibc / systemd / GNU",
+							"sudo",
+							"levitateos-x86_64.iso (live + installer)",
 						],
 						[
 							"AcornOS",
-							"Daily-driver desktop/workstation (musl mirror)",
-							"Alpine APK extraction (musl)",
-							"OpenRC",
-							"ISO (installer/live)",
-							"Optional (unsafe)",
+							"Daily-driver desktop/workstation, a smaller and simpler base",
+							"Alpine APKs",
+							"musl / OpenRC / busybox",
+							"doas",
+							"acornos-x86_64.iso (live + installer)",
 						],
 					],
 				},
 				{
 					type: "note",
 					variant: "info",
-					content: rich`All variants are A/B immutable by default. Mutable mode (where it exists) is an explicit opt-in for daredevils, and is unsafe if you let an LLM author recipes without review. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`Both variants are A/B by default, with a trial boot and rollback managed by ${code("recab")}; a mutable root is an explicit opt-in. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+				},
+			],
+		},
+		{
+			title: "One Pipeline",
+			content: [
+				{
+					type: "text",
+					content: rich`${code("distro-builder")} builds both from their own declarations under ${code("distro/variants/<distro>/")}: sources and recipes, filesystem products, EROFS/initramfs/UKI transforms, the ISO release, and the boot, install and runtime scenarios. Recipes own the package facts; the builder owns orchestration and output locations.`,
+				},
+				{
+					type: "code",
+					language: "bash",
+					content: `cargo xtask build live-tools levitate
+cargo xtask build live-tools acorn`,
 				},
 			],
 		},
@@ -44,7 +59,7 @@ export const variantsContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("Desktop")} → ${link("Getting Started", "/docs/getting-started")}`,
+						rich`${bold("Install")} → ${link("Getting Started", "/docs/getting-started")}`,
 						rich`${bold("Packages")} → ${link("recipe CLI Reference", "/docs/cli-reference")}`,
 						rich`${bold("Update model")} → ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}`,
 						rich`${bold("Build/test loop")} → ${code("architecture.md")} (repo root)`,
