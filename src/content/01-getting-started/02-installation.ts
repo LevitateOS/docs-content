@@ -27,7 +27,7 @@ export const installationContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("Boot")} - Boot the live ISO into the install screen: a shell beside this guide`,
+						rich`${bold("Boot")} - Boot the live ISO into the install screen: the install steps (${code("install-hub")}), with a shell one key away, beside this guide`,
 						rich`${bold("Partition")} - Create the default A/B layout with ${code("recpart")}: EFI, system slot A, system slot B and the ${code("/var")} state partition`,
 						rich`${bold("Extract")} - Use ${code("recstrap")} to extract the system (like pacstrap)`,
 						rich`${bold("Configure")} - Set time zone, locale, keymap, hostname and users with ${code("recsetup")}`,
