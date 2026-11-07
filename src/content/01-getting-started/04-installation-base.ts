@@ -1,10 +1,10 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
 	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
-	intro: rich`Installation steps 6-9: Verify media, extract the system, generate fstab, and enter chroot. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro: rich`Installation steps 6-9: Verify media, extract the system, generate fstab, and inspect the target. See ${link("Installation", "/docs/installation")} for an overview.`,
 	sections: [
 		{
 			title: "6. Verify Installation Media",
@@ -82,23 +82,23 @@ export const installationBaseContent: DocsContent = {
 			],
 		},
 		{
-			title: "9. Enter the New System",
+			title: "9. Inspect the New System",
 			content: [
 				{
 					type: "text",
-					content: rich`Use ${code("recchroot")} (like Arch's ${code("arch-chroot")}) to enter the new system. It automatically sets up bind mounts for ${code("/dev")}, ${code("/proc")}, ${code("/sys")}, ${code("/run")}, and EFI variables:`,
+					content: rich`Stay in the live shell. ${code("recsetup")} reads the mounted target and lists the configuration choices its recipes provide.`,
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Enter the installed system",
-					command: "recchroot /mnt",
+					description: "Inspect the installed system",
+					command: "recsetup inspect --root /mnt --json",
 				},
 				{
 					type: "text",
-					content: rich`You are now inside the new system. Continue to ${link("Configuration", "/docs/installation-config")} (steps 10-14).`,
+					content: rich`Continue from the live shell to ${link("Configuration", "/docs/installation-config")} (steps 10-14).`,
 				},
 			],
 		},
 	],
-}
+};

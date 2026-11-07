@@ -1,5 +1,5 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, bold, link } from "../../rich-text";
 
 export const installationContent: DocsContent = {
 	title: "Installation",
@@ -44,7 +44,7 @@ export const installationContent: DocsContent = {
 					type: "list",
 					items: [
 						rich`${link("Disk Preparation", "/docs/installation-disk")} - Boot, identify disk, partition, format, mount (steps 1-5)`,
-						rich`${link("Base System", "/docs/installation-base")} - Extract with recstrap, generate fstab, enter chroot (steps 6-9)`,
+						rich`${link("Base System", "/docs/installation-base")} - Extract with recstrap, generate fstab, inspect the target (steps 6-9)`,
 						rich`${link("Configuration", "/docs/installation-config")} - Timezone, locale, hostname, passwords, user account (steps 10-14)`,
 						rich`${link("Bootloader & Finish", "/docs/installation-boot")} - Install A/B boot images, install bootloader, enable services, reboot (steps 15-18)`,
 					],
@@ -52,4 +52,4 @@ export const installationContent: DocsContent = {
 			],
 		},
 	],
-}
+};

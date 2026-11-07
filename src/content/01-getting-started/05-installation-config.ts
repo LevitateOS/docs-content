@@ -1,56 +1,41 @@
-import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code, link } from "../../rich-text";
 
 export const installationConfigContent: DocsContent = {
 	title: "Configuration",
 	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
-	intro: rich`Installation steps 10-14: Configure timezone, locale, hostname, and user accounts. See ${link("Installation", "/docs/installation")} for an overview.`,
+	intro:
+		"Run these commands in the live shell, with the installed system mounted at /mnt. Recipe prepares the system defaults; recsetup applies your machine's choices using the setup program shipped in that system.",
 	sections: [
 		{
-			title: "10. Set Timezone",
+			title: "10. Inspect Available Choices",
 			content: [
 				{
 					type: "command",
 					language: "bash",
-					description: "List available timezones",
-					command: "ls /usr/share/zoneinfo/",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Set your timezone (example: US Eastern)",
-					command: "ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Sync hardware clock",
-					command: "hwclock --systohc",
+					description: "List the target's timezones, locales, keymaps, shells, groups and services",
+					command: "recsetup inspect --root /mnt --json",
 				},
 			],
 		},
 		{
-			title: "11. Set Locale",
+			title: "11. Set Timezone and Locale",
 			content: [
 				{
-					type: "text",
-					content: "The English locales come already compiled, so there is nothing to generate. Pick one and set it:",
+					type: "command",
+					language: "bash",
+					description: "Preview your choices",
+					command: "recsetup plan --root /mnt --timezone Europe/Brussels --locale en_US.UTF-8",
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "List the available locales",
-					command: "locale -a",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Set system locale (example: US English)",
-					command: 'echo "LANG=en_US.UTF-8" > /etc/locale.conf',
+					description: "Apply timezone and locale",
+					command: "recsetup apply --root /mnt --timezone Europe/Brussels --locale en_US.UTF-8",
 				},
 				{
 					type: "text",
-					content: rich`Use a name from ${code("locale -a")}; it prints ${code("en_US.utf8")} for what you write as ${code("en_US.UTF-8")}.`,
+					content: rich`Choose values listed by ${code("recsetup inspect")}. To select a console layout, add ${code("--keymap us")} with an available keymap.`,
 				},
 			],
 		},
@@ -58,24 +43,10 @@ export const installationConfigContent: DocsContent = {
 			title: "12. Set Hostname",
 			content: [
 				{
-					type: "text",
-					content: rich`Set your hostname (replace ${code("myhostname")} with your preferred name):`,
-				},
-				{
 					type: "command",
 					language: "bash",
-					description: "Set hostname",
-					command: 'echo "myhostname" > /etc/hostname',
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Create the hosts file",
-					command: `cat > /etc/hosts << 'EOF'
-127.0.0.1   localhost
-::1         localhost
-127.0.1.1   myhostname.localdomain myhostname
-EOF`,
+					description: "Set hostname and its hosts-file mapping",
+					command: "recsetup apply --root /mnt --hostname myhostname",
 				},
 			],
 		},
@@ -83,10 +54,15 @@ EOF`,
 			title: "13. Set Root Password",
 			content: [
 				{
+					type: "text",
+					content:
+						"The release image has a locked root account. Set a password interactively; it is never stored in a setup request or passed as a command argument.",
+				},
+				{
 					type: "command",
 					language: "bash",
-					description: "Set the root password",
-					command: "passwd",
+					description: "Set the installed root password",
+					command: "recchroot /mnt -- passwd",
 				},
 			],
 		},
@@ -94,36 +70,25 @@ EOF`,
 			title: "14. Create User Account",
 			content: [
 				{
-					type: "text",
-					content: rich`Create your user (replace ${code("yourname")} with your username):`,
-				},
-				{
 					type: "command",
 					language: "bash",
-					description: "Create user with home directory and add to wheel group",
-					command: "useradd -m -G wheel -s /bin/bash yourname",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Set user password",
-					command: "passwd yourname",
+					description: "Create an administrator without putting a password in the request",
+					command: `cat > /tmp/user-setup.json <<'EOF'
+{"users":[{"name":"yourname","admin":true,"password":false}]}
+EOF
+recsetup apply --root /mnt --request /tmp/user-setup.json
+recchroot /mnt -- passwd yourname`,
 				},
 				{
 					type: "text",
-					content: "Enable sudo for the wheel group:",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Create sudoers file for wheel group",
-					command: `echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel && chmod 0440 /etc/sudoers.d/wheel`,
+					content:
+						"The system recipe already supplies the administrator rule for wheel. No additional sudoers file is needed.",
 				},
 				{
 					type: "text",
-					content: rich`Continue to ${link("Bootloader & Finish", "/docs/installation-boot")} (steps 15-18).`,
+					content: rich`Continue to ${link("Bootloader & Finish", "/docs/installation-boot")}.`,
 				},
 			],
 		},
 	],
-}
+};
