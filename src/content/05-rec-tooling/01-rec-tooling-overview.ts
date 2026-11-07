@@ -69,6 +69,12 @@ export const recToolingOverviewContent: DocsContent = {
 							"Beta (library-only)",
 						],
 						[
+							rich`${link("recsetup", "/docs/recsetup")}`,
+							"CLI + backend",
+							"Configure and boot the installed system",
+							"Experimental",
+						],
+						[
 							rich`${link("recstrap", "/docs/recstrap")}`,
 							"CLI",
 							"Extract installed rootfs",
@@ -91,7 +97,7 @@ export const recToolingOverviewContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("Installer-facing")}: ${code("recstrap")}, ${code("recfstab")}, ${code("recchroot")}`,
+						rich`${bold("Installer-facing")}: ${code("recstrap")}, ${code("recfstab")}, ${code("recchroot")}, ${code("recsetup")}`,
 						rich`${bold("Partition backend")}: ${code("recpart")} (plan/apply and handoff only)`,
 						rich`${bold("Build pipeline")}: ${code("recinit")}, ${code("recuki")}, ${code("reciso")}`,
 						rich`${bold("Infra/automation")}: ${code("recqemu")}`,
