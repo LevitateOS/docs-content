@@ -66,7 +66,7 @@ export const postInstallationContent: DocsContent = {
 					language: "bash",
 					description: "Write the new system into the inactive slot",
 					command:
-						"sudo recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz --initrd /mnt/boot/initramfs.img",
+						"sudo recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz --initrd /mnt/boot/initramfs-installed.img",
 				},
 				{
 					type: "command",

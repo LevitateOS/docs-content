@@ -111,7 +111,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 				},
 				{
 					type: "text",
-					content: rich`${code("boot.kernel")} defaults to the live media's ${code("/run/live-media/boot/vmlinuz")}. ${code("boot.initrd")} defaults to its ${code("initramfs.img")} on systemd systems and to none on OpenRC ones, which boot without an initramfs; ${code('""')} (or ${code("--no-initrd")}) means none.`,
+					content: rich`${code("boot.kernel")} defaults to the live media's ${code("/run/live-media/boot/vmlinuz")}. ${code("boot.initrd")} defaults, on systemd systems, to the installed system's initramfs the live media carries, ${code("/run/live-media/boot/initramfs-installed.img")}, and to none on OpenRC ones, which boot without an initramfs; ${code('""')} (or ${code("--no-initrd")}) means none. The live media's own ${code("initramfs.img")} is refused (E030): it only finds the live medium and ignores ${code("root=")}.`,
 				},
 			],
 		},
