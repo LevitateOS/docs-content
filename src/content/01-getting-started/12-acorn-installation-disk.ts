@@ -11,7 +11,7 @@ export const acornInstallationDiskContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Boot from the AcornOS ISO. The install screen opens beside this guide. On the left, ${code("install-hub")} lists the install steps and does each one: it starts ${code("disk-plan")} for the disk, runs this guide's commands for the base system and the bootloader, and opens a shell for the rest (${code("s")} at any time; ${code("exit")} returns). The commands below work the same typed by hand. Ctrl-] switches between the panes.`,
+					content: rich`Boot from the AcornOS ISO. The install screen opens beside this guide. On the left, ${code("install-hub")} lists the install steps and does each one: it starts ${code("disk-plan")} for the disk and ${code("base-system")} for the base system, runs this guide's commands for the bootloader, and opens a shell for the rest (${code("s")} at any time; ${code("exit")} returns). The commands below work the same typed by hand. Ctrl-] switches between the panes.`,
 				},
 				{
 					type: "note",

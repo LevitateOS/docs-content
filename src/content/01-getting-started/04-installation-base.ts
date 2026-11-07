@@ -1,5 +1,5 @@
 import type { DocsContent } from "../../types";
-import { rich, code, link } from "../../rich-text";
+import { rich, bold, code, link } from "../../rich-text";
 
 export const installationBaseContent: DocsContent = {
 	title: "Base System",
@@ -9,6 +9,17 @@ export const installationBaseContent: DocsContent = {
 		{
 			title: "6. Verify Installation Media",
 			content: [
+				{
+					type: "note",
+					variant: "info",
+					content: rich`${bold("Steps 6-8 in one tool:")} ${code("base-system")} checks the target, copies the system with a progress bar, shows the fstab entries (and any lines already in the target's fstab they would replace) and writes them. It reads the target from the disk step, so after ${code("disk-plan")} it needs no arguments. The steps below do the same by hand.`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Check, copy and write the fstab interactively",
+					command: "base-system",
+				},
 				{
 					type: "text",
 					content:
@@ -58,7 +69,7 @@ export const installationBaseContent: DocsContent = {
 					type: "command",
 					language: "bash",
 					description: "Generate fstab from current mounts",
-					command: "recfstab /mnt >> /mnt/etc/fstab",
+					command: "recfstab --write /mnt",
 				},
 				{
 					type: "command",
