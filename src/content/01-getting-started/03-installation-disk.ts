@@ -68,6 +68,17 @@ export const installationDiskContent: DocsContent = {
 			title: "2. Identify Target Disk",
 			content: [
 				{
+					type: "note",
+					variant: "info",
+					content: rich`${bold("Steps 2-5 in one tool:")} ${code("disk-plan")} lists the disks, shows the partition plan and every command, runs recpart's safety checks, and partitions, formats and mounts the disk once you confirm. Its last page shows where the new system is mounted (${code("/mnt/sysroot")}) and the commands that come next. The steps below do the same by hand.`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Plan, check and apply the disk layout interactively",
+					command: "disk-plan",
+				},
+				{
 					type: "command",
 					language: "bash",
 					description: "List all disks and identify your installation target",
