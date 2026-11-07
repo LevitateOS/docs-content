@@ -48,6 +48,15 @@ export const acornInstallationBootContent: DocsContent = {
 					type: "text",
 					content: rich`Add another installed service to the default runlevel with ${code("recsetup apply --root /mnt --service SERVICE")} (it runs ${code("rc-update add")} in the target).`,
 				},
+				{
+					type: "command",
+					language: "bash",
+					description: "WiFi: keep the network saved in the live session and connect at boot",
+					command: [
+						"cp /etc/wpa_supplicant/wpa_supplicant.conf /mnt/etc/wpa_supplicant/",
+						"recsetup apply --root /mnt --service wpa_supplicant",
+					],
+				},
 			],
 		},
 		{

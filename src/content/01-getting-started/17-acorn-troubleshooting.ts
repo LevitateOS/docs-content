@@ -149,7 +149,7 @@ export const acornTroubleshootingContent: DocsContent = {
 								{
 									type: "text",
 									content:
-										"AcornOS ships no WiFi tools yet; dhcpcd configures wired interfaces. Use a wired connection.",
+										"Check that the card shows up with iw dev and that wpa_supplicant runs (rc-service wpa_supplicant status). Cards that need firmware (most Intel, Realtek, MediaTek and Broadcom chips) do not work yet: the ISO ships no firmware.",
 								},
 							],
 						},

@@ -79,7 +79,7 @@ export const acornInstallationContent: DocsContent = {
 						],
 						["Install-screen shell", "bash", "sh (busybox ash)"],
 						["Admin rule", "sudo for wheel", "doas for wheel"],
-						["Network", "NetworkManager", "dhcpcd on wired interfaces; no WiFi tools"],
+						["Network", "NetworkManager", "dhcpcd, with wpa_supplicant for WiFi"],
 						["Boot", "kernel and the installed initramfs", "kernel only, no initramfs"],
 					],
 				},
