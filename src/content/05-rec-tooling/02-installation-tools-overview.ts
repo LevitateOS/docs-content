@@ -4,24 +4,24 @@ import { rich, bold, code, link } from "../../rich-text"
 export const installationToolsOverviewContent: DocsContent = {
 	title: "Installation Tools Overview",
 	meta: {
-		product: "levitate",
+		product: "shared",
 		scopes: ["install"],
 		audience: ["operator", "developer"],
 		stability: "stable",
 	},
 	intro:
-		"Command-line tools for manual LevitateOS installation, equivalent to Arch Linux's partitioning tools, pacstrap, genfstab and arch-chroot.",
+		"Command-line tools for manual LevitateOS and AcornOS installation, equivalent to Arch Linux's partitioning tools, pacstrap, genfstab and arch-chroot.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`LevitateOS provides five installation tools that mirror Arch Linux's manual installation workflow. They give you complete control over the installation process, and they are also the backends of the install screen's step apps, so the same commands work with or without a TUI.`,
+					content: rich`LevitateOS and AcornOS ship the same five installation tools that mirror Arch Linux's manual installation workflow. They give you complete control over the installation process, and they are also the backends of the install screen's step apps, so the same commands work with or without a TUI.`,
 				},
 				{
 					type: "table",
-					headers: ["LevitateOS", "Arch Linux", "Purpose"],
+					headers: ["Tool", "Arch Linux", "Purpose"],
 					rows: [
 						[rich`${link("recpart", "/docs/recpart")}`, "fdisk + mkfs + mount", "Partition, format and mount the target disk"],
 						[rich`${link("recstrap", "/docs/recstrap")}`, "pacstrap", "Extract the base system to the target directory"],

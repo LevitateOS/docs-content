@@ -5,7 +5,7 @@ import { TOOL_HELP } from "../../tool-help"
 export const recsetupContent: DocsContent = {
 	title: "recsetup",
 	meta: {
-		product: "levitate",
+		product: "shared",
 		scopes: ["install"],
 		audience: ["operator", "developer"],
 		stability: "experimental",

@@ -5,19 +5,19 @@ import { TOOL_HELP } from "../../tool-help"
 export const recstrapContent: DocsContent = {
 	title: "recstrap",
 	meta: {
-		product: "levitate",
+		product: "shared",
 		scopes: ["install"],
 		audience: ["operator", "developer"],
 		stability: "stable",
 	},
-	intro: "Extract the LevitateOS base system to a target directory. Like pacstrap for Arch Linux.",
+	intro: "Extract the base system (LevitateOS or AcornOS) to a target directory. Like pacstrap for Arch Linux.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recstrap")} extracts the LevitateOS EROFS image from the live ISO to a mounted target directory. This is the equivalent of Arch Linux's ${code("pacstrap")} command. ${code("recab stage")} uses it on the installed system to write a new system into the inactive slot.`,
+					content: rich`${code("recstrap")} extracts the system's EROFS image from the live ISO to a mounted target directory. This is the equivalent of Arch Linux's ${code("pacstrap")} command. ${code("recab stage")} uses it on the installed system to write a new system into the inactive slot.`,
 				},
 				{
 					type: "text",

@@ -5,7 +5,7 @@ import { TOOL_HELP } from "../../tool-help"
 export const recchrootContent: DocsContent = {
 	title: "recchroot",
 	meta: {
-		product: "levitate",
+		product: "shared",
 		scopes: ["install"],
 		audience: ["operator", "developer"],
 		stability: "stable",

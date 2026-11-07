@@ -137,6 +137,11 @@ function inferMetaFromSection(sectionName: string, pageName: string): DocsPageMe
 		}
 	}
 
+	// Recipe helpers document the package manager, which both variants share.
+	if (sectionName === "helpers") {
+		return { product: "shared", scopes: ["reference"], stability: "stable" }
+	}
+
 	if (sectionName === "architecture") {
 		return {
 			product: "levitate",
