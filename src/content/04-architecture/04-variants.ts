@@ -44,7 +44,7 @@ export const variantsContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("distro-builder")} builds both from their own declarations under ${code("distro/variants/<distro>/")}: sources and recipes, filesystem products, EROFS/initramfs/UKI transforms, the ISO release, and the boot, install and runtime scenarios. Recipes own the package facts; the builder owns orchestration and output locations.`,
+					content: rich`${code("distro-builder")} builds both from their own contract, ${code("distro/variants/<distro>/distro.toml")} (with the kernel configuration ${code("kconfig")} and the release hooks beside it): sources and recipes, filesystem products, EROFS/initramfs/UKI transforms, the ISO release, and the boot, install and runtime scenarios. Recipes own the package facts; the builder owns orchestration and output locations.`,
 				},
 				{
 					type: "code",
