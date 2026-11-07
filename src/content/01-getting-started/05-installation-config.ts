@@ -34,29 +34,23 @@ export const installationConfigContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Enable and generate your locale:",
+					content: "The English locales come already compiled, so there is nothing to generate. Pick one and set it:",
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Uncomment en_US.UTF-8 (or your preferred locale)",
-					command: "sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen",
+					description: "List the available locales",
+					command: "locale -a",
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Generate locales",
-					command: "locale-gen",
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Set system locale",
+					description: "Set system locale (example: US English)",
 					command: 'echo "LANG=en_US.UTF-8" > /etc/locale.conf',
 				},
 				{
 					type: "text",
-					content: rich`For other locales, edit ${code("/etc/locale.gen")} and uncomment the lines you need before running ${code("locale-gen")}.`,
+					content: rich`Use a name from ${code("locale -a")}; it prints ${code("en_US.utf8")} for what you write as ${code("en_US.UTF-8")}.`,
 				},
 			],
 		},
