@@ -50,7 +50,6 @@ export default {
 					type: "list",
 					items: [
 						rich`${link("recinit", "/docs/recinit")} - Build initramfs inputs`,
-						rich`${link("recuki", "/docs/recuki")} - Build UKI inputs`,
 					],
 				},
 			],

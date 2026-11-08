@@ -51,7 +51,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`${bold("Scope note")}: the repo also ships ${code("rec*")} tooling for updates and for building and testing images: ${code("recab")}, ${code("recinit")}, ${code("reciso")}, ${code("recqemu")}, ${code("recuki")}. See the ${link("rec* Tooling Overview", "/docs/rec-tooling-overview")}.`,
+					content: rich`${bold("Scope note")}: the repo also ships ${code("rec*")} tooling for updates and for building and testing images: ${code("recab")}, ${code("recinit")}, ${code("reciso")}, ${code("recqemu")}. See the ${link("rec* Tooling Overview", "/docs/rec-tooling-overview")}.`,
 				},
 			],
 		},

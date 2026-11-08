@@ -80,12 +80,6 @@ export default {
 							"Extract the system image",
 							"Live ISO and installed system (used by recab stage)",
 						],
-						[
-							rich`${link("recuki", "/docs/recuki")}`,
-							"CLI + library",
-							"Unified Kernel Image builder",
-							"Build host",
-						],
 					],
 					monospaceCol: 0,
 				},
@@ -99,7 +93,7 @@ export default {
 					items: [
 						rich`${bold("Installer-facing")}: ${code("recstrap")}, ${code("recfstab")}, ${code("recchroot")}, ${code("recsetup")}`,
 						rich`${bold("Partition backend")}: ${code("recpart")} (inspect/plan/apply and handoff only)`,
-						rich`${bold("Build pipeline")}: ${code("recinit")}, ${code("recuki")}, ${code("reciso")}`,
+						rich`${bold("Build pipeline")}: ${code("recinit")}, ${code("reciso")}`,
 						rich`${bold("Test VMs")}: ${code("recqemu")}, ${code("recshuttle")}`,
 						rich`${bold("A/B control-plane")}: ${code("recab")}`,
 					],

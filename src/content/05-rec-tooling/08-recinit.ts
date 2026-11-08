@@ -64,7 +64,6 @@ export default {
 				{
 					type: "list",
 					items: [
-						rich`${link("recuki", "/docs/recuki")} - Build UKIs`,
 						rich`${link("reciso", "/docs/reciso")} - Build bootable ISO`,
 					],
 				},

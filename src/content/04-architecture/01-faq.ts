@@ -192,7 +192,7 @@ export default {
 									type: "list",
 									items: [
 										rich`${bold("systemd-boot everywhere")} - no GRUB or isolinux`,
-										rich`${bold("Live ISO")}: Unified Kernel Images built by ${code("recuki")}, each one PE binary holding the kernel, initramfs and command line, which systemd-boot finds on its own`,
+										rich`${bold("Live ISO")}: Unified Kernel Images built by ${code("reciso")}, each one PE binary holding the kernel, initramfs and command line, which systemd-boot finds on its own`,
 										rich`${bold("Installed system")}: one boot entry per slot, naming the slot's kernel and initramfs in ${code("/boot/levitateos-a/")} or ${code("/boot/levitateos-b/")} and its root by ${code("root=PARTUUID=")}. ${code("recab")} rewrites a slot's kernel and trial options without touching the other slot`,
 									],
 								},
