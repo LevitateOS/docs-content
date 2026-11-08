@@ -5,8 +5,8 @@ export const DISTROS = [
 	{
 		defaultHostname: "acornos",
 		id: "acorn",
-		installShell: "/bin/sh",
-		installedInitramfs: null,
+		installShell: "/bin/bash",
+		installedInitramfs: "initramfs-installed.img",
 		isoFile: "acornos-x86_64.iso",
 		isoLabel: "ACORNOS",
 		kernel: {
