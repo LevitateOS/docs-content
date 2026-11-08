@@ -29,7 +29,7 @@ recab rollback        # later, if wanted: back to A, while A still holds its sys
 				},
 				{
 					type: "text",
-					content: rich`${code("stage")} formats the inactive slot, extracts the image with ${code("recstrap")}, and carries over the hostname, machine id, locale, time settings, accounts (merged by name), SSH host keys, enabled services and network connections, as the image's ${code("/usr/lib/recab/carried")} lists them. For the carried directories (systemd units and links, OpenRC runlevels, conf.d) it records what the image shipped in ${code("/usr/lib/recab/baseline")}; the next update carries only what the machine added or changed there, drops what it removed, and takes the rest from the new image. It refuses while the running slot is uncommitted or while the target slot is the next boot.`,
+					content: rich`${code("stage")} formats the inactive slot, extracts the image with ${code("recstrap")}, and carries over the hostname, machine id, locale, time settings, accounts (merged by name), SSH host keys, enabled services and network connections, as the image's ${code("/usr/lib/recab/carried")} lists them. For the carried directories (systemd units and links, OpenRC runlevels, conf.d) it records what the image shipped in ${code("/usr/lib/recab/baseline")}; the next update carries only what the machine added or changed there, drops what it removed, and takes the rest from the new image. It refuses while the running slot is uncommitted or while the target slot is the next boot, and it refuses an image of the other flavour (${code("REC_FLAVOUR")} in its os-release: the base system over a desktop install, or the reverse) unless ${code("--change-flavour")} is given.`,
 				},
 			],
 		},

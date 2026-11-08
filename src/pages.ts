@@ -47,6 +47,12 @@ export const DESKTOP_NAME: Record<Profile["desktop"], string> = {
 	lxqt: "LXQt",
 };
 
+/** The terminal each desktop opens, where the desktop ISO's install screen runs. */
+export const TERMINAL_NAME: Record<Profile["desktop"], string> = {
+	plasma: "Konsole",
+	lxqt: "QTerminal",
+};
+
 export const INIT_NAME: Record<Profile["init"], string> = {
 	systemd: "systemd",
 	openrc: "OpenRC",

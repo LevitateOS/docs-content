@@ -1,7 +1,15 @@
 import { distroPage } from "../../types";
 import { rich, bold, code, link } from "../../rich-text";
 import { GUIDE, guideSteps } from "../../install";
-import { intendedDifferences, PAGE_TITLES, pageLink } from "../../pages";
+import {
+	admin,
+	DESKTOP_NAME,
+	HARDWARE,
+	intendedDifferences,
+	PAGE_TITLES,
+	pageLink,
+	TERMINAL_NAME,
+} from "../../pages";
 
 /** What each guide page covers, for the step list. */
 const COVERS = {
@@ -54,6 +62,30 @@ export default distroPage((d) => ({
 						(page) =>
 							rich`${pageLink(page.slug)} - ${COVERS[page.slug]} (${guideSteps(page.slug)})`,
 					),
+				},
+			],
+		},
+		{
+			title: "From the Desktop ISO",
+			content: [
+				{
+					type: "text",
+					content: rich`${code(d.desktop.isoFile)} boots live into ${DESKTOP_NAME[d.profile.desktop]}, logged in as ${code(d.desktop.liveUser)}, and installs the desktop system: the same base system with ${DESKTOP_NAME[d.profile.desktop]}, whose display manager (${code(d.desktop.displayManager)}) starts at boot. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the desktop's locked packages:`,
+				},
+				{
+					type: "code",
+					language: "bash",
+					content: `cargo xtask build rootfs-source <distro> --desktop
+cargo xtask build live-desktop <distro>`,
+				},
+				{
+					type: "text",
+					content: rich`The display manager owns the first virtual console, so the install screen does not run there. Open ${TERMINAL_NAME[d.profile.desktop]} and start it as root, with the password ${code(d.desktop.livePassword)}: ${code(`${admin(d)} ${d.desktop.installScreen}`)}. It also runs on the serial console. From there every step of this guide is the same; ${code("recstrap")} extracts the desktop system, and after the reboot the display manager asks for the account you made with ${code("recsetup")}.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Updates keep the flavour:")} ${code("recab stage")} refuses a base image on a desktop install, and a desktop image on a base install, since staging it would change the system. Stage the rootfs of the same kind of ISO, or pass ${code("--change-flavour")} to switch on purpose. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
 		},

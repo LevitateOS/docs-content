@@ -4,6 +4,13 @@
 export const DISTROS = [
 	{
 		defaultHostname: "acornos",
+		desktop: {
+			displayManager: "sddm",
+			installScreen: "/usr/local/bin/install-ux",
+			isoFile: "acornos-x86_64-live-desktop.iso",
+			livePassword: "live",
+			liveUser: "live",
+		},
 		id: "acorn",
 		installShell: "/bin/bash",
 		installedInitramfs: "initramfs-installed.img",
@@ -33,6 +40,13 @@ export const DISTROS = [
 	},
 	{
 		defaultHostname: "levitateos",
+		desktop: {
+			displayManager: "sddm",
+			installScreen: "/usr/local/bin/install-ux",
+			isoFile: "levitateos-x86_64-live-desktop.iso",
+			livePassword: "live",
+			liveUser: "live",
+		},
 		id: "levitate",
 		installShell: "/bin/bash",
 		installedInitramfs: "initramfs-installed.img",

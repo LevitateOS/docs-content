@@ -115,7 +115,7 @@ export default distroPage((d) => ({
 				{
 					type: "list",
 					items: [
-						`A ${DESKTOP_NAME[d.profile.desktop]} desktop edition of ${d.osName} is in development`,
+						rich`For ${DESKTOP_NAME[d.profile.desktop]}, install from the desktop ISO: ${pageLink("installation", "From the Desktop ISO")}`,
 						"Set up development tools and editors",
 						rich`Review ${pageLink("troubleshooting")} if you encounter issues`,
 					],
