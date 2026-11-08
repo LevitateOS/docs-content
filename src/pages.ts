@@ -4,7 +4,7 @@
  * a per-distro thing only through one of these, never by the distro's name.
  */
 import { DISTROS, type Profile } from "./distros";
-import { commands, guideTitle, type GuideSlug } from "./install";
+import { guideTitle, type GuideSlug } from "./install";
 import { link, type InlineLink } from "./rich-text";
 import type { DistroFacts } from "./types";
 
@@ -99,8 +99,7 @@ export function network(d: DistroFacts) {
 			`cp -a /etc/NetworkManager/system-connections/. ${target}/etc/NetworkManager/system-connections/`,
 		],
 		daemon,
-		firmware:
-			"If no wireless device appears, the card may need firmware the system does not ship.",
+		firmware: "If no wireless device appears, the card may need firmware the system does not ship.",
 	};
 }
 
