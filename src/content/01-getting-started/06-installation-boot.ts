@@ -48,7 +48,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`The system recipe starts ${network(d).installedServices.join(", ")} at boot. Live-session autologin and shell overrides stay on the ISO.`,
+					content: rich`The system recipe starts ${network(d).daemon} at boot. Live-session autologin and shell overrides stay on the ISO.`,
 				},
 				{
 					type: "command",
@@ -60,16 +60,12 @@ export default distroPage((d) => ({
 					type: "text",
 					content: rich`Start another installed service at boot with ${code(commands.service(target, "SERVICE"))}.`,
 				},
-				...(network(d).keepWifi(target).length > 0
-					? [
-							{
-								type: "command" as const,
-								language: "bash" as const,
-								description: "WiFi: keep the network saved in the live session and connect at boot",
-								command: network(d).keepWifi(target),
-							},
-						]
-					: []),
+				{
+					type: "command",
+					language: "bash",
+					description: "WiFi: keep the networks saved in the live session",
+					command: network(d).keepWifi(target),
+				},
 			],
 		},
 		{

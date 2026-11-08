@@ -50,6 +50,16 @@ export const KERNEL_LINE_NAME: Record<Profile["kernel_line"], string> = {
 	latest: "latest stable",
 };
 
+/**
+ * Where root's Recipe keeps its recipes, state and image cache on every installed system:
+ * on /var, shared by both A/B slots (distro/builder/recipes/install-tools.rhai packages them).
+ */
+export const RECIPE = {
+	recipes: "/var/lib/recipe/recipes",
+	state: "/var/lib/recipe/state",
+	cache: "/var/cache/recipe",
+};
+
 /** The privilege tool's command word: `sudo` or `doas`. */
 export function admin(d: DistroFacts): string {
 	return d.profile.privilege;
@@ -75,42 +85,23 @@ export function services(d: DistroFacts) {
 }
 
 /**
- * The network stack, live and installed. The two siblings still differ here (one runs
- * NetworkManager, the other dhcpcd with wpa_supplicant), a parity gap the variants close
- * (G28); until they do, this is the one place the guide follows it, by the init system
- * each stack comes with.
+ * The network stack, live and installed: NetworkManager with wpa_supplicant on both
+ * siblings. Only the service name differs, by init system.
  */
 export function network(d: DistroFacts) {
-	return d.profile.init === "systemd"
-		? {
-				wired: "NetworkManager configures a wired connection by itself.",
-				listWifi: "nmcli device wifi list",
-				connectWifi: ['nmcli --ask device wifi connect "YOUR_NETWORK"'],
-				/** Commands that keep the live session's WiFi network on the installed system at `target`. */
-				keepWifi: (_target: string): string[] => [],
-				installedServices: ["NetworkManager"],
-				daemon: "NetworkManager",
-				reconnect: ['nmcli --ask device wifi connect "YOUR_NETWORK"'],
-				firmware:
-					"If no wireless device appears, the card may need firmware the system does not ship.",
-			}
-		: {
-				wired: "dhcpcd configures a wired connection at boot.",
-				listWifi: "iw dev",
-				connectWifi: [
-					'wpa_passphrase "YOUR_NETWORK" > /etc/wpa_supplicant/wpa_supplicant.conf',
-					"rc-service wpa_supplicant start",
-				],
-				keepWifi: (target: string) => [
-					`cp /etc/wpa_supplicant/wpa_supplicant.conf ${target}/etc/wpa_supplicant/`,
-					commands.service(target, "wpa_supplicant"),
-				],
-				installedServices: ["networking", "dhcpcd", "sshd"],
-				daemon: "dhcpcd",
-				reconnect: ["rc-service wpa_supplicant status"],
-				firmware:
-					"Cards that need firmware (most Intel, Realtek, MediaTek and Broadcom chips) do not work yet: the system ships no WiFi firmware.",
-			};
+	const daemon = d.profile.init === "systemd" ? "NetworkManager" : "networkmanager";
+	return {
+		wired: "NetworkManager configures a wired connection by itself.",
+		listWifi: "nmcli device wifi list",
+		connectWifi: ['nmcli --ask device wifi connect "YOUR_NETWORK"'],
+		/** Commands that keep the live session's saved networks on the installed system at `target`. */
+		keepWifi: (target: string): string[] => [
+			`cp -a /etc/NetworkManager/system-connections/. ${target}/etc/NetworkManager/system-connections/`,
+		],
+		daemon,
+		firmware:
+			"If no wireless device appears, the card may need firmware the system does not ship.",
+	};
 }
 
 /** The differences between the siblings that are intended: privilege tool, desktop and kernel line. */
