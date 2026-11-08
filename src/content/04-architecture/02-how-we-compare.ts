@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, bold } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, bold } from "../../rich-text";
 
-export const howWeCompareContent: DocsContent = {
+export default {
 	title: "How We Compare",
 	intro:
 		"Honest comparison with other distributions. We show our strengths and admit our weaknesses.",
@@ -19,9 +19,21 @@ export const howWeCompareContent: DocsContent = {
 						["Reproducible builds", "No", "No", "Yes", "Partial (lock + A/B)"],
 						["Learning curve", "Medium", "Low", "High", "Medium"],
 						["Community size", "Huge", "Large", "Medium", "Growing"],
-						["Atomic updates + rollback", "No", "Atomic editions only", "Yes (generations)", "Yes (A/B slots)"],
+						[
+							"Atomic updates + rollback",
+							"No",
+							"Atomic editions only",
+							"Yes (generations)",
+							"Yes (A/B slots)",
+						],
 						["Rolling release", "Yes", "No (6mo)", "Yes", "No (follows Fedora releases)"],
-						["Package source", "Compile AUR", "Fedora repos", "Nixpkgs", "Fedora RPMs (core) + recipes"],
+						[
+							"Package source",
+							"Compile AUR",
+							"Fedora repos",
+							"Nixpkgs",
+							"Fedora RPMs (core) + recipes",
+						],
 					],
 				},
 			],
@@ -111,4 +123,4 @@ export const howWeCompareContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

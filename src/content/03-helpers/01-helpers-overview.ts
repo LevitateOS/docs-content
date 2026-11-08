@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code, link } from "../../rich-text";
 
-export const helpersOverviewContent: DocsContent = {
+export default {
 	title: "Helpers Overview",
 	intro: rich`Functions available in ${link("recipe scripts", "/docs/recipe-format")} with ${code("const RECIPE_API = 2;")}. Helpers take explicit paths and return explicit results; paths come from ${code("RUNTIME")} during setup and ${code("ctx.runtime")} in hooks.`,
 	sections: [
@@ -97,7 +97,11 @@ fn install(ctx) {
 					headers: ["Helper", "Returns", "Meaning"],
 					rows: [
 						["ready(ctx)", "Map", "The check passes, with the updated context."],
-						["needs_work(ctx, reason)", "Map", "The phase must run; reason is a nonempty explanation."],
+						[
+							"needs_work(ctx, reason)",
+							"Map",
+							"The phase must run; reason is a nonempty explanation.",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -108,4 +112,4 @@ fn install(ctx) {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

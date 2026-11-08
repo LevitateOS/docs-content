@@ -15,14 +15,14 @@ Single source of truth for LevitateOS documentation. Consumed by both website an
 
 | Don't put here | Put it in |
 |----------------|-----------|
-| TUI rendering | `docs/tui/` |
-| Website rendering | `website/` (submodule) |
+| TUI rendering | `tui/apps/live-tools/install-docs` |
+| Website rendering | `docs/website` |
 
 ## Key Rules
 
 ### Docs Are the Spec
 
-Documentation = what the final ISO should be. If ISO doesn't match docs, **fix the ISO**, not the docs.
+Documentation = what the final ISO should be. If ISO doesn't match docs, **fix the ISO**, not the docs. There is one guide for every distro: a sentence that differs between distros does so through a declared fact (`src/pages.ts`, `src/distros.ts`), so it specifies each distro's ISO the same way.
 
 - **Wrong:** "timedatectl missing from ISO, remove from docs"
 - **Right:** "timedatectl in docs, add to ISO"

@@ -1,57 +1,74 @@
-import type { DocsContent } from "../../types";
-import { rich, code, link } from "../../rich-text";
+import { distroPage } from "../../types";
+import { rich, code } from "../../rich-text";
+import {
+	commands,
+	EXAMPLE_DISK,
+	EXAMPLE_SETUP,
+	guideStep,
+	guideSteps,
+	guideTitle,
+} from "../../install";
+import { pageLink } from "../../pages";
 
-export const installationConfigContent: DocsContent = {
-	title: "Configuration",
-	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
-	intro:
-		"Run these commands in the live shell, with the installed system mounted at /mnt. Recipe prepares the system defaults; recsetup applies your machine's choices using the setup program shipped in that system.",
+const SLUG = "installation-config";
+const target = EXAMPLE_DISK.target;
+const choice = { timezone: EXAMPLE_SETUP.timezone, locale: EXAMPLE_SETUP.locale };
+
+export default distroPage((d) => ({
+	title: guideTitle(SLUG),
+	intro: `Installation ${guideSteps(SLUG)}. Run these commands in the live shell, with the installed system mounted at ${target}. Recipe prepares the system defaults; recsetup applies your machine's choices using the setup program shipped in that system.`,
 	sections: [
 		{
-			title: "10. Inspect Available Choices",
+			title: guideStep(SLUG, "Inspect Available Choices"),
 			content: [
 				{
 					type: "command",
 					language: "bash",
 					description: "List the target's timezones, locales, keymaps, shells, groups and services",
-					command: "recsetup inspect --root /mnt --json",
+					command: commands.inspect(target, true),
 				},
 			],
 		},
 		{
-			title: "11. Set Timezone and Locale",
+			title: guideStep(SLUG, "Set Timezone, Locale and Keymap"),
 			content: [
 				{
 					type: "command",
 					language: "bash",
 					description: "Preview your choices",
-					command: "recsetup plan --root /mnt --timezone Europe/Brussels --locale en_US.UTF-8",
+					command: commands.configure(target, choice, "plan"),
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Apply timezone and locale",
-					command: "recsetup apply --root /mnt --timezone Europe/Brussels --locale en_US.UTF-8",
+					description: "Apply timezone, locale and keymap",
+					command: commands.configure(target, { ...choice, keymap: EXAMPLE_SETUP.keymap }),
 				},
 				{
 					type: "text",
-					content: rich`Choose values listed by ${code("recsetup inspect")}. To select a console layout, add ${code("--keymap us")} with an available keymap.`,
+					content: [
+						...rich`Choose values listed by ${code("recsetup inspect")}. `,
+						...(d.profile.libc === "musl"
+							? rich`musl compiles no locales, so the locale only sets ${code("LANG")} in ${code("/etc/locale.conf")}. `
+							: []),
+						...rich`The keymap is the console layout the system loads at boot; leave ${code("--keymap")} out for the US layout.`,
+					],
 				},
 			],
 		},
 		{
-			title: "12. Set Hostname",
+			title: guideStep(SLUG, "Set Hostname"),
 			content: [
 				{
 					type: "command",
 					language: "bash",
 					description: "Set hostname and its hosts-file mapping",
-					command: "recsetup apply --root /mnt --hostname myhostname",
+					command: commands.configure(target, { hostname: d.defaultHostname }),
 				},
 			],
 		},
 		{
-			title: "13. Set Root Password",
+			title: guideStep(SLUG, "Set Root Password"),
 			content: [
 				{
 					type: "text",
@@ -62,33 +79,32 @@ export const installationConfigContent: DocsContent = {
 					type: "command",
 					language: "bash",
 					description: "Set the installed root password",
-					command: "recchroot /mnt -- passwd",
+					command: commands.password(target),
 				},
 			],
 		},
 		{
-			title: "14. Create User Account",
+			title: guideStep(SLUG, "Create User Account"),
 			content: [
 				{
 					type: "command",
 					language: "bash",
-					description: "Create an administrator without putting a password in the request",
-					command: `cat > /tmp/user-setup.json <<'EOF'
-{"users":[{"name":"yourname","admin":true,"password":false}]}
-EOF
-recsetup apply --root /mnt --request /tmp/user-setup.json
-recchroot /mnt -- passwd yourname`,
+					description:
+						"Create an administrator without putting a password in the request, then set it",
+					command: [
+						...commands.createUser(target, EXAMPLE_SETUP.user),
+						commands.password(target, EXAMPLE_SETUP.user),
+					],
 				},
 				{
 					type: "text",
-					content:
-						"The system recipe already supplies the administrator rule for wheel. No additional sudoers file is needed.",
+					content: rich`An administrator joins ${code("wheel")}. The system recipe already ships the ${code(d.profile.privilege)} rule for wheel (${code(d.privilegeTool.adminRule)} in ${code(d.privilegeTool.adminRuleFile)}), so administrative commands go through ${code(d.profile.privilege)}.`,
 				},
 				{
 					type: "text",
-					content: rich`Continue to ${link("Bootloader & Finish", "/docs/installation-boot")}.`,
+					content: rich`Continue to ${pageLink("installation-boot")}.`,
 				},
 			],
 		},
 	],
-};
+}));

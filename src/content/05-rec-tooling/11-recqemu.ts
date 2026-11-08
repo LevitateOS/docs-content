@@ -1,15 +1,10 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
 
-export const recqemuContent: DocsContent = {
+export default {
 	title: "recqemu",
-	meta: {
-		product: "shared",
-		scopes: ["reference"],
-		audience: ["developer"],
-		stability: "experimental",
-	},
-	intro: "Library for running scenario VMs as libvirt domains and driving them over the serial console.",
+	intro:
+		"Library for running scenario VMs as libvirt domains and driving them over the serial console.",
 	sections: [
 		{
 			title: "Overview",
@@ -36,11 +31,26 @@ export const recqemuContent: DocsContent = {
 					type: "table",
 					headers: ["API", "Purpose"],
 					rows: [
-						[rich`${code("libvirt::DomainSpec")}`, "A VM: firmware, disk, boot ISO, extra CDs, fw_cfg entries, SSH forward, serial target and log"],
-						[rich`${code("libvirt::Domain")}`, "Create (paused), resume, keep running, or destroy a domain"],
-						[rich`${code("serial::Console")}`, "Serial console: wait for boot, log in, run commands and read their exit status"],
-						[rich`${code("serial::protocol")}`, "The serial test protocol and its guest-side profile script"],
-						[rich`${code("find_ovmf / find_ovmf_vars")}`, "Firmware discovery (OVMF_PATH, else the Fedora, Debian/Ubuntu, Arch and NixOS locations)"],
+						[
+							rich`${code("libvirt::DomainSpec")}`,
+							"A VM: firmware, disk, boot ISO, extra CDs, fw_cfg entries, SSH forward, serial target and log",
+						],
+						[
+							rich`${code("libvirt::Domain")}`,
+							"Create (paused), resume, keep running, or destroy a domain",
+						],
+						[
+							rich`${code("serial::Console")}`,
+							"Serial console: wait for boot, log in, run commands and read their exit status",
+						],
+						[
+							rich`${code("serial::protocol")}`,
+							"The serial test protocol and its guest-side profile script",
+						],
+						[
+							rich`${code("find_ovmf / find_ovmf_vars")}`,
+							"Firmware discovery (OVMF_PATH, else the Fedora, Debian/Ubuntu, Arch and NixOS locations)",
+						],
 						[rich`${code("create_disk")}`, "Create a qcow2 disk with qemu-img"],
 					],
 					monospaceCol: 0,
@@ -119,4 +129,4 @@ domain.resume()?;`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

@@ -1,14 +1,12 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import { bootArgs, commands, EXAMPLE_DISK, EXAMPLE_SETUP } from "../../install";
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
 
-export const installationToolsOverviewContent: DocsContent = {
+const disk = EXAMPLE_DISK;
+const t = disk.target;
+
+export default {
 	title: "Installation Tools Overview",
-	meta: {
-		product: "shared",
-		scopes: ["install"],
-		audience: ["operator", "developer"],
-		stability: "stable",
-	},
 	intro:
 		"Command-line tools for manual LevitateOS and AcornOS installation, equivalent to Arch Linux's partitioning tools, pacstrap, genfstab and arch-chroot.",
 	sections: [
@@ -23,15 +21,31 @@ export const installationToolsOverviewContent: DocsContent = {
 					type: "table",
 					headers: ["Tool", "Arch Linux", "Purpose"],
 					rows: [
-						[rich`${link("recpart", "/docs/recpart")}`, "fdisk + mkfs + mount", "Partition, format and mount the target disk"],
-						[rich`${link("recstrap", "/docs/recstrap")}`, "pacstrap", "Extract the base system to the target directory"],
-						[rich`${link("recfstab", "/docs/recfstab")}`, "genfstab", "Generate fstab from mounted filesystems"],
+						[
+							rich`${link("recpart", "/docs/recpart")}`,
+							"fdisk + mkfs + mount",
+							"Partition, format and mount the target disk",
+						],
+						[
+							rich`${link("recstrap", "/docs/recstrap")}`,
+							"pacstrap",
+							"Extract the base system to the target directory",
+						],
+						[
+							rich`${link("recfstab", "/docs/recfstab")}`,
+							"genfstab",
+							"Generate fstab from mounted filesystems",
+						],
 						[
 							rich`${link("recsetup", "/docs/recsetup")}`,
 							"the configuration steps",
 							"Time zone, locale, keymap, hostname, users, bootloader and services",
 						],
-						[rich`${link("recchroot", "/docs/recchroot")}`, "arch-chroot", "Enter chroot with proper bind mounts"],
+						[
+							rich`${link("recchroot", "/docs/recchroot")}`,
+							"arch-chroot",
+							"Enter chroot with proper bind mounts",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -53,42 +67,32 @@ export const installationToolsOverviewContent: DocsContent = {
 					intro: "Complete installation workflow:",
 					steps: [
 						{
-							command: "recpart apply --disk /dev/nvme0n1 --confirm DESTROY",
-							description: "Create the A/B layout and mount it at /mnt (--mode mutable for one root)",
+							command: commands.partition(disk.disk),
+							description: `Create the A/B layout and mount it at ${t} (--mode mutable for one root)`,
 						},
+						{ command: commands.extract(t), description: "Extract the base system" },
+						{ command: commands.fstab(t), description: "Generate fstab entries" },
 						{
-							command: "recstrap /mnt",
-							description: "Extract the base system",
-						},
-						{
-							command: "recfstab /mnt >> /mnt/etc/fstab",
-							description: "Generate fstab entries",
-						},
-						{
-							command: "recsetup inspect --root /mnt --json",
+							command: commands.inspect(t, true),
 							description: "List the time zones, locales, keymaps and services the target offers",
 						},
 						{
-							command: "recsetup apply --root /mnt --timezone Europe/Amsterdam --locale en_US.UTF-8 --hostname myhostname",
+							command: commands.configure(t, {
+								timezone: EXAMPLE_SETUP.timezone,
+								locale: EXAMPLE_SETUP.locale,
+							}),
 							description: "Apply the machine settings",
 						},
+						{ command: commands.password(t), description: "Set the installed root password" },
 						{
-							command: "recchroot /mnt -- passwd",
-							description: "Set the installed root password",
-						},
-						{
-							command:
-								"recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3 --machine-id",
+							command: commands.boot(t, bootArgs(disk) as string),
 							description: "Install systemd-boot and the A/B boot entries",
 						},
-						{
-							command: "umount -R /mnt",
-							description: "Unmount the installed system",
-						},
-						{
-							command: "reboot",
-							description: "Reboot into the installed system",
-						},
+						...commands.unmount(disk).map((command) => ({
+							command,
+							description: "Unmount the installed system, deepest mount first",
+						})),
+						{ command: commands.reboot(), description: "Reboot into the installed system" },
 					],
 				},
 			],
@@ -143,4 +147,4 @@ export const installationToolsOverviewContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

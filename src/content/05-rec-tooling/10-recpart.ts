@@ -1,15 +1,9 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recpartContent: DocsContent = {
+export default {
 	title: "recpart",
-	meta: {
-		product: "shared",
-		scopes: ["install", "reference"],
-		audience: ["operator", "developer"],
-		stability: "experimental",
-	},
 	intro: "Mode-aware partition planning and apply backend for installation flows.",
 	sections: [
 		{
@@ -47,7 +41,10 @@ export const recpartContent: DocsContent = {
 					type: "table",
 					headers: ["Mode", "Template layout"],
 					rows: [
-						[rich`${code("ab")} (default)`, "EFI (1 GiB, /boot), ROOT_A (20 GiB, /), ROOT_B (20 GiB, unmounted) and STATE (the rest, at least 4 GiB, /var)"],
+						[
+							rich`${code("ab")} (default)`,
+							"EFI (1 GiB, /boot), ROOT_A (20 GiB, /), ROOT_B (20 GiB, unmounted) and STATE (the rest, at least 4 GiB, /var)",
+						],
 						[rich`${code("mutable")}`, "EFI (1 GiB, /boot) and ROOT (the rest, at least 8 GiB, /)"],
 					],
 					monospaceCol: 0,
@@ -90,7 +87,8 @@ export const recpartContent: DocsContent = {
 				{
 					type: "command",
 					language: "bash",
-					description: "Plan an explicit layout, for example keeping an existing EFI partition for dual boot",
+					description:
+						"Plan an explicit layout, for example keeping an existing EFI partition for dual boot",
 					command: "recpart plan --disk /dev/nvme0n1 --layout layout.json",
 				},
 			],
@@ -132,4 +130,4 @@ export const recpartContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

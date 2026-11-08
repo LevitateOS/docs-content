@@ -1,16 +1,29 @@
-import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import { distroPage } from "../../types";
+import { rich, code, link } from "../../rich-text";
+import { commands } from "../../install";
+import { admin, DESKTOP_NAME, PAGE_TITLES, pageLink, services } from "../../pages";
 
-export const postInstallationContent: DocsContent = {
-	title: "Post-Installation",
-	meta: {
-		product: "levitate",
-		scopes: ["install", "post_install"],
-		audience: ["beginner"],
-		stability: "stable",
-	},
-	intro: rich`After rebooting, log in with your user account and start using your new system.`,
+export default distroPage((d) => ({
+	title: PAGE_TITLES["post-installation"],
+	intro: rich`After rebooting, log in with your user account and start using your new ${d.osName} system. Administrative commands go through ${code(admin(d))}.`,
 	sections: [
+		{
+			title: "Services",
+			content: [
+				{
+					type: "command",
+					language: "bash",
+					description: "Show the services and whether they run",
+					command: services(d).list,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Start a service now and at every boot",
+					command: services(d).enable("SERVICE"),
+				},
+			],
+		},
 		{
 			title: "Package Management",
 			content: [
@@ -53,30 +66,33 @@ export const postInstallationContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`A new LevitateOS release is written into the inactive slot (slot B after a fresh install) and trial-booted once. Mount the new release ISO, then stage its system image, kernel and initramfs:`,
+					content: `A new ${d.osName} release is written into the inactive slot (slot B after a fresh install) and trial-booted once. Mount the new release ISO, then stage its system image and kernel${d.installedInitramfs ? " and initramfs" : " (the system boots without an initramfs)"}:`,
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Mount the new release ISO",
-					command: "sudo mount -o loop,ro levitateos-x86_64.iso /mnt",
+					command: `${admin(d)} mount -o loop,ro ${d.isoFile} /mnt`,
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Write the new system into the inactive slot",
-					command:
-						"sudo recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz --initrd /mnt/boot/initramfs-installed.img",
+					command: `${admin(d)} ${commands.stage(d)}`,
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Boot the staged slot once, as a trial",
-					command: ["sudo umount /mnt", "sudo recab set-next B", "sudo reboot"],
+					command: [
+						`${admin(d)} umount /mnt`,
+						`${admin(d)} recab set-next B`,
+						`${admin(d)} reboot`,
+					],
 				},
 				{
 					type: "text",
-					content: rich`The hostname, accounts, enabled services, network connections and SSH host keys are carried into the new slot. If it starts cleanly, the trial service commits it; if not, the machine reboots into the previous slot by itself. ${code("recab status")} shows which slot runs and how the last trial ended, and ${code("sudo recab rollback")} returns to the previous slot later. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`The hostname, accounts, enabled services, network connections and SSH host keys are carried into the new slot. If it starts cleanly, the trial service commits it; if not, the machine reboots into the previous slot by itself. ${code("recab status")} shows which slot runs and how the last trial ended, and ${code(`${admin(d)} recab rollback`)} returns to the previous slot later. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
 		},
@@ -86,12 +102,12 @@ export const postInstallationContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						"Install a desktop environment or window manager (Sway, GNOME, KDE, etc.)",
+						`A ${DESKTOP_NAME[d.profile.desktop]} desktop edition of ${d.osName} is in development`,
 						"Set up development tools and editors",
-						rich`Review ${link("Troubleshooting", "/docs/troubleshooting")} if you encounter issues`,
+						rich`Review ${pageLink("troubleshooting")} if you encounter issues`,
 					],
 				},
 			],
 		},
 	],
-}
+}));

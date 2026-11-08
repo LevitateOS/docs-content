@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code } from "../../rich-text";
 
-export const helpersCommandsContent: DocsContent = {
+export default {
 	title: "Command Helpers",
 	intro: "Functions for running programs and shell commands inside the recipe's domain.",
 	sections: [
@@ -21,7 +21,11 @@ export const helpersCommandsContent: DocsContent = {
 						["exec(cmd, args[, options])", "Returns the status", "exit status (int)"],
 						["shell(cmd) / shell_in(dir, cmd)", "Throws", "()"],
 						["shell_output(cmd) / shell_output_in(dir, cmd)", "Throws", "stdout as a string"],
-						["shell_status(cmd) / shell_status_in(dir, cmd)", "Returns the status", "exit status, or -1 if it could not run"],
+						[
+							"shell_status(cmd) / shell_status_in(dir, cmd)",
+							"Returns the status",
+							"exit status, or -1 if it could not run",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -64,7 +68,8 @@ let files = exec_output("find", [ctx.src, "-name", "*.c"]);`,
 			content: [
 				{
 					type: "text",
-					content: "Run a program and return its exit status, for a recipe that handles failure itself.",
+					content:
+						"Run a program and return its exit status, for a recipe that handles failure itself.",
 				},
 				{
 					type: "code",
@@ -104,4 +109,4 @@ if shell_status_in(ctx.src, "test -f Makefile") != 0 {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

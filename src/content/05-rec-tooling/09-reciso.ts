@@ -1,15 +1,9 @@
-import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import type { DocsContent } from "../../types";
+import { rich, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recisoContent: DocsContent = {
+export default {
 	title: "reciso",
-	meta: {
-		product: "shared",
-		scopes: ["reference"],
-		audience: ["developer"],
-		stability: "experimental",
-	},
 	intro: "Create bootable UEFI ISOs from kernel, initramfs, and EROFS rootfs.",
 	sections: [
 		{
@@ -62,4 +56,4 @@ export const recisoContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

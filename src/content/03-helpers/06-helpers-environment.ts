@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code, link } from "../../rich-text";
 
-export const helpersEnvironmentContent: DocsContent = {
+export default {
 	title: "Environment Helpers",
 	intro: "Reading the worker's environment, finding programs, and logging.",
 	sections: [
@@ -54,4 +54,4 @@ print("plain line");                   // stderr as well`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

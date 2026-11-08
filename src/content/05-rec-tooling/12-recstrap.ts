@@ -1,16 +1,14 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import { bootArgs, commands, EXAMPLE_DISK, EXAMPLE_SETUP } from "../../install";
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recstrapContent: DocsContent = {
+const t = EXAMPLE_DISK.target;
+
+export default {
 	title: "recstrap",
-	meta: {
-		product: "shared",
-		scopes: ["install"],
-		audience: ["operator", "developer"],
-		stability: "stable",
-	},
-	intro: "Extract the base system (LevitateOS or AcornOS) to a target directory. Like pacstrap for Arch Linux.",
+	intro:
+		"Extract the base system (LevitateOS or AcornOS) to a target directory. Like pacstrap for Arch Linux.",
 	sections: [
 		{
 			title: "Overview",
@@ -148,21 +146,26 @@ export const recstrapContent: DocsContent = {
 				{
 					type: "code",
 					language: "bash",
-					content: `# Generate fstab
-recfstab /mnt >> /mnt/etc/fstab
-
-# Configure the system
-recsetup apply --root /mnt --timezone Europe/Amsterdam --locale en_US.UTF-8 --hostname myhostname
-
-# Set the root password (root is locked by default)
-recchroot /mnt -- passwd
-
-# Install systemd-boot and the A/B boot entries
-recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3 --machine-id
-
-# Unmount and reboot
-umount -R /mnt
-reboot`,
+					content: [
+						"# Generate fstab",
+						commands.fstab(t),
+						"",
+						"# Configure the system",
+						commands.configure(t, {
+							timezone: EXAMPLE_SETUP.timezone,
+							locale: EXAMPLE_SETUP.locale,
+						}),
+						"",
+						"# Set the root password (root is locked by default)",
+						commands.password(t),
+						"",
+						"# Install systemd-boot and the A/B boot entries",
+						commands.boot(t, bootArgs(EXAMPLE_DISK) as string),
+						"",
+						"# Unmount and reboot",
+						...commands.unmount(EXAMPLE_DISK),
+						commands.reboot(),
+					].join("\n"),
 				},
 			],
 		},
@@ -195,4 +198,4 @@ reboot`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

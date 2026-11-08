@@ -14,9 +14,9 @@ Structured documentation content library for LevitateOS. Single source of truth 
 
 ### Works
 
-- Structured content types (text, code, table, list, conversation, qa, command, interactive)
-- Shared between website and TUI
-- TypeScript type exports
+- Structured content types (text, code, table, list, interactive, command, qa, note); every renderer handles each
+- One install guide for every distro: distro pages are written once from the distro facts
+- The install procedure (`./install`), which the guide, the install TUIs and the website render
 
 ### Known Issues
 
@@ -43,26 +43,21 @@ bun add @levitate/docs-content
 ## Usage
 
 ```typescript
-import { installContent, levitateContent } from '@levitate/docs-content';
+import { docsFor, docsNav, sharedPages } from "@levitate/docs-content"
+import { installSteps, commands } from "@levitate/docs-content/install"
+
+const pages = docsFor("acorn") // every page AcornOS has, by slug
 ```
 
-## Content Types
+## Pages
 
-- `text` - Paragraphs and inline markdown
-- `code` - Syntax-highlighted code blocks
-- `table` - Data tables with headers
-- `list` - Bulleted and numbered lists
-- `conversation` - Command/response pairs
-- `qa` - Question and answer format
-- `command` - Terminal commands with descriptions
-- `interactive` - Step-by-step tutorials
-
-## Adding Content
-
-1. Create content file in `src/content/<NN-section>/<NN-page>.ts`
-2. Export a `DocsContent` object from that file
-3. For website dev, just run `docs/website` dev server (live discovery picks it up)
-4. For production builds or publishing docs-content generated data, run `bun run build`
+A page is `src/content/<NN-section>/<NN-page>.ts` with one default export: a `DocsContent`
+object (a page every distro shares), or `distroPage((d) => ...)` (a page written once and
+rendered for every distro from its facts, under the same slug and title). The file name is
+the slug. Per-distro wording goes through a fact (`src/pages.ts`, `src/distros.ts`), never
+through the distro's name. `bun run build` refuses a misnamed file, a missing or extra
+export, an unknown field or block type, a distro-dependent title and a duplicate slug, and
+writes `src/generated/index.ts` (not tracked: run it after checkout, and after editing a page).
 
 ## Development
 

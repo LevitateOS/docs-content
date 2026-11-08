@@ -1,15 +1,9 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recfstabContent: DocsContent = {
+export default {
 	title: "recfstab",
-	meta: {
-		product: "shared",
-		scopes: ["install"],
-		audience: ["operator", "developer"],
-		stability: "stable",
-	},
 	intro: "Generate fstab entries from mounted filesystems. Like genfstab for Arch Linux.",
 	sections: [
 		{
@@ -211,4 +205,4 @@ UUID=0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0	/var	ext4	relatime	0	2`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

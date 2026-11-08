@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, code, bold, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code, bold, link } from "../../rich-text";
 
-export const faqContent: DocsContent = {
+export default {
 	title: "Architecture FAQ",
 	intro:
 		"Design decisions and rationale behind LevitateOS components. Each answer explains why we chose a particular approach over alternatives.",
@@ -26,7 +26,11 @@ export const faqContent: DocsContent = {
 										["Target User", "Power users seeking control", "Same"],
 										["Philosophy", "Minimal base, user builds", "Same"],
 										["Package Manager", "pacman + AUR", "recipe (Rhai scripts)"],
-										["Binary Source", "Compiled from source", "Core extracted from signed Fedora RPMs"],
+										[
+											"Binary Source",
+											"Compiled from source",
+											"Core extracted from signed Fedora RPMs",
+										],
 										["Updates", "In place", "A/B slots, trial boot, rollback"],
 										["Build Time", "Hours (compiling)", "Minutes (extracting)"],
 									],
@@ -433,11 +437,17 @@ fn install(ctx) {
 										["build-preflight", "The build inputs and host prerequisites"],
 										["live-boot", "The ISO boots to the live system"],
 										["live-tools", "The install tools work in the live system"],
-										["install", "Partition, extract, configure and install the bootloader on a VM disk"],
+										[
+											"install",
+											"Partition, extract, configure and install the bootloader on a VM disk",
+										],
 										["installed-boot", "The installed disk boots"],
 										["automated-login", "Login on the installed system"],
 										["runtime", "The installed system's services and behavior at runtime"],
-										["ab-update", "Stage the release into slot B, then trial boot, fallback, commit and rollback"],
+										[
+											"ab-update",
+											"Stage the release into slot B, then trial boot, fallback, commit and rollback",
+										],
 									],
 									monospaceCol: 0,
 								},
@@ -528,7 +538,11 @@ fn install(ctx) {
 						["A/B slots", "Update in place", "Trial boot before commit, rollback"],
 						["EROFS", "Large initramfs", "RAM savings, scalability, single source"],
 						["Rhai recipes", "S-expressions/YAML", "Real programming, infinite extensibility"],
-						["Ginux build domains", "Build on the host", "Isolation, explicit inputs, no network by default"],
+						[
+							"Ginux build domains",
+							"Build on the host",
+							"Isolation, explicit inputs, no network by default",
+						],
 						["E2E scenarios", "Unit tests", "Catches integration issues"],
 						["Build-time module order", "Hand-ordered insmod", "No manual ordering, robust"],
 						["readelf", "ldd", "Cross-compilation safe"],
@@ -537,4 +551,4 @@ fn install(ctx) {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

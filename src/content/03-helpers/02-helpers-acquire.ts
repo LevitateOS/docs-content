@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code } from "../../rich-text";
 
-export const helpersAcquireContent: DocsContent = {
+export default {
 	title: "Acquire Helpers",
 	intro:
 		"Functions for downloading, checking out and verifying source materials. Every payload is pinned: downloads need a SHA256, Git checkouts a full commit id.",
@@ -86,7 +86,8 @@ export const helpersAcquireContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Check an existing file against an expected digest. Each throws if the digest is malformed or does not match.",
+					content:
+						"Check an existing file against an expected digest. Each throws if the digest is malformed or does not match.",
 				},
 				{
 					type: "code",
@@ -117,4 +118,4 @@ verify_blake3(archive, ctx.blake3);`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

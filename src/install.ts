@@ -9,6 +9,9 @@
  */
 import type { Distro } from "./distros";
 
+/** A distro's facts; the procedure follows facts, never the distro's id. */
+type Facts = Omit<Distro, "id">;
+
 /** The system image the install copies, on the live ISO (recinit's live rootfs). */
 export const LIVE_ROOTFS = "/run/live-rootfs.erofs";
 /** Exists only when the machine booted in UEFI mode. */
@@ -192,7 +195,7 @@ export const commands = {
 	 * images) loads binary keymaps with `loadkmap`, as recsetup does on those targets;
 	 * kbd's `loadkeys` elsewhere.
 	 */
-	liveKeymap: (d: Distro, map: string) =>
+	liveKeymap: (d: Facts, map: string) =>
 		d.profile.init === "openrc"
 			? `zcat /usr/share/bkeymaps/${map}/${map}.bmap.gz | loadkmap`
 			: `loadkeys ${map}`,
@@ -236,6 +239,17 @@ export const commands = {
 			.sort((a, b) => b.path.length - a.path.length)
 			.map((mount) => `umount ${shellQuote(mount.path)}`),
 	reboot: () => "reboot",
+	/**
+	 * Stages a release into the inactive slot, from its ISO mounted at `iso`: the system
+	 * image, the kernel and, where the installed system boots one, the initramfs.
+	 */
+	stage: (d: Facts, iso = "/mnt") =>
+		[
+			`recab stage --rootfs ${iso}/live/filesystem.erofs --kernel ${iso}/boot/vmlinuz`,
+			d.installedInitramfs && `--initrd ${iso}/boot/${d.installedInitramfs}`,
+		]
+			.filter(Boolean)
+			.join(" "),
 };
 
 /** A check the preflight step makes on the live system: `path` exists. */
@@ -299,7 +313,7 @@ export interface InstallContext {
 }
 
 /** Every install step, in order, for distro `d` given what the earlier steps recorded. */
-export function installSteps(d: Distro, ctx: InstallContext): InstallStep[] {
+export function installSteps(d: Facts, ctx: InstallContext): InstallStep[] {
 	const { disk } = ctx;
 	const target = disk?.target;
 	const noDisk = (what: string): StepRun => ({

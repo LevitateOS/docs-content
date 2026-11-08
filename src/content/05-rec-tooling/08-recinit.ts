@@ -1,15 +1,9 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recinitContent: DocsContent = {
+export default {
 	title: "recinit",
-	meta: {
-		product: "shared",
-		scopes: ["reference"],
-		audience: ["developer"],
-		stability: "experimental",
-	},
 	intro: "Rootless initramfs builder for the live ISO and installed systems.",
 	sections: [
 		{
@@ -23,8 +17,14 @@ export const recinitContent: DocsContent = {
 					type: "table",
 					headers: ["Command", "Purpose"],
 					rows: [
-						[rich`${code("build-tiny")}`, "Build the live ISO initramfs (busybox-based): find the boot medium, mount the EROFS rootfs and live overlay, switch_root"],
-						[rich`${code("build-install")}`, "Build an initramfs for booting an installed system from disk (systemd-based)"],
+						[
+							rich`${code("build-tiny")}`,
+							"Build the live ISO initramfs (busybox-based): find the boot medium, mount the EROFS rootfs and live overlay, switch_root",
+						],
+						[
+							rich`${code("build-install")}`,
+							"Build an initramfs for booting an installed system from disk (systemd-based)",
+						],
 						[rich`${code("modules")}`, "List module presets and the modules in each"],
 					],
 					monospaceCol: 0,
@@ -71,4 +71,4 @@ export const recinitContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

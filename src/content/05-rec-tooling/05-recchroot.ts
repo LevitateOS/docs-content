@@ -1,15 +1,9 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recchrootContent: DocsContent = {
+export default {
 	title: "recchroot",
-	meta: {
-		product: "shared",
-		scopes: ["install"],
-		audience: ["operator", "developer"],
-		stability: "stable",
-	},
 	intro: "Enter a chroot environment with proper bind mounts. Like arch-chroot for Arch Linux.",
 	sections: [
 		{
@@ -76,7 +70,11 @@ export const recchrootContent: DocsContent = {
 					type: "table",
 					headers: ["Source", "Target", "Purpose"],
 					rows: [
-						[rich`${code("/proc")}`, rich`${code("<chroot>/proc")}`, "Process information filesystem"],
+						[
+							rich`${code("/proc")}`,
+							rich`${code("<chroot>/proc")}`,
+							"Process information filesystem",
+						],
 						[
 							rich`${code("/sys")}`,
 							rich`${code("<chroot>/sys")}`,
@@ -178,4 +176,4 @@ export const recchrootContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

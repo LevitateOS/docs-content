@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code, link } from "../../rich-text";
 
-export const helpersHttpContent: DocsContent = {
+export default {
 	title: "HTTP Helpers",
 	intro:
 		"Bounded metadata requests: release versions, tags and small text documents. Payload downloads use the verified Acquire helpers.",
@@ -20,7 +20,8 @@ export const helpersHttpContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: "Fetch a URL and return the response body as text. The response size is bounded.",
+					content:
+						"Fetch a URL and return the response body as text. The response size is bounded.",
 				},
 				{
 					type: "code",
@@ -70,4 +71,4 @@ parse_version("version-3.1");   // "3.1"`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

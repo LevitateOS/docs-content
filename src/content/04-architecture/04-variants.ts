@@ -1,9 +1,8 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
 
-export const variantsContent: DocsContent = {
+export default {
 	title: "Variants",
-	meta: { product: "shared", scopes: ["architecture"], audience: ["developer"], stability: "stable" },
 	intro:
 		"LevitateOS is a shared build system with two OS variants. They share the recipe engine, the build pipeline and the install and update tools, but differ in their base, libc and init.",
 	sections: [
@@ -69,4 +68,4 @@ cargo xtask build live-tools acorn`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

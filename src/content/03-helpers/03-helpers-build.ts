@@ -1,9 +1,10 @@
-import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code, link } from "../../rich-text";
 
-export const helpersBuildContent: DocsContent = {
+export default {
 	title: "Build Helpers",
-	intro: "Functions for extracting archives and assembling root filesystem trees. For running compilers and build tools, see the Commands helpers.",
+	intro:
+		"Functions for extracting archives and assembling root filesystem trees. For running compilers and build tools, see the Commands helpers.",
 	sections: [
 		{
 			title: "extract",
@@ -58,11 +59,23 @@ extract(archive, ctx.runtime.paths.build);
 					type: "table",
 					headers: ["Helper", "Behavior"],
 					rows: [
-						["target_extract_rpm(rpm, root)", "Unpack an RPM into root, recording its ownership, modes and capabilities."],
+						[
+							"target_extract_rpm(rpm, root)",
+							"Unpack an RPM into root, recording its ownership, modes and capabilities.",
+						],
 						["target_extract_tar(archive, root)", "Unpack a tar archive into root the same way."],
-						["target_capture_apks(root, archives)", "Record the metadata of the packages apk installed under root, read from their pinned .apk archives."],
-						["target_mode(root, path, mode)", "Set the recorded mode of one path, such as 0o440 for a sudoers file."],
-						["target_finalize(root)", "Finish the manifest after the recipe's own changes: paths that no longer exist are dropped and files the recipe created are owned by root."],
+						[
+							"target_capture_apks(root, archives)",
+							"Record the metadata of the packages apk installed under root, read from their pinned .apk archives.",
+						],
+						[
+							"target_mode(root, path, mode)",
+							"Set the recorded mode of one path, such as 0o440 for a sudoers file.",
+						],
+						[
+							"target_finalize(root)",
+							"Finish the manifest after the recipe's own changes: paths that no longer exist are dropped and files the recipe created are owned by root.",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -100,4 +113,4 @@ target_finalize(rootfs);`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

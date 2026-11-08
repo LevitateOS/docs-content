@@ -1,14 +1,8 @@
-import type { DocsContent } from "../../types"
-import { rich, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code, link } from "../../rich-text";
 
-export const recipeFormatContent: DocsContent = {
+export default {
 	title: "Recipe Format",
-	meta: {
-		product: "shared",
-		scopes: ["reference"],
-		audience: ["developer"],
-		stability: "experimental",
-	},
 	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts executed inside a configured Ginux domain. They own package facts and custom acquire/build/install behavior. Every executable recipe declares ${code("const RECIPE_API = 2;")}.`,
 	sections: [
 		{
@@ -72,8 +66,14 @@ fn remove(ctx) {
 					headers: ["Field", "Purpose"],
 					rows: [
 						["RUNTIME / ctx.runtime", "Immutable invocation paths, target, operation and options."],
-						["ctx.name / ctx.version", "Package facts initialized from the current recipe on every run."],
-						["ctx.state", "The only restored namespace: resumable values paired with a filesystem checkpoint."],
+						[
+							"ctx.name / ctx.version",
+							"Package facts initialized from the current recipe on every run.",
+						],
+						[
+							"ctx.state",
+							"The only restored namespace: resumable values paired with a filesystem checkpoint.",
+						],
 						["ctx.outputs", "Named files/directories selected for validated publication."],
 					],
 					monospaceCol: 0,
@@ -82,11 +82,19 @@ fn remove(ctx) {
 					type: "table",
 					headers: ["Path", "Domain path", "Contents"],
 					rows: [
-						["runtime.paths.inputs", "/inputs", "Imported read-only inputs, one per --input NAME=PATH"],
+						[
+							"runtime.paths.inputs",
+							"/inputs",
+							"Imported read-only inputs, one per --input NAME=PATH",
+						],
 						["runtime.paths.build", "/work/build", "Owned build and acquisition work"],
 						["runtime.paths.tools", "/work/tools", "Shared dependency products"],
 						["runtime.paths.temp", "/work/tmp", "Owned scratch space"],
-						["runtime.paths.output / .target", "/out", "The selected output and installed-target tree"],
+						[
+							"runtime.paths.output / .target",
+							"/out",
+							"The selected output and installed-target tree",
+						],
 						["runtime.paths.recipe_dir", "(staged)", "The recipe's own directory"],
 					],
 					monospaceCol: 0,
@@ -107,7 +115,7 @@ fn remove(ctx) {
 				{
 					type: "list",
 					items: [
-						rich`Checks return ${code("ready(ctx)")} or ${code("needs_work(ctx, \"a concrete reason\")")}. A check that throws is an error, not a request for work. Check the real files, not a saved boolean.`,
+						rich`Checks return ${code("ready(ctx)")} or ${code('needs_work(ctx, "a concrete reason")')}. A check that throws is an error, not a request for work. Check the real files, not a saved boolean.`,
 						rich`${code("acquire(ctx)")}, ${code("build(ctx)")}, ${code("install(ctx)")} and ${code("remove(ctx)")} return the updated context. A missing check means work is needed; a missing required action fails.`,
 						rich`${code("cleanup(ctx, reason)")} is optional. Reasons are ${code("manual")} and ${code("auto.<phase>.<success|failure>")}.`,
 					],
@@ -173,4 +181,4 @@ let build_deps = ["compiler-tools"];`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

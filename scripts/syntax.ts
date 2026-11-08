@@ -1,147 +1,147 @@
-import { createHighlighter, createJavaScriptRegexEngine } from "shiki"
-import type { ContentBlock, DocsContent, DocsSyntaxLanguage } from "../src/types"
-import { INDUSTRIAL_PASTEL_1984_THEMES } from "../src/syntax-theme"
+import { createHighlighter, createJavaScriptRegexEngine } from "shiki";
+import type { ContentBlock, DocsContent, DocsSyntaxLanguage } from "../src/types";
+import { INDUSTRIAL_PASTEL_1984_THEMES } from "../src/syntax-theme";
 
-const SNAPSHOT_THEME = INDUSTRIAL_PASTEL_1984_THEMES.dark
-const SNAPSHOT_THEME_NAME = SNAPSHOT_THEME.name
-const SHIKI_LANGUAGES = ["bash", "rust", "toml"] as const
-const DOCS_SYNTAX_LANGUAGES = ["bash", "rust", "rhai", "toml", "text"] as const
+const SNAPSHOT_THEME = INDUSTRIAL_PASTEL_1984_THEMES.dark;
+const SNAPSHOT_THEME_NAME = SNAPSHOT_THEME.name;
+const SHIKI_LANGUAGES = ["bash", "rust", "toml"] as const;
+const DOCS_SYNTAX_LANGUAGES = ["bash", "rust", "rhai", "toml", "text"] as const;
 
 type SyntaxContext = {
-	filePath: string
-	slug: string
-	sectionIndex: number
-	sectionTitle: string
-	blockPath: string
-	blockType: string
-}
+	filePath: string;
+	slug: string;
+	sectionIndex: number;
+	sectionTitle: string;
+	blockPath: string;
+	blockType: string;
+};
 
 type SnapshotContext = {
-	filePath: string
-	slug: string
-}
+	filePath: string;
+	slug: string;
+};
 
 type ShikiToken = {
-	content?: unknown
-	color?: unknown
-}
+	content?: unknown;
+	color?: unknown;
+};
 
 type ShikiTokenResult = {
-	tokens?: unknown
-}
+	tokens?: unknown;
+};
 
-type SyntaxHighlighter = Awaited<ReturnType<typeof createHighlighter>>
+type SyntaxHighlighter = Awaited<ReturnType<typeof createHighlighter>>;
 
-let highlighterPromise: Promise<SyntaxHighlighter> | null = null
+let highlighterPromise: Promise<SyntaxHighlighter> | null = null;
 
 function syntaxError(context: SyntaxContext, message: string): never {
-	const location = `${context.filePath} :: ${context.blockPath} (${context.blockType})`
+	const location = `${context.filePath} :: ${context.blockPath} (${context.blockType})`;
 	throw new Error(
 		`Syntax snapshot failure for '${context.slug}': ${message}. Location: ${location}. Remediation: bun run build (docs/content).`,
-	)
+	);
 }
 
 function normalizeHexColor(value: unknown): string | null {
 	if (typeof value !== "string") {
-		return null
+		return null;
 	}
 
-	const candidate = value.trim().toLowerCase()
+	const candidate = value.trim().toLowerCase();
 	if (/^#[0-9a-f]{6}$/.test(candidate)) {
-		return candidate
+		return candidate;
 	}
 
 	if (/^#[0-9a-f]{3}$/.test(candidate)) {
-		const [, r, g, b] = candidate
-		return `#${r}${r}${g}${g}${b}${b}`
+		const [, r, g, b] = candidate;
+		return `#${r}${r}${g}${g}${b}${b}`;
 	}
 
 	if (/^#[0-9a-f]{8}$/.test(candidate)) {
-		return candidate.slice(0, 7)
+		return candidate.slice(0, 7);
 	}
 
-	return null
+	return null;
 }
 
 function escapeStyleText(value: string): string {
-	return value.replaceAll("{", "\\{").replaceAll("}", "\\}").replaceAll("[[", "\\[[")
+	return value.replaceAll("{", "\\{").replaceAll("}", "\\}").replaceAll("[[", "\\[[");
 }
 
 function isDocsSyntaxLanguage(value: string): value is DocsSyntaxLanguage {
-	return DOCS_SYNTAX_LANGUAGES.includes(value as DocsSyntaxLanguage)
+	return DOCS_SYNTAX_LANGUAGES.includes(value as DocsSyntaxLanguage);
 }
 
 function resolveLanguage(value: unknown, context: SyntaxContext): DocsSyntaxLanguage {
 	if (typeof value !== "string") {
-		syntaxError(context, "missing required language")
+		syntaxError(context, "missing required language");
 	}
 
-	const normalized = value.trim()
+	const normalized = value.trim();
 	if (!isDocsSyntaxLanguage(normalized)) {
 		syntaxError(
 			context,
 			`unsupported language '${normalized}' (supported: ${DOCS_SYNTAX_LANGUAGES.join(", ")})`,
-		)
+		);
 	}
 
-	return normalized
+	return normalized;
 }
 
 function shikiLanguageFor(language: DocsSyntaxLanguage): "bash" | "rust" | "toml" | "text" {
 	switch (language) {
 		case "bash":
-			return "bash"
+			return "bash";
 		case "rust":
-			return "rust"
+			return "rust";
 		case "rhai":
-			return "rust"
+			return "rust";
 		case "toml":
-			return "toml"
+			return "toml";
 		case "text":
-			return "text"
+			return "text";
 	}
 }
 
 function normalizeCommandSource(command: unknown, context: SyntaxContext): string {
 	if (typeof command === "string") {
-		return command
+		return command;
 	}
 
 	if (!Array.isArray(command)) {
-		syntaxError(context, "command payload must be string or string[]")
+		syntaxError(context, "command payload must be string or string[]");
 	}
 
-	const pieces = command.filter((entry): entry is string => typeof entry === "string")
+	const pieces = command.filter((entry): entry is string => typeof entry === "string");
 	if (pieces.length !== command.length) {
-		syntaxError(context, "command[] payload contains non-string entry")
+		syntaxError(context, "command[] payload contains non-string entry");
 	}
 
-	return pieces.join("\n")
+	return pieces.join("\n");
 }
 
 function normalizeTokenLines(result: ShikiTokenResult, context: SyntaxContext): string[] {
 	if (!Array.isArray(result.tokens)) {
-		syntaxError(context, "highlighter returned malformed token payload")
+		syntaxError(context, "highlighter returned malformed token payload");
 	}
 
 	return result.tokens.map((line, lineIndex) => {
 		if (!Array.isArray(line)) {
-			syntaxError(context, `token line ${lineIndex} is not an array`)
+			syntaxError(context, `token line ${lineIndex} is not an array`);
 		}
 
 		return line
 			.map((token) => {
-				const fragment = (token as ShikiToken).content
-				const text = typeof fragment === "string" ? fragment : ""
-				const escapedText = escapeStyleText(text)
-				const color = normalizeHexColor((token as ShikiToken).color)
+				const fragment = (token as ShikiToken).content;
+				const text = typeof fragment === "string" ? fragment : "";
+				const escapedText = escapeStyleText(text);
+				const color = normalizeHexColor((token as ShikiToken).color);
 				if (!color || escapedText.length === 0) {
-					return escapedText
+					return escapedText;
 				}
-				return `[[fg=${color}]]${escapedText}[[/]]`
+				return `[[fg=${color}]]${escapedText}[[/]]`;
 			})
-			.join("")
-	})
+			.join("");
+	});
 }
 
 async function getHighlighter(): Promise<SyntaxHighlighter> {
@@ -150,10 +150,10 @@ async function getHighlighter(): Promise<SyntaxHighlighter> {
 			themes: [SNAPSHOT_THEME],
 			langs: [...SHIKI_LANGUAGES],
 			engine: createJavaScriptRegexEngine(),
-		})
+		});
 	}
 
-	return highlighterPromise
+	return highlighterPromise;
 }
 
 function highlightSource(
@@ -163,19 +163,19 @@ function highlightSource(
 	highlighter: SyntaxHighlighter,
 ): string[] {
 	if (source.length === 0) {
-		return [""]
+		return [""];
 	}
 
 	if (language === "text") {
-		return source.split("\n").map(escapeStyleText)
+		return source.split("\n").map(escapeStyleText);
 	}
 
 	const tokens = highlighter.codeToTokens(source, {
 		lang: shikiLanguageFor(language),
 		theme: SNAPSHOT_THEME_NAME,
-	}) as ShikiTokenResult
+	}) as ShikiTokenResult;
 
-	return normalizeTokenLines(tokens, context)
+	return normalizeTokenLines(tokens, context);
 }
 
 function snapshotBlock(
@@ -185,22 +185,22 @@ function snapshotBlock(
 ): ContentBlock {
 	switch (block.type) {
 		case "code": {
-			const language = resolveLanguage(block.language, context)
-			const codeContent = typeof block.content === "string" ? block.content : ""
+			const language = resolveLanguage(block.language, context);
+			const codeContent = typeof block.content === "string" ? block.content : "";
 			return {
 				...block,
 				language,
 				highlightedLines: highlightSource(codeContent, language, context, highlighter),
-			}
+			};
 		}
 		case "command": {
-			const language = resolveLanguage(block.language, context)
-			const commandSource = normalizeCommandSource(block.command, context)
+			const language = resolveLanguage(block.language, context);
+			const commandSource = normalizeCommandSource(block.command, context);
 			return {
 				...block,
 				language,
 				highlightedCommandLines: highlightSource(commandSource, language, context, highlighter),
-			}
+			};
 		}
 		case "qa":
 			return {
@@ -219,9 +219,9 @@ function snapshotBlock(
 						),
 					),
 				})),
-			}
+			};
 		default:
-			return block
+			return block;
 	}
 }
 
@@ -229,7 +229,7 @@ export async function snapshotDocsContent(
 	content: DocsContent,
 	context: SnapshotContext,
 ): Promise<DocsContent> {
-	const highlighter = await getHighlighter()
+	const highlighter = await getHighlighter();
 
 	return {
 		...content,
@@ -250,5 +250,5 @@ export async function snapshotDocsContent(
 				),
 			),
 		})),
-	}
+	};
 }

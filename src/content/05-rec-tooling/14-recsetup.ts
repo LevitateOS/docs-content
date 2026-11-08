@@ -1,15 +1,9 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recsetupContent: DocsContent = {
+export default {
 	title: "recsetup",
-	meta: {
-		product: "shared",
-		scopes: ["install"],
-		audience: ["operator", "developer"],
-		stability: "experimental",
-	},
 	intro:
 		"Configure and boot an extracted system: time zone, locale, keymap, hostname, accounts, systemd-boot, boot entries, machine id and services. It plans first, shows every command, then applies them.",
 	sections: [
@@ -83,7 +77,8 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 					type: "command",
 					language: "bash",
 					description: "Mutable layout: one boot entry for the root partition",
-					command: "recsetup apply --root /mnt --boot mutable --root-device /dev/nvme0n1p2 --machine-id",
+					command:
+						"recsetup apply --root /mnt --boot mutable --root-device /dev/nvme0n1p2 --machine-id",
 				},
 			],
 		},
@@ -251,4 +246,4 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 			],
 		},
 	],
-}
+} satisfies DocsContent;

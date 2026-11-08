@@ -1,14 +1,8 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
 
-export const recToolingOverviewContent: DocsContent = {
+export default {
 	title: "rec* Tooling Overview",
-	meta: {
-		product: "shared",
-		scopes: ["reference"],
-		audience: ["operator", "developer"],
-		stability: "experimental",
-	},
 	intro: "Inventory of the rec* tools: what each one does and where it runs.",
 	sections: [
 		{
@@ -31,17 +25,67 @@ export const recToolingOverviewContent: DocsContent = {
 					type: "table",
 					headers: ["Tool", "Surface", "Primary Use", "Runs On"],
 					rows: [
-						[rich`${link("recab", "/docs/recab")}`, "CLI", "A/B slot state machine", "Installed system"],
-						[rich`${link("recchroot", "/docs/recchroot")}`, "CLI", "Chroot with bind mounts", "Live ISO"],
-						[rich`${link("recfstab", "/docs/recfstab")}`, "CLI", "Generate fstab entries", "Live ISO"],
-						[rich`${link("recinit", "/docs/recinit")}`, "CLI + library", "Initramfs builder", "Build host"],
-						[rich`${link("reciso", "/docs/reciso")}`, "CLI + library", "UEFI ISO builder", "Build host"],
-						[rich`${link("recpart", "/docs/recpart")}`, "CLI + backend", "Disk inspect/plan/apply backend", "Live ISO"],
-						[rich`${link("recqemu", "/docs/recqemu")}`, "Library", "Scenario VMs as libvirt domains, serial console", "Build host"],
-						[rich`${link("recsetup", "/docs/recsetup")}`, "CLI + backend", "Configure and boot the installed system", "Live ISO"],
+						[
+							rich`${link("recab", "/docs/recab")}`,
+							"CLI",
+							"A/B slot state machine",
+							"Installed system",
+						],
+						[
+							rich`${link("recchroot", "/docs/recchroot")}`,
+							"CLI",
+							"Chroot with bind mounts",
+							"Live ISO",
+						],
+						[
+							rich`${link("recfstab", "/docs/recfstab")}`,
+							"CLI",
+							"Generate fstab entries",
+							"Live ISO",
+						],
+						[
+							rich`${link("recinit", "/docs/recinit")}`,
+							"CLI + library",
+							"Initramfs builder",
+							"Build host",
+						],
+						[
+							rich`${link("reciso", "/docs/reciso")}`,
+							"CLI + library",
+							"UEFI ISO builder",
+							"Build host",
+						],
+						[
+							rich`${link("recpart", "/docs/recpart")}`,
+							"CLI + backend",
+							"Disk inspect/plan/apply backend",
+							"Live ISO",
+						],
+						[
+							rich`${link("recqemu", "/docs/recqemu")}`,
+							"Library",
+							"Scenario VMs as libvirt domains, serial console",
+							"Build host",
+						],
+						[
+							rich`${link("recsetup", "/docs/recsetup")}`,
+							"CLI + backend",
+							"Configure and boot the installed system",
+							"Live ISO",
+						],
 						["recshuttle", "Library", "SSH transport to scenario VMs", "Build host"],
-						[rich`${link("recstrap", "/docs/recstrap")}`, "CLI", "Extract the system image", "Live ISO and installed system (used by recab stage)"],
-						[rich`${link("recuki", "/docs/recuki")}`, "CLI + library", "Unified Kernel Image builder", "Build host"],
+						[
+							rich`${link("recstrap", "/docs/recstrap")}`,
+							"CLI",
+							"Extract the system image",
+							"Live ISO and installed system (used by recab stage)",
+						],
+						[
+							rich`${link("recuki", "/docs/recuki")}`,
+							"CLI + library",
+							"Unified Kernel Image builder",
+							"Build host",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -75,4 +119,4 @@ export const recToolingOverviewContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

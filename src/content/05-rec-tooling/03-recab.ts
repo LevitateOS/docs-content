@@ -1,16 +1,11 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recabContent: DocsContent = {
+export default {
 	title: "recab",
-	meta: {
-		product: "shared",
-		scopes: ["reference"],
-		audience: ["operator", "developer"],
-		stability: "experimental",
-	},
-	intro: "A/B slot management: which slot runs, which boots next, commit and rollback (systemd-boot backend).",
+	intro:
+		"A/B slot management: which slot runs, which boots next, commit and rollback (systemd-boot backend).",
 	sections: [
 		{
 			title: "How It Works",
@@ -78,4 +73,4 @@ recab rollback        # later, if wanted: back to A, while A still holds its sys
 			],
 		},
 	],
-}
+} satisfies DocsContent;

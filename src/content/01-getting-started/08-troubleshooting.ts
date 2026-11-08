@@ -1,11 +1,40 @@
-import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import { distroPage } from "../../types";
+import { rich, code } from "../../rich-text";
+import { bootArgs, commands, EXAMPLE_DISK, UEFI_VARS } from "../../install";
+import { network, PAGE_TITLES, services } from "../../pages";
 
-export const troubleshootingContent: DocsContent = {
-	title: "Troubleshooting",
-	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
-	intro: "Common issues and solutions for LevitateOS installation and usage.",
+const disk = EXAMPLE_DISK.disk;
+const target = EXAMPLE_DISK.target;
+
+export default distroPage((d) => ({
+	title: PAGE_TITLES.troubleshooting,
+	intro: `Common issues and solutions for ${d.osName} installation and usage.`,
 	sections: [
+		{
+			title: "Install Issues",
+			content: [
+				{
+					type: "qa",
+					items: [
+						{
+							question: "recpart refuses the disk",
+							answer: [
+								{
+									type: "text",
+									content: rich`It prints the check that failed, an error code and what to do. ${code("--dry-run")} runs the same checks without changing anything.`,
+								},
+								{
+									type: "command",
+									language: "bash",
+									description: "Show the steps and anything apply would refuse",
+									command: commands.partition(disk, true),
+								},
+							],
+						},
+					],
+				},
+			],
+		},
 		{
 			title: "Boot Issues",
 			content: [
@@ -23,28 +52,24 @@ export const troubleshootingContent: DocsContent = {
 									type: "command",
 									language: "bash",
 									description: "Mount slot A, the EFI partition and the state partition",
-									command: [
-										"mount /dev/nvme0n1p2 /mnt",
-										"mount /dev/nvme0n1p1 /mnt/boot",
-										"mount /dev/nvme0n1p4 /mnt/var",
-									],
+									command: EXAMPLE_DISK.mounts.map((m) => `mount ${m.device} ${m.path}`),
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Check that both slot entries and slot A's kernel are on the EFI partition",
-									command: ["ls /mnt/boot/loader/entries", "ls /mnt/boot/levitateos-a"],
+									description:
+										"Check that both slot entries and slot A's kernel are on the EFI partition",
+									command: [`ls ${target}/boot/loader/entries`, `ls ${target}/boot/${d.osId}-a`],
 								},
 								{
 									type: "text",
-									content: rich`You should see ${code("levitateos-a.conf")} and ${code("levitateos-b.conf")}, and ${code("vmlinuz")} and ${code("initramfs.img")} for slot A. Each entry's ${code("options")} line names its slot by ${code("root=PARTUUID=")}; compare it with ${code("blkid -s PARTUUID /dev/nvme0n1p2")}.`,
+									content: rich`You should see ${code(`${d.osId}-a.conf`)} and ${code(`${d.osId}-b.conf`)}, and ${code("vmlinuz")}${d.installedInitramfs ? " and " : " (no initramfs)"}${d.installedInitramfs ? code("initramfs.img") : ""} for slot A. Each entry's ${code("options")} line names its slot by ${code("root=PARTUUID=")}; compare it with ${code(`blkid -s PARTUUID ${EXAMPLE_DISK.slot_a}`)}.`,
 								},
 								{
 									type: "command",
 									language: "bash",
 									description: "Reinstall systemd-boot and the A/B boot layout",
-									command:
-										"recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3",
+									command: commands.boot(target, bootArgs(EXAMPLE_DISK) as string),
 								},
 							],
 						},
@@ -59,7 +84,7 @@ export const troubleshootingContent: DocsContent = {
 									type: "command",
 									language: "bash",
 									description: "Check if EFI variables are accessible",
-									command: "ls /sys/firmware/efi/efivars",
+									command: `ls ${UEFI_VARS}`,
 								},
 								{
 									type: "command",
@@ -100,20 +125,20 @@ export const troubleshootingContent: DocsContent = {
 								{
 									type: "command",
 									language: "bash",
-									description: "Check NetworkManager status",
-									command: "systemctl status NetworkManager",
+									description: "Check the interfaces and their addresses",
+									command: "ip addr",
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Start if not running",
-									command: "sudo systemctl enable --now NetworkManager",
+									description: `Check that ${network(d).daemon} runs`,
+									command: services(d).status(network(d).daemon),
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Connect to WiFi",
-									command: 'nmcli device wifi connect "YourNetwork" password "YourPassword"',
+									description: "Start it now and at every boot",
+									command: services(d).enable(network(d).daemon),
 								},
 							],
 						},
@@ -121,26 +146,12 @@ export const troubleshootingContent: DocsContent = {
 							question: "WiFi adapter not detected",
 							answer: [
 								{
-									type: "text",
-									content: "Check if the wireless driver is loaded:",
-								},
-								{
 									type: "command",
 									language: "bash",
-									description: "List network interfaces",
-									command: "ip link",
+									description: "List wireless devices",
+									command: network(d).listWifi,
 								},
-								{
-									type: "command",
-									language: "bash",
-									description: "Check for wireless devices",
-									command: "nmcli device",
-								},
-								{
-									type: "text",
-									content:
-										"If no wireless device appears, you may need to install additional firmware packages.",
-								},
+								{ type: "text", content: network(d).firmware },
 							],
 						},
 					],
@@ -187,4 +198,4 @@ export const troubleshootingContent: DocsContent = {
 			],
 		},
 	],
-}
+}));

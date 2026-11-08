@@ -1,4 +1,4 @@
-import type { ThemeRegistration } from "shiki"
+import type { ThemeRegistration } from "shiki";
 
 export const INDUSTRIAL_PASTEL_1984_THEMES = {
 	light: {
@@ -10,11 +10,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 		},
 		tokenColors: [
 			{
-				scope: [
-					"comment",
-					"punctuation.definition.comment",
-					"comment.block.documentation",
-				],
+				scope: ["comment", "punctuation.definition.comment", "comment.block.documentation"],
 				settings: { foreground: "#7b808d", fontStyle: "italic" },
 			},
 			{
@@ -30,12 +26,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 				settings: { foreground: "#7c658f" },
 			},
 			{
-				scope: [
-					"string",
-					"string.quoted",
-					"string.template",
-					"string.regexp",
-				],
+				scope: ["string", "string.quoted", "string.template", "string.regexp"],
 				settings: { foreground: "#4d7c72" },
 			},
 			{
@@ -84,11 +75,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 				settings: { foreground: "#394b58" },
 			},
 			{
-				scope: [
-					"punctuation",
-					"meta.brace",
-					"meta.delimiter",
-				],
+				scope: ["punctuation", "meta.brace", "meta.delimiter"],
 				settings: { foreground: "#6f7482" },
 			},
 			{
@@ -106,11 +93,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 		},
 		tokenColors: [
 			{
-				scope: [
-					"comment",
-					"punctuation.definition.comment",
-					"comment.block.documentation",
-				],
+				scope: ["comment", "punctuation.definition.comment", "comment.block.documentation"],
 				settings: { foreground: "#9aa5ba", fontStyle: "italic" },
 			},
 			{
@@ -126,12 +109,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 				settings: { foreground: "#c5a8d9" },
 			},
 			{
-				scope: [
-					"string",
-					"string.quoted",
-					"string.template",
-					"string.regexp",
-				],
+				scope: ["string", "string.quoted", "string.template", "string.regexp"],
 				settings: { foreground: "#98c5b4" },
 			},
 			{
@@ -180,11 +158,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 				settings: { foreground: "#ece2d1" },
 			},
 			{
-				scope: [
-					"punctuation",
-					"meta.brace",
-					"meta.delimiter",
-				],
+				scope: ["punctuation", "meta.brace", "meta.delimiter"],
 				settings: { foreground: "#b3bdd2" },
 			},
 			{
@@ -193,4 +167,4 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 			},
 		],
 	},
-} satisfies Record<"light" | "dark", ThemeRegistration>
+} satisfies Record<"light" | "dark", ThemeRegistration>;

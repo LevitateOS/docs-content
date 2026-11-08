@@ -1,9 +1,8 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
 
-export const atomicUpdatesContent: DocsContent = {
+export default {
 	title: "Atomic Updates (A/B)",
-	meta: { product: "shared", scopes: ["architecture"], audience: ["developer"], stability: "stable" },
 	intro:
 		"LevitateOS and AcornOS default to an A/B system layout: write the next system into the inactive slot, trial-boot it, then commit. Roll back by booting the previous slot.",
 	sections: [
@@ -66,4 +65,4 @@ export const atomicUpdatesContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

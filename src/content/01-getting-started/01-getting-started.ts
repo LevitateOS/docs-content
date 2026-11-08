@@ -1,10 +1,10 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
+import { distroPage } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { HARDWARE, PAGE_TITLES, pageLink } from "../../pages";
 
-export const gettingStartedContent: DocsContent = {
-	title: "Getting Started",
-	meta: { product: "levitate", scopes: ["install"], audience: ["beginner"], stability: "stable" },
-	intro: "Download the LevitateOS live ISO and create bootable installation media.",
+export default distroPage((d) => ({
+	title: PAGE_TITLES["getting-started"],
+	intro: `Download the ${d.osName} live ISO and create bootable installation media.`,
 	sections: [
 		{
 			title: "Requirements",
@@ -12,10 +12,10 @@ export const gettingStartedContent: DocsContent = {
 				{
 					type: "list",
 					items: [
-						rich`${bold("CPU:")} x86-64-v3 (Intel Haswell or newer, AMD Zen or newer)`,
-						rich`${bold("RAM:")} 16 GB`,
-						rich`${bold("Storage:")} an NVMe disk. The default A/B layout uses 1 GB for EFI and 20 GB for each system slot, and gives the rest to ${code("/var")}`,
-						rich`${bold("Boot:")} UEFI. LevitateOS's boot files are unsigned, so Secure Boot must be disabled`,
+						rich`${bold("CPU:")} ${HARDWARE.cpu}`,
+						rich`${bold("RAM:")} ${HARDWARE.ram}`,
+						rich`${bold("Storage:")} ${HARDWARE.disk}. The default A/B layout uses 1 GB for EFI and 20 GB for each system slot, and gives the rest to ${code("/var")}`,
+						rich`${bold("Boot:")} UEFI. ${d.osName}'s boot files are unsigned, so Secure Boot must be disabled`,
 					],
 				},
 				{
@@ -30,15 +30,15 @@ export const gettingStartedContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`Download the variant you want from ${link("Download", "/download")}. LevitateOS and AcornOS each ship as an x86_64 live ISO that boots into the install environment.`,
+					content: rich`Download ${d.osName} from ${link("Download", "/download")}. It ships as an x86_64 live ISO that boots into the install environment.`,
 				},
-				{ type: "text", content: "Example: download the LevitateOS ISO and verify its checksum:" },
+				{ type: "text", content: `Example: download the ${d.osName} ISO and verify its checksum:` },
 				{
 					type: "code",
 					language: "bash",
-					content: `curl -LO https://releases.levitateos.org/latest/levitateos-x86_64.iso
-curl -LO https://releases.levitateos.org/latest/levitateos-x86_64.iso.sha512
-sha512sum -c levitateos-x86_64.iso.sha512`,
+					content: `curl -LO https://releases.levitateos.org/latest/${d.isoFile}
+curl -LO https://releases.levitateos.org/latest/${d.isoFile}.sha512
+sha512sum -c ${d.isoFile}.sha512`,
 				},
 			],
 		},
@@ -58,7 +58,7 @@ lsblk  # Linux
 diskutil list  # macOS
 
 # Write the ISO (CAUTION: this erases the drive)
-sudo dd if=levitateos-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
+sudo dd if=${d.isoFile} of=/dev/sdX bs=4M status=progress oflag=sync`,
 				},
 			],
 		},
@@ -79,19 +79,19 @@ sudo dd if=levitateos-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync`,
 				{
 					type: "code",
 					language: "bash",
-					content: `# Create a 64GB virtual disk
-qemu-img create -f qcow2 disk.qcow2 64G
+					content: `# Create a ${HARDWARE.disk} virtual disk
+qemu-img create -f qcow2 disk.qcow2 ${HARDWARE.disk.replace(" GB", "G")}
 
 # Boot the installer (the OVMF firmware path varies by distribution)
 qemu-system-x86_64 \\
-  -m 16G \\
-  -smp 4 \\
+  -m ${HARDWARE.qemuRam} \\
+  -smp 2 \\
   -enable-kvm \\
   -cpu host \\
   -bios /usr/share/ovmf/OVMF.fd \\
-  -cdrom levitateos-x86_64.iso \\
+  -cdrom ${d.isoFile} \\
   -drive file=disk.qcow2,format=qcow2,if=none,id=disk0 \\
-  -device nvme,drive=disk0,serial=levitate \\
+  -device nvme,drive=disk0,serial=disk0 \\
   -boot d`,
 				},
 			],
@@ -101,9 +101,9 @@ qemu-system-x86_64 \\
 			content: [
 				{
 					type: "text",
-					content: rich`Boot from the ISO to enter the live environment, then follow the ${link("Installation Guide", "/docs/installation")} to install LevitateOS.`,
+					content: rich`Boot from the ISO to enter the live environment, then follow the ${pageLink("installation")} guide to install ${d.osName}.`,
 				},
 			],
 		},
 	],
-}
+}));

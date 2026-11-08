@@ -10,51 +10,51 @@
 
 // Inline node types
 export interface InlineLink {
-	type: "link"
-	text: string
-	href: string
+	type: "link";
+	text: string;
+	href: string;
 }
 
 export interface InlineBold {
-	type: "bold"
-	text: string
+	type: "bold";
+	text: string;
 }
 
 export interface InlineCode {
-	type: "code"
-	text: string
+	type: "code";
+	text: string;
 }
 
 export interface InlineItalic {
-	type: "italic"
-	text: string
+	type: "italic";
+	text: string;
 }
 
-export type InlineNode = string | InlineLink | InlineBold | InlineCode | InlineItalic
+export type InlineNode = string | InlineLink | InlineBold | InlineCode | InlineItalic;
 
-export type RichText = InlineNode[]
+export type RichText = InlineNode[];
 
 // Helper functions for creating inline nodes
 export const link = (text: string, href: string): InlineLink => ({
 	type: "link",
 	text,
 	href,
-})
+});
 
 export const bold = (text: string): InlineBold => ({
 	type: "bold",
 	text,
-})
+});
 
 export const code = (text: string): InlineCode => ({
 	type: "code",
 	text,
-})
+});
 
 export const italic = (text: string): InlineItalic => ({
 	type: "italic",
 	text,
-})
+});
 
 /**
  * Tagged template literal for rich text.
@@ -65,29 +65,22 @@ export const italic = (text: string): InlineItalic => ({
  * // Returns: ["Hello ", { type: "bold", text: "world" }, "!"]
  */
 export function rich(strings: TemplateStringsArray, ...values: InlineNode[]): RichText {
-	const result: RichText = []
+	const result: RichText = [];
 
 	strings.forEach((str, i) => {
 		if (str) {
-			result.push(str)
+			result.push(str);
 		}
 		if (i < values.length) {
-			result.push(values[i])
+			result.push(values[i]);
 		}
-	})
+	});
 
-	return result
+	return result;
 }
 
-// Type guard helpers
-export const isInlineLink = (node: InlineNode): node is InlineLink =>
-	typeof node !== "string" && node.type === "link"
-
-export const isInlineBold = (node: InlineNode): node is InlineBold =>
-	typeof node !== "string" && node.type === "bold"
-
-export const isInlineCode = (node: InlineNode): node is InlineCode =>
-	typeof node !== "string" && node.type === "code"
-
-export const isInlineItalic = (node: InlineNode): node is InlineItalic =>
-	typeof node !== "string" && node.type === "italic"
+/** The text of `content` without its formatting: every inline kind's text, in order. */
+export function plainText(content: string | RichText): string {
+	if (typeof content === "string") return content;
+	return content.map((node) => (typeof node === "string" ? node : node.text)).join("");
+}

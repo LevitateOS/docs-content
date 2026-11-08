@@ -1,9 +1,10 @@
-import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code } from "../../rich-text";
 
-export const helpersFilesystemContent: DocsContent = {
+export default {
 	title: "Filesystem Helpers",
-	intro: "File and directory operations: path checks, directories, links, permissions, file contents and globs. Paths are in the domain's filesystem.",
+	intro:
+		"File and directory operations: path checks, directories, links, permissions, file contents and globs. Paths are in the domain's filesystem.",
 	sections: [
 		{
 			title: "exists / is_file / is_dir",
@@ -71,7 +72,10 @@ chmod(join_path(bin, "myapp"), 0o755);`,
 						["read_file_or_empty(path)", "Contents, or an empty string if the file can't be read."],
 						["write_file(path, content)", "Replace the file's contents."],
 						["append_file(path, content)", "Append to the file."],
-						["append_line_if_missing(path, line)", "Append the exact line once; returns true if it was added."],
+						[
+							"append_line_if_missing(path, line)",
+							"Append the exact line once; returns true if it was added.",
+						],
 						["replace_in_file(path, from, to)", "Replace every occurrence of from in the file."],
 					],
 					monospaceCol: 0,
@@ -101,4 +105,4 @@ append_line_if_missing(join_path(ctx.runtime.paths.output, "etc/shells"), "/bin/
 			],
 		},
 	],
-}
+} satisfies DocsContent;

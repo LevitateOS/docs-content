@@ -1,15 +1,9 @@
-import type { DocsContent } from "../../types"
-import { rich, bold, code, link } from "../../rich-text"
-import { TOOL_HELP } from "../../tool-help"
+import type { DocsContent } from "../../types";
+import { rich, bold, code, link } from "../../rich-text";
+import { TOOL_HELP } from "../../tool-help";
 
-export const recukiContent: DocsContent = {
+export default {
 	title: "recuki",
-	meta: {
-		product: "shared",
-		scopes: ["reference"],
-		audience: ["developer"],
-		stability: "experimental",
-	},
 	intro: "Build Unified Kernel Images (UKIs) from kernel + initramfs + cmdline.",
 	sections: [
 		{
@@ -60,4 +54,4 @@ export const recukiContent: DocsContent = {
 			],
 		},
 	],
-}
+} satisfies DocsContent;

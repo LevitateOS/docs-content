@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code } from "../../rich-text";
 
-export const helpersPathsContent: DocsContent = {
+export default {
 	title: "Path Helpers",
 	intro:
 		"Pure functions for building paths and working with strings. They have no effects and never touch the filesystem.",
@@ -91,4 +91,4 @@ let parts = split(ctx.version, ".");`,
 			],
 		},
 	],
-}
+} satisfies DocsContent;

@@ -1,413 +1,242 @@
 /**
- * Build script for docs-content
- *
- * Generates src/generated/index.ts with pre-computed navigation and content.
- * This removes the dependency on Vite's import.meta.glob, making the package
- * work in any runtime (Bun, Node, etc).
+ * The docs build: the one page discovery. It loads every page under src/content,
+ * renders each distro page for every distro, and writes src/generated/index.ts with the
+ * navigation, the pages and their slugs as types. It refuses anything it cannot place:
+ * a file outside `NN-section/NN-page.ts`, a file without exactly one (default) export, a
+ * page of the wrong shape, a distro page whose title depends on the distro, and a slug
+ * used twice.
  *
  * Run:
- *   bun scripts/build.ts
- *   bun scripts/build.ts --validate-only
+ *   bun scripts/build.ts                       # write src/generated/index.ts
+ *   bun scripts/build.ts --check-generated     # fail if it is not current
  */
 
-import { readdir, readFile, mkdir, writeFile } from "node:fs/promises"
-import { join } from "node:path"
-import type {
-	DocsAudience,
-	DocsContent,
-	DocsPageMeta,
-	DocsProduct,
-	DocsScope,
-	DocsStability,
-	NavSection,
-} from "../src/types"
-import { DISTROS } from "../src/distros"
-import { snapshotDocsContent } from "./syntax"
+import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import type { ContentBlock, DocsContent, NavSection, PageSource } from "../src/types";
+import { DISTROS, type DistroId } from "../src/distros";
+import { snapshotDocsContent } from "./syntax";
 
-const SRC_DIR = join(import.meta.dir, "../src")
-const CONTENT_DIR = join(SRC_DIR, "content")
-const GENERATED_DIR = join(SRC_DIR, "generated")
+const SRC_DIR = join(import.meta.dir, "../src");
+const CONTENT_DIR = join(SRC_DIR, "content");
+const OUTPUT = join(SRC_DIR, "generated", "index.ts");
+const NAME = /^(\d+)-([a-z0-9][a-z0-9-]*)$/;
+const BLOCK_TYPES: readonly ContentBlock["type"][] = [
+	"text",
+	"code",
+	"table",
+	"list",
+	"interactive",
+	"command",
+	"qa",
+	"note",
+];
+const PAGE_KEYS = new Set(["title", "intro", "sections"]);
 
-interface ContentEntry {
-	filePath: string
-	sectionOrder: number
-	sectionName: string
-	pageOrder: number
-	pageName: string
-	slug: string
-	meta: DocsPageMeta
-	content: DocsContent
+interface Entry {
+	file: string;
+	sectionOrder: number;
+	sectionTitle: string;
+	pageOrder: number;
+	/** The page file's name, which is its slug in every section. */
+	slug: string;
+	/** Shared pages: one content; distro pages: one per distro. */
+	content: DocsContent | Record<DistroId, DocsContent>;
 }
 
-type BuildOptions = {
-	validateOnly?: boolean
-	checkGenerated?: boolean
+const failures: string[] = [];
+function fail(file: string, message: string): void {
+	failures.push(`${file}: ${message}`);
 }
 
-async function assertGeneratedOutput(outputPath: string, expectedOutput: string): Promise<void> {
-	let currentOutput: string
-	try {
-		currentOutput = await readFile(outputPath, "utf8")
-	} catch (err) {
-		if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-			throw new Error(
-				`Generated docs contract file is missing at '${outputPath}'. Remediation: bun run build (docs/content).`,
-			)
-		}
-		throw err
-	}
-
-	if (currentOutput !== expectedOutput) {
-		throw new Error(
-			`Generated docs contract file is stale at '${outputPath}'. Remediation: bun run build (docs/content) and commit updated src/generated/index.ts.`,
-		)
-	}
-}
-
-async function discoverContentFiles(): Promise<string[]> {
-	const files: string[] = []
-	const sections = await readdir(CONTENT_DIR)
-
-	for (const section of sections) {
-		if (!section.match(/^\d+-/)) continue
-		const sectionPath = join(CONTENT_DIR, section)
-		const pages = await readdir(sectionPath)
-
-		for (const page of pages) {
-			if (!page.endsWith(".ts")) continue
-			files.push(join(sectionPath, page))
-		}
-	}
-
-	return files
-}
-
-function parseContentPath(
-	filePath: string,
-): { sectionOrder: number; sectionName: string; pageOrder: number; pageName: string } | null {
-	// Path format: .../content/01-getting-started/02-installation.ts
-	const match = filePath.match(/\/(\d+)-([^/]+)\/(\d+)-([^.]+)\.ts$/)
-	if (!match) return null
-
-	const [, sectionOrderStr, sectionName, pageOrderStr, pageName] = match
-	return {
-		sectionOrder: parseInt(sectionOrderStr, 10),
-		sectionName,
-		pageOrder: parseInt(pageOrderStr, 10),
-		pageName,
-	}
-}
-
-function generateSlug(sectionName: string, pageName: string): string {
-	// helpers section files get "helpers-" prefix, others use filename directly
-	return sectionName === "helpers" ? `helpers-${pageName}` : pageName
-}
-
-function toTitleCase(str: string): string {
-	return str
+function titleCase(name: string): string {
+	return name
 		.split("-")
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-		.join(" ")
+		.join(" ");
 }
 
-function getNavSection(sectionName: string): { key: string; title: string } {
-	return { key: sectionName, title: toTitleCase(sectionName) }
-}
-
-const PRODUCT_VALUES: DocsProduct[] = [...DISTROS.map((distro) => distro.id), "shared"]
-const SCOPE_VALUES: DocsScope[] = ["install", "post_install", "architecture", "reference"]
-const AUDIENCE_VALUES: DocsAudience[] = ["beginner", "operator", "developer"]
-const STABILITY_VALUES: DocsStability[] = ["stable", "experimental"]
-
-function inferMetaFromSection(sectionName: string, pageName: string): DocsPageMeta {
-	if (sectionName === "getting-started") {
-		return {
-			product: "levitate",
-			scopes: pageName === "post-installation" ? ["install", "post_install"] : ["install"],
-			audience: ["beginner"],
-			stability: "stable",
+function checkBlocks(file: string, where: string, blocks: unknown): void {
+	if (!Array.isArray(blocks)) return fail(file, `${where} is not a list of blocks`);
+	blocks.forEach((block, i) => {
+		const type = (block as { type?: unknown })?.type;
+		if (!BLOCK_TYPES.includes(type as ContentBlock["type"])) {
+			return fail(file, `${where}[${i}] has unknown block type '${String(type)}'`);
 		}
-	}
-
-	if (sectionName === "installation-tools" || sectionName === "rec-tooling") {
-		return {
-			product: "levitate",
-			scopes: ["install"],
-			audience: ["operator", "developer"],
-			stability: "stable",
+		if (type === "qa") {
+			(block as { items: { answer: unknown }[] }).items.forEach((item, j) =>
+				checkBlocks(file, `${where}[${i}].items[${j}].answer`, item.answer),
+			);
 		}
-	}
-
-	// Recipe helpers document the package manager, which both variants share.
-	if (sectionName === "helpers") {
-		return { product: "shared", scopes: ["reference"], stability: "stable" }
-	}
-
-	if (sectionName === "architecture") {
-		return {
-			product: "levitate",
-			scopes: ["architecture"],
-			audience: ["developer"],
-			stability: "stable",
-		}
-	}
-
-	return {
-		product: "levitate",
-		scopes: ["reference"],
-		stability: "stable",
-	}
+	});
 }
 
-function normalizeEnum<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
-	if (typeof value !== "string") {
-		return fallback
+/** `value` is a DocsContent, or the reason it is not. */
+function checkPage(file: string, value: unknown, label: string): value is DocsContent {
+	if (typeof value !== "object" || value === null) {
+		fail(file, `${label} is not a page`);
+		return false;
 	}
-
-	return allowed.includes(value as T) ? (value as T) : fallback
+	const before = failures.length;
+	for (const key of Object.keys(value)) {
+		if (!PAGE_KEYS.has(key)) fail(file, `${label} has unknown field '${key}'`);
+	}
+	const page = value as Partial<DocsContent>;
+	if (typeof page.title !== "string" || page.title.length === 0) {
+		fail(file, `${label} has no title`);
+	}
+	if (!Array.isArray(page.sections)) {
+		fail(file, `${label} has no sections`);
+	} else {
+		page.sections.forEach((section, i) =>
+			checkBlocks(file, `${label}.sections[${i}](${section.title}).content`, section.content),
+		);
+	}
+	return failures.length === before;
 }
 
-function normalizeEnumArray<T extends string>(
-	value: unknown,
-	allowed: readonly T[],
-	fallback: readonly T[],
-): T[] {
-	if (!Array.isArray(value)) {
-		return [...fallback]
-	}
-
-	const normalized = value.filter((entry): entry is T => {
-		return typeof entry === "string" && allowed.includes(entry as T)
-	})
-
-	if (normalized.length === 0) {
-		return [...fallback]
-	}
-
-	return Array.from(new Set(normalized))
-}
-
-function normalizeMeta(rawMeta: unknown, inferred: DocsPageMeta): DocsPageMeta {
-	if (typeof rawMeta !== "object" || rawMeta === null) {
-		return inferred
-	}
-
-	const candidate = rawMeta as {
-		product?: unknown
-		scopes?: unknown
-		audience?: unknown
-		stability?: unknown
-	}
-
-	const meta: DocsPageMeta = {
-		product: normalizeEnum(candidate.product, PRODUCT_VALUES, inferred.product),
-		scopes: normalizeEnumArray(candidate.scopes, SCOPE_VALUES, inferred.scopes),
-	}
-
-	const audience = normalizeEnumArray(candidate.audience, AUDIENCE_VALUES, [])
-	if (audience.length > 0) {
-		meta.audience = audience
-	}
-
-	const stability = normalizeEnum(
-		candidate.stability,
-		STABILITY_VALUES,
-		inferred.stability ?? "stable",
-	)
-	if (stability.length > 0) {
-		meta.stability = stability
-	}
-
-	return meta
-}
-
-function resolvePageMeta(
-	content: DocsContent,
+async function loadEntry(
+	file: string,
+	sectionOrder: number,
 	sectionName: string,
-	pageName: string,
-): DocsPageMeta {
-	const inferred = inferMetaFromSection(sectionName, pageName)
-	return normalizeMeta(content.meta, inferred)
-}
-
-async function loadContentEntries(): Promise<ContentEntry[]> {
-	const files = await discoverContentFiles()
-	const entries: ContentEntry[] = []
-
-	for (const filePath of files) {
-		const parsed = parseContentPath(filePath)
-		if (!parsed) continue
-
-		const slug = generateSlug(parsed.sectionName, parsed.pageName)
-
-		// Import the module
-		const module = await import(filePath)
-
-		// Find the DocsContent export (first export matching the shape)
-		const content = Object.values(module).find(
-			(val): val is DocsContent =>
-				val !== null && typeof val === "object" && "title" in val && "sections" in val,
-		)
-
-		if (!content) {
-			console.warn(`No DocsContent export found in ${filePath}`)
-			continue
-		}
-
-		const meta = resolvePageMeta(content, parsed.sectionName, parsed.pageName)
-		const contentWithMeta: DocsContent = {
-			...content,
-			meta,
-		}
-
-		const snapshotted = await snapshotDocsContent(contentWithMeta, {
-			filePath,
-			slug,
-		})
-
-		entries.push({
-			filePath,
-			...parsed,
-			slug,
-			meta,
-			content: snapshotted,
-		})
+	page: string,
+): Promise<Entry | null> {
+	const match = NAME.exec(page.replace(/\.ts$/, ""));
+	if (!page.endsWith(".ts") || !match) {
+		fail(file, "is not named NN-page.ts");
+		return null;
 	}
-
-	return entries.sort((a, b) => a.sectionOrder - b.sectionOrder || a.pageOrder - b.pageOrder)
+	const module = (await import(file)) as Record<string, unknown>;
+	const exports = Object.keys(module);
+	if (exports.length !== 1 || exports[0] !== "default") {
+		fail(file, `must have exactly one export, the default (has: ${exports.join(", ") || "none"})`);
+		return null;
+	}
+	const source = module.default as PageSource;
+	const slug = match[2]!;
+	const base = {
+		file,
+		sectionOrder,
+		sectionTitle: titleCase(sectionName),
+		pageOrder: Number(match[1]),
+		slug,
+	};
+	if ("kind" in source && source.kind === "distro-page") {
+		const content = {} as Record<DistroId, DocsContent>;
+		for (const distro of DISTROS) {
+			const { id, ...facts } = distro;
+			const rendered = source.render(facts);
+			if (!checkPage(file, rendered, `the page for ${id}`)) return null;
+			content[id] = await snapshotDocsContent(rendered, { filePath: file, slug });
+		}
+		const titles = new Set(Object.values(content).map((c) => c.title));
+		if (titles.size > 1) {
+			fail(file, `its title differs between distros (${[...titles].join(" / ")})`);
+			return null;
+		}
+		return { ...base, content };
+	}
+	if (!checkPage(file, source, "the page")) return null;
+	return {
+		...base,
+		content: await snapshotDocsContent(source as DocsContent, { filePath: file, slug }),
+	};
 }
 
-function buildNavigation(entries: ContentEntry[]): NavSection[] {
-	const sectionMap = new Map<
-		string,
-		{
-			order: number
-			title: string
-			items: { slug: string; title: string; order: number }[]
+async function loadEntries(): Promise<Entry[]> {
+	const entries: Entry[] = [];
+	for (const section of (await readdir(CONTENT_DIR)).sort()) {
+		const match = NAME.exec(section);
+		const dir = join(CONTENT_DIR, section);
+		if (!match) {
+			fail(dir, "is not a section directory named NN-section");
+			continue;
 		}
-	>()
-
+		for (const page of (await readdir(dir)).sort()) {
+			const entry = await loadEntry(join(dir, page), Number(match[1]), match[2]!, page);
+			if (entry) entries.push(entry);
+		}
+	}
+	const seen = new Map<string, string>();
 	for (const entry of entries) {
-		const navSection = getNavSection(entry.sectionName)
-
-		if (!sectionMap.has(navSection.key)) {
-			sectionMap.set(navSection.key, {
-				order: entry.sectionOrder,
-				title: navSection.title,
-				items: [],
-			})
-		}
-
-		const section = sectionMap.get(navSection.key)!
-		section.order = Math.min(section.order, entry.sectionOrder)
-
-		section.items.push({
-			slug: entry.slug,
-			title: entry.content.title,
-			order: entry.pageOrder,
-		})
+		const other = seen.get(entry.slug);
+		if (other) fail(entry.file, `slug '${entry.slug}' is also ${other}'s`);
+		seen.set(entry.slug, entry.file);
 	}
-
-	return Array.from(sectionMap.values())
-		.sort((a, b) => a.order - b.order)
-		.map((section) => ({
-			title: section.title,
-			items: section.items
-				.sort((a, b) => a.order - b.order)
-				.map((item) => ({
-					title: item.title,
-					href: `/docs/${item.slug}`,
-				})),
-		}))
+	return entries.sort((a, b) => a.sectionOrder - b.sectionOrder || a.pageOrder - b.pageOrder);
 }
 
-function buildContentMap(entries: ContentEntry[]): Record<string, DocsContent> {
-	const contentBySlug: Record<string, DocsContent> = {}
+function isDistro(entry: Entry): entry is Entry & { content: Record<DistroId, DocsContent> } {
+	return !("sections" in entry.content);
+}
+
+function navigation(entries: Entry[]): NavSection[] {
+	const sections: NavSection[] = [];
 	for (const entry of entries) {
-		contentBySlug[entry.slug] = entry.content
+		let section = sections.find((s) => s.title === entry.sectionTitle);
+		if (!section) sections.push((section = { title: entry.sectionTitle, items: [] }));
+		const content = isDistro(entry) ? Object.values(entry.content)[0]! : entry.content;
+		section.items.push({ title: content.title, slug: entry.slug, distro: isDistro(entry) });
 	}
-	return contentBySlug
+	return sections;
 }
 
-function buildMetaMap(entries: ContentEntry[]): Record<string, DocsPageMeta> {
-	const metaBySlug: Record<string, DocsPageMeta> = {}
-	for (const entry of entries) {
-		metaBySlug[entry.slug] = entry.meta
-	}
-	return metaBySlug
+function union(values: readonly string[]): string {
+	return values.length === 0 ? "never" : values.map((v) => JSON.stringify(v)).join(" | ");
 }
 
-async function generateOutput(entries: ContentEntry[]): Promise<string> {
-	const nav = buildNavigation(entries)
-	const contentBySlug = buildContentMap(entries)
-	const metaBySlug = buildMetaMap(entries)
-
-	const lines: string[] = [
+function generate(entries: Entry[]): string {
+	const shared = entries.filter((e) => !isDistro(e));
+	const distro = entries.filter(isDistro);
+	const sharedPages = Object.fromEntries(shared.map((e) => [e.slug, e.content]));
+	const distroPages = Object.fromEntries(
+		DISTROS.map((d) => [d.id, Object.fromEntries(distro.map((e) => [e.slug, e.content[d.id]]))]),
+	);
+	const json = (value: unknown) => JSON.stringify(value, null, "\t");
+	return [
 		"/**",
-		" * AUTO-GENERATED FILE - DO NOT EDIT",
-		" *",
-		" * Generated by: bun scripts/build.ts",
+		" * AUTO-GENERATED by `bun scripts/build.ts` (docs/content). Do not edit.",
 		" */",
 		"",
-		'import type { NavSection, DocsContent, DocsPageMeta } from "../types"',
+		'import type { DistroId } from "../distros";',
+		'import type { DocsContent, NavSection } from "../types";',
 		"",
-	]
-
-	// Export navigation
-	lines.push("export const docsNav: NavSection[] = " + JSON.stringify(nav, null, "\t"))
-	lines.push("")
-
-	// Export content by slug with build-time syntax snapshot payloads
-	lines.push(
-		"export const contentBySlug: Record<string, DocsContent> = " +
-			JSON.stringify(contentBySlug, null, "\t"),
-	)
-	lines.push("")
-
-	lines.push(
-		"export const metaBySlug: Record<string, DocsPageMeta> = " +
-			JSON.stringify(metaBySlug, null, "\t"),
-	)
-	lines.push("")
-
-	return lines.join("\n")
+		"/** Pages shared by every distro. */",
+		`export type SharedSlug = ${union(shared.map((e) => e.slug))};`,
+		"/** Pages every distro has its own version of, under the same slug. */",
+		`export type DistroSlug = ${union(distro.map((e) => e.slug))};`,
+		"export type DocsSlug = SharedSlug | DistroSlug;",
+		"",
+		`export const docsNav: NavSection[] = ${json(navigation(entries))};`,
+		"",
+		`export const sharedPages: Record<SharedSlug, DocsContent> = ${json(sharedPages)};`,
+		"",
+		`export const distroPages: Record<DistroId, Record<DistroSlug, DocsContent>> = ${json(distroPages)};`,
+		"",
+	].join("\n");
 }
 
-export async function runBuild(options: BuildOptions = {}): Promise<void> {
-	console.log("Building docs-content...")
-
-	const entries = await loadContentEntries()
-	console.log(`Loaded ${entries.length} content files`)
-
-	const output = await generateOutput(entries)
-	const outputPath = join(GENERATED_DIR, "index.ts")
-
-	if (options.checkGenerated) {
-		await assertGeneratedOutput(outputPath, output)
-		console.log("Generated contract is up to date")
+async function main(): Promise<void> {
+	const check = process.argv.includes("--check-generated");
+	const entries = await loadEntries();
+	if (failures.length > 0) {
+		throw new Error(`${failures.length} problem(s) in the docs:\n  ${failures.join("\n  ")}`);
 	}
-
-	if (options.validateOnly) {
-		console.log("Syntax validation passed")
-		return
+	const output = generate(entries);
+	if (check) {
+		const current = await readFile(OUTPUT, "utf8").catch(() => null);
+		if (current !== output) {
+			throw new Error(`${OUTPUT} is missing or stale: run bun run build (docs/content)`);
+		}
+		console.log(`docs: ${entries.length} pages, generated index current`);
+		return;
 	}
-
-	await mkdir(GENERATED_DIR, { recursive: true })
-	await writeFile(outputPath, output)
-
-	console.log(`Generated: ${outputPath}`)
-	console.log("Done!")
+	await mkdir(join(SRC_DIR, "generated"), { recursive: true });
+	await writeFile(OUTPUT, output);
+	console.log(`docs: ${entries.length} pages -> ${OUTPUT}`);
 }
 
-async function main() {
-	const validateOnly = process.argv.includes("--validate-only")
-	const checkGenerated = process.argv.includes("--check-generated")
-	await runBuild({ validateOnly, checkGenerated })
-}
-
-if (import.meta.main) {
-	main().catch((err) => {
-		console.error("Build failed:", err)
-		process.exit(1)
-	})
-}
+main().catch((error) => {
+	console.error(`docs build failed: ${error instanceof Error ? error.message : String(error)}`);
+	process.exit(1);
+});

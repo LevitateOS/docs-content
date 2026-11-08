@@ -1,7 +1,7 @@
-import type { DocsContent } from "../../types"
-import { rich, code } from "../../rich-text"
+import type { DocsContent } from "../../types";
+import { rich, code } from "../../rich-text";
 
-export const helpersInstallContent: DocsContent = {
+export default {
 	title: "Install Helpers",
 	intro: rich`Functions for placing files in the recipe's output tree (${code("ctx.runtime.paths.output")}, ${code("/out")}) and for using a package manager inside the domain.`,
 	sections: [
@@ -36,10 +36,22 @@ export const helpersInstallContent: DocsContent = {
 					headers: ["Helper", "Behavior"],
 					rows: [
 						["copy_file(src, dst)", "Copy one file to the exact path dst."],
-						["copy_file_reflink(src, dst)", "Copy with a reflink where the filesystem supports it, else a checked copy."],
-						["copy_into_dir(pattern, dest_dir)", "Copy every file matching the glob into the existing dest_dir; matching nothing is an error."],
-						["copy_tree_contents(src, dest)", "Copy a directory's contents, keeping hardlinks, symlink bytes and modes."],
-						["copy_first_existing(sources, dst)", "Copy the first source in the array that exists; returns its path."],
+						[
+							"copy_file_reflink(src, dst)",
+							"Copy with a reflink where the filesystem supports it, else a checked copy.",
+						],
+						[
+							"copy_into_dir(pattern, dest_dir)",
+							"Copy every file matching the glob into the existing dest_dir; matching nothing is an error.",
+						],
+						[
+							"copy_tree_contents(src, dest)",
+							"Copy a directory's contents, keeping hardlinks, symlink bytes and modes.",
+						],
+						[
+							"copy_first_existing(sources, dst)",
+							"Copy the first source in the array that exists; returns its path.",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -93,4 +105,4 @@ exec_checked("cmake", ["--install", "build", "--prefix", join_path(ctx.runtime.p
 			],
 		},
 	],
-}
+} satisfies DocsContent;
