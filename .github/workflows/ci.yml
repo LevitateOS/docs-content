@@ -6,15 +6,17 @@ on:
   pull_request:
     branches: [master, main]
 
+# The superproject's reusable workflows, pinned to one of its commits: this CI changes
+# only when that pin is moved.
 jobs:
   changes:
-    uses: LevitateOS/LevitateOS/.github/workflows/detect-changes.yml@master
+    uses: LevitateOS/LevitateOS/.github/workflows/detect-changes.yml@64cfecdb34098c88b4d81db55399db6c9f274ca9
     with:
       type: bun
 
   ci:
     needs: changes
     if: needs.changes.outputs.has_changes == 'true'
-    uses: LevitateOS/LevitateOS/.github/workflows/bun-ci.yml@master
+    uses: LevitateOS/LevitateOS/.github/workflows/bun-ci.yml@64cfecdb34098c88b4d81db55399db6c9f274ca9
     with:
       run-build: true
