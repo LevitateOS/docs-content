@@ -63,9 +63,7 @@ export default {
 			content: [
 				{
 					type: "list",
-					items: [
-						rich`${link("reciso", "/docs/reciso")} - Build bootable ISO`,
-					],
+					items: [rich`${link("reciso", "/docs/reciso")} - Build bootable ISO`],
 				},
 			],
 		},

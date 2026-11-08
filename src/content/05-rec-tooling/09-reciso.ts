@@ -48,9 +48,7 @@ export default {
 			content: [
 				{
 					type: "list",
-					items: [
-						rich`${link("recinit", "/docs/recinit")} - Build initramfs inputs`,
-					],
+					items: [rich`${link("recinit", "/docs/recinit")} - Build initramfs inputs`],
 				},
 			],
 		},
