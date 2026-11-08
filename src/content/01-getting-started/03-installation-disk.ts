@@ -136,7 +136,7 @@ export default distroPage((d) => ({
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("Why this layout:")} slot A holds the installed system and slot B is where the next system is written, so an update never touches the running one and rollback is a reboot. Only ${code("/var")} is shared by both slots, so it is where what must survive an update lives; home directories under ${code("/home")} are in the slot and are not carried yet.`,
+					content: rich`${bold("Why this layout:")} slot A holds the installed system and slot B is where the next system is written, so an update never touches the running one and rollback is a reboot. Only ${code("/var")} is shared by both slots, so it is where what must survive an update lives; home directories live in ${code("/var/home")} (${code("/home")} is a symlink to it), so they survive updates.`,
 				},
 				{
 					type: "list",
