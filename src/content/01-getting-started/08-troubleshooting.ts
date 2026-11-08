@@ -1,7 +1,7 @@
 import { distroPage } from "../../types";
 import { rich, code } from "../../rich-text";
 import { bootArgs, commands, EXAMPLE_DISK, UEFI_VARS } from "../../install";
-import { network, PAGE_TITLES, services } from "../../pages";
+import { admin, network, PAGE_TITLES, RECIPE, services } from "../../pages";
 
 const disk = EXAMPLE_DISK.disk;
 const target = EXAMPLE_DISK.target;
@@ -176,20 +176,20 @@ export default distroPage((d) => ({
 									language: "bash",
 									description: "See which phase still needs work",
 									command: [
-										"recipe isacquired packagename",
-										"recipe isbuilt packagename",
-										"recipe isinstalled packagename",
+										`${admin(d)} recipe isacquired packagename`,
+										`${admin(d)} recipe isbuilt packagename`,
+										`${admin(d)} recipe isinstalled packagename`,
 									],
 								},
 								{
 									type: "text",
-									content: rich`Networking is off unless granted: a recipe that downloads needs ${code("--network-host HOST:443")} for each server it uses. The full log of every run is under ${code("~/.local/state/recipe/logs/")}.`,
+									content: rich`Networking is off unless granted: a recipe that downloads needs ${code("--network-host HOST:443")} for each server it uses. The full log of every run is under ${code(`${RECIPE.state}/logs/`)}.`,
 								},
 								{
 									type: "command",
 									language: "bash",
 									description: "Retry, redoing acquisition and build",
-									command: "recipe install packagename --force-acquire",
+									command: `${admin(d)} recipe install packagename --force-acquire`,
 								},
 							],
 						},

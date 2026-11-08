@@ -1,7 +1,7 @@
 import { distroPage } from "../../types";
 import { rich, code, link } from "../../rich-text";
 import { commands } from "../../install";
-import { admin, DESKTOP_NAME, PAGE_TITLES, pageLink, services } from "../../pages";
+import { admin, DESKTOP_NAME, PAGE_TITLES, pageLink, RECIPE, services } from "../../pages";
 
 export default distroPage((d) => ({
 	title: PAGE_TITLES["post-installation"],
@@ -29,31 +29,34 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`Packages are Rhai recipes that you keep yourself. ${code("recipe")} looks recipes up by name in ${code("~/.local/share/recipe/recipes")} (or ${code("--recipes-path")}), or takes a path to a ${code(".rhai")} file.`,
-				},
-				{
-					type: "note",
-					variant: "info",
-					content:
-						"A/B by default: recipe changes are composed into the inactive slot and activated on reboot after a trial boot and commit. Mutable mode is an explicit opt-in.",
+					content: rich`${code("recipe")} is the package manager. A package is a Rhai recipe: ${code("recipe")} looks a name up in root's recipes, ${code(RECIPE.recipes)}, or takes a path to a ${code(".rhai")} file. Its recipes, state and image cache are on ${code("/var")}, which both slots share, so they stay through a system update.`,
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "List your recipes",
-					command: "recipe list",
+					description: "List the recipes",
+					command: `${admin(d)} recipe list`,
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Show a recipe's name, version and description",
-					command: "recipe info ripgrep",
+					command: `${admin(d)} recipe info ripgrep`,
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Install a package from its recipe",
-					command: "recipe install ripgrep",
+					description: "Build and install a package from its recipe",
+					command: `${admin(d)} recipe install ripgrep`,
+				},
+				{
+					type: "text",
+					content: rich`${code("recipe install")} runs the recipe in a Ginux domain and publishes what it produces under ${code(".artifacts/ginux-export")} in the current directory; its JSON names the paths in ${code("ctx.outputs")}. It does not change the running system.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${code("recipe install")} needs the Ginux launcher (${code("GINUX_BIN")}) and a Ginux root image, which ${d.osName} does not ship yet. ${code("recipe list")} and ${code("recipe info")} need neither.`,
 				},
 				{
 					type: "text",
@@ -92,7 +95,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`The hostname, accounts, enabled services, network connections and SSH host keys are carried into the new slot. If it starts cleanly, the trial service commits it; if not, the machine reboots into the previous slot by itself. ${code("recab status")} shows which slot runs and how the last trial ended, and ${code(`${admin(d)} recab rollback`)} returns to the previous slot later. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`The hostname, accounts, enabled services, network connections and SSH host keys are carried into the new slot, and ${code("/var")} (with Recipe's packages and state) is shared by both slots; the rest of the system, ${code("/home")} included, comes from the new image. If it starts cleanly, the trial service commits it; if not, the machine reboots into the previous slot by itself. ${code("recab status")} shows which slot runs and how the last trial ended, and ${code(`${admin(d)} recab rollback`)} returns to the previous slot later. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
 		},

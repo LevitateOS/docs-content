@@ -22,14 +22,14 @@ export default {
 				{
 					type: "code",
 					language: "bash",
-					content: `recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz --initrd /mnt/boot/initramfs-installed.img
+					content: `recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz   # plus --initrd <initramfs> where the system boots one
 recab set-next B      # one trial boot of the staged slot
 reboot                # into B: committed if it comes up healthy, else back to A
 recab rollback        # later, if wanted: back to A, while A still holds its system`,
 				},
 				{
 					type: "text",
-					content: rich`${code("stage")} formats the inactive slot, extracts the image with ${code("recstrap")}, and carries over the hostname, machine id, locale, time settings, accounts (merged by name), SSH host keys, enabled services and network connections. It refuses while the running slot is uncommitted or while the target slot is the next boot.`,
+					content: rich`${code("stage")} formats the inactive slot, extracts the image with ${code("recstrap")}, and carries over the hostname, machine id, locale, time settings, accounts (merged by name), SSH host keys, enabled services and network connections, as the image's ${code("/usr/lib/recab/carried")} lists them. It refuses while the running slot is uncommitted or while the target slot is the next boot.`,
 				},
 			],
 		},

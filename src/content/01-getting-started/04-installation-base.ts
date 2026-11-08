@@ -52,7 +52,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`This extracts the complete base system: ${INIT_NAME[d.profile.init]}, the userland, kernel modules, ${network(d).daemon}, ${code(d.profile.privilege)} and ${code("recab")} for A/B updates. It checks the target first and the extracted system afterwards, before it reports success.`,
+					content: rich`This extracts the complete base system: ${INIT_NAME[d.profile.init]}, the userland, kernel modules, ${network(d).daemon}, ${code(d.profile.privilege)}, the ${code("recipe")} package manager and ${code("recab")} for A/B updates. It checks the target first and the extracted system afterwards, before it reports success.`,
 				},
 				{
 					type: "command",
@@ -83,7 +83,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`You should see entries for ${code("/")} (ext4), ${code("/boot")} (vfat) and, with the default A/B layout, ${code("/var")} (ext4), each with its UUID. Persistent state (including ${code("/var/home")}) lives on ${code("/var")}. Slot B has no entry: it is not mounted.`,
+					content: rich`You should see entries for ${code("/")} (ext4), ${code("/boot")} (vfat) and, with the default A/B layout, ${code("/var")} (ext4), each with its UUID. Persistent state, shared by both slots, lives on ${code("/var")}. Slot B has no entry: it is not mounted.`,
 				},
 			],
 		},

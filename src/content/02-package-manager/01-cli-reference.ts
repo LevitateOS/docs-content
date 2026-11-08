@@ -3,7 +3,7 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "CLI Reference",
-	intro: rich`The Recipe CLI executes build-time Rhai recipes inside a configured Ginux domain and returns named published products. Prepare the launcher, verified image and worker first using the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")}.`,
+	intro: rich`The Recipe CLI executes Rhai recipes inside a configured Ginux domain and returns named published products: the producers that build each distro, and the packages of an installed system (see ${link("Post-Installation", "/docs/post-installation")}). Prepare the launcher, verified image and worker first using the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")}.`,
 	sections: [
 		{
 			title: "Commands",
