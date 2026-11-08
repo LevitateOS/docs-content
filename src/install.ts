@@ -193,15 +193,8 @@ export function bootArgs(disk: DiskResult): string | { missing: string } {
 export const commands = {
 	uefiCheck: () => `ls ${UEFI_VARS}`,
 	mediaCheck: () => `ls -la ${LIVE_ROOTFS}`,
-	/**
-	 * Loads a console keymap in the live session. The busybox userland (the OpenRC
-	 * images) loads binary keymaps with `loadkmap`, as recsetup does on those targets;
-	 * kbd's `loadkeys` elsewhere.
-	 */
-	liveKeymap: (d: Facts, map: string) =>
-		d.profile.init === "openrc"
-			? `zcat /usr/share/bkeymaps/${map}/${map}.bmap.gz | loadkmap`
-			: `loadkeys ${map}`,
+	/** Loads a console keymap in the live session (kbd's `loadkeys`, on every image). */
+	liveKeymap: (_d: Facts, map: string) => `loadkeys ${map}`,
 	diskPlan: () => "disk-plan",
 	/** recpart's apply on the whole disk; `--dry-run` shows the steps and any refusal. */
 	partition: (disk: string, dryRun = false) =>
