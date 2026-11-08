@@ -1,38 +1,39 @@
 {
-  "name": "@levitate/docs-content",
-  "version": "0.1.0",
-  "license": "(MIT OR Apache-2.0)",
-  "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": "./src/index.ts",
-    "./live": "./src/discovery.ts",
-    "./types": "./src/types.ts",
-    "./distros": "./src/distros.ts",
-    "./syntax-theme": "./src/syntax-theme.ts",
-    "./content/*": "./src/content/*.ts"
-  },
-  "scripts": {
-    "build": "bun scripts/build.ts",
-    "syntax:validate": "bun scripts/validate-syntax.ts",
-    "generated:check": "bun scripts/build.ts --validate-only --check-generated",
-    "typecheck": "tsc --noEmit",
-    "lint": "bunx oxlint --config ../../.oxlintrc.json src scripts --deny-warnings",
-    "lint:fix": "bunx oxlint --config ../../.oxlintrc.json src scripts --fix",
-    "format": "bunx oxfmt --config ../../.oxfmtrc.json --write src scripts package.json tsconfig.json",
-    "format:check": "bunx oxfmt --config ../../.oxfmtrc.json --check src scripts package.json tsconfig.json",
-    "check": "bun run syntax:validate && bun run generated:check && bun run typecheck && bun run lint && bun run format:check"
-  },
-  "peerDependencies": {
-    "react": ">=18"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.3.11",
-    "@types/react": "^18.3.0",
-    "oxlint": "1.39.0",
-    "shiki": "^3.22.0",
-    "typescript": "^5.7.2",
-    "vite": "^7.1.7"
-  }
+	"name": "@levitate/docs-content",
+	"version": "0.1.0",
+	"license": "(MIT OR Apache-2.0)",
+	"type": "module",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./live": "./src/discovery.ts",
+		"./types": "./src/types.ts",
+		"./distros": "./src/distros.ts",
+		"./install": "./src/install.ts",
+		"./syntax-theme": "./src/syntax-theme.ts",
+		"./content/*": "./src/content/*.ts"
+	},
+	"scripts": {
+		"build": "bun scripts/build.ts",
+		"syntax:validate": "bun scripts/validate-syntax.ts",
+		"generated:check": "bun scripts/build.ts --validate-only --check-generated",
+		"typecheck": "tsc --noEmit",
+		"lint": "bunx oxlint --config ../../.oxlintrc.json src scripts --deny-warnings",
+		"lint:fix": "bunx oxlint --config ../../.oxlintrc.json src scripts --fix",
+		"format": "bunx oxfmt --config ../../.oxfmtrc.json --write src scripts package.json tsconfig.json",
+		"format:check": "bunx oxfmt --config ../../.oxfmtrc.json --check src scripts package.json tsconfig.json",
+		"check": "bun run syntax:validate && bun run generated:check && bun run typecheck && bun run lint && bun run format:check"
+	},
+	"peerDependencies": {
+		"react": ">=18"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.11",
+		"@types/react": "^18.3.0",
+		"oxlint": "1.39.0",
+		"shiki": "^3.22.0",
+		"typescript": "^5.7.2",
+		"vite": "^7.1.7"
+	}
 }

@@ -18,7 +18,7 @@ export const recsetupContent: DocsContent = {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recsetup")} does installation steps 10 to 17 against the system that ${link("recstrap", "/docs/recstrap")} extracted to ${code("/mnt")}. It is the backend of the install's setup and boot apps, and the commands it prints are the manual install for anyone who would rather type them.`,
+					content: rich`${code("recsetup")} does the install's configuration and boot steps against the system that ${link("recstrap", "/docs/recstrap")} extracted. install-hub runs it for the boot step and shows its commands for the configuration step, and the commands it prints are the manual install for anyone who would rather type them.`,
 				},
 				{
 					type: "list",
