@@ -3,9 +3,11 @@
  * Pages define content as structured data, rendered by DocsPage.
  */
 
+import type { DistroId } from "./distros"
 import type { RichText } from "./rich-text"
 
-export type DocsProduct = "levitate" | "acorn" | "shared"
+/** The variant a page is for (its id), or `shared` for every variant. */
+export type DocsProduct = DistroId | "shared"
 export type DocsScope = "install" | "post_install" | "architecture" | "reference"
 export type DocsAudience = "beginner" | "operator" | "developer"
 export type DocsStability = "stable" | "experimental"

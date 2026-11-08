@@ -21,6 +21,7 @@ import type {
 	DocsStability,
 	NavSection,
 } from "../src/types"
+import { DISTROS } from "../src/distros"
 import { snapshotDocsContent } from "./syntax"
 
 const SRC_DIR = join(import.meta.dir, "../src")
@@ -113,7 +114,7 @@ function getNavSection(sectionName: string): { key: string; title: string } {
 	return { key: sectionName, title: toTitleCase(sectionName) }
 }
 
-const PRODUCT_VALUES: DocsProduct[] = ["levitate", "acorn", "shared"]
+const PRODUCT_VALUES: DocsProduct[] = [...DISTROS.map((distro) => distro.id), "shared"]
 const SCOPE_VALUES: DocsScope[] = ["install", "post_install", "architecture", "reference"]
 const AUDIENCE_VALUES: DocsAudience[] = ["beginner", "operator", "developer"]
 const STABILITY_VALUES: DocsStability[] = ["stable", "experimental"]
