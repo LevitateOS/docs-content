@@ -32,8 +32,8 @@ export default {
 					type: "list",
 					ordered: true,
 					items: [
-						rich`Write the new system into the inactive slot: ${code("recab stage --rootfs <image> --kernel <vmlinuz>")}, plus ${code("--initrd <initramfs>")} on a system that boots one. The machine's hostname, accounts, enabled services, network connections and SSH host keys come along, as the image's ${code("/usr/lib/recab/carried")} lists them.`,
-						rich`Trial-boot it once: ${code("recab set-next B")} (the inactive slot), then reboot`,
+						rich`Write the new system into the inactive slot with ${code("recab stage")}. The machine's hostname, accounts, enabled services, network connections and SSH host keys come along, as the image's ${code("/usr/lib/recab/carried")} lists them.`,
+						rich`Trial-boot it once with ${code("recab set-next")}, then reboot`,
 						rich`If slot B comes up with no failed services, recab's trial service (a systemd unit or an OpenRC service, with the system's init) commits it. If services fail, startup never finishes, the new system cannot mount its root, or its kernel or init crashes, the machine reboots into slot A by itself. ${code("recab status")} shows how the last trial ended.`,
 						rich`Later, ${code("recab rollback")} returns to the previous slot while it still holds that system`,
 					],

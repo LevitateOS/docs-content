@@ -11,7 +11,7 @@ export default {
 			content: [
 				{
 					type: "table",
-					headers: ["Variant", "Goal", "Base", "Stack", "Admin", "Artifact"],
+					headers: ["Variant", "Goal", "Base", "Stack", "Admin"],
 					rows: [
 						[
 							"LevitateOS",
@@ -19,7 +19,6 @@ export default {
 							"Locked, signed Fedora RPMs",
 							"glibc / systemd / GNU",
 							"sudo",
-							"levitateos-x86_64.iso (live + installer)",
 						],
 						[
 							"AcornOS",
@@ -27,7 +26,6 @@ export default {
 							"Alpine APKs",
 							"musl / OpenRC / busybox",
 							"doas",
-							"acornos-x86_64.iso (live + installer)",
 						],
 					],
 				},
@@ -43,13 +41,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("distro-builder")} builds both from their own contract, ${code("distro/variants/<distro>/distro.toml")} (with the kernel configuration ${code("kconfig")} and the release hooks beside it): sources and recipes, filesystem products, EROFS/initramfs/UKI transforms, the ISO release, and the boot, install and runtime scenarios. Recipes own the package facts; the builder owns orchestration and output locations.`,
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `cargo xtask build live-tools levitate
-cargo xtask build live-tools acorn`,
+					content: rich`${code("distro-builder")} builds both from their own contract, ${code("distro/variants/<distro>/distro.toml")} (with the kernel configuration ${code("kconfig")} and the release hooks beside it): what each variant declares for sources, products, the live system and the install screen. Recipes own the package facts; the builder owns orchestration and output locations.`,
 				},
 			],
 		},
@@ -62,7 +54,7 @@ cargo xtask build live-tools acorn`,
 						rich`${bold("Install")} → ${link("Getting Started", "/docs/getting-started")}`,
 						rich`${bold("Packages")} → ${link("recipe CLI Reference", "/docs/cli-reference")}`,
 						rich`${bold("Update model")} → ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}`,
-						rich`${bold("Build/test loop")} → ${code("architecture.md")} (repo root)`,
+						rich`${bold("Build/test loop")} → ${code("cargo xtask --help")}, and ${code("architecture.md")} (repo root) for where each fact lives`,
 					],
 				},
 			],
