@@ -63,7 +63,7 @@ export default distroPage((d) => ({
 								},
 								{
 									type: "text",
-									content: rich`You should see ${code(`${d.osId}-a.conf`)} and ${code(`${d.osId}-b.conf`)}, and ${code("vmlinuz")}${d.installedInitramfs ? " and " : " (no initramfs)"}${d.installedInitramfs ? code("initramfs.img") : ""} for slot A. Each entry's ${code("options")} line names its slot by ${code("root=PARTUUID=")}; compare it with ${code(`blkid -s PARTUUID ${EXAMPLE_DISK.slot_a}`)}.`,
+									content: rich`You should see ${code(`${d.osId}-a.conf`)} and ${code(`${d.osId}-b.conf`)}, and ${code("vmlinuz")} and ${code("initramfs.img")} for slot A. Each entry's ${code("options")} line names its slot by ${code("root=PARTUUID=")}; compare it with ${code(`blkid -s PARTUUID ${EXAMPLE_DISK.slot_a}`)}.`,
 								},
 								{
 									type: "command",

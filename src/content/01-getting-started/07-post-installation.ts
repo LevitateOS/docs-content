@@ -69,7 +69,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: `A new ${d.osName} release is written into the inactive slot (slot B after a fresh install) and trial-booted once. Mount the new release ISO, then stage its system image and kernel${d.installedInitramfs ? " and initramfs" : " (the system boots without an initramfs)"}:`,
+					content: `A new ${d.osName} release is written into the inactive slot (slot B after a fresh install) and trial-booted once. Mount the new release ISO, then stage its system image, kernel and initramfs:`,
 				},
 				{
 					type: "command",

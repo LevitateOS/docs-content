@@ -1,5 +1,6 @@
 import type { DocsContent } from "../../types";
 import { rich, code, bold, link } from "../../rich-text";
+import { HARDWARE } from "../../pages";
 
 export default {
 	title: "Architecture FAQ",
@@ -97,10 +98,10 @@ export default {
 									type: "table",
 									headers: ["Component", "Baseline"],
 									rows: [
-										["CPU", "x86-64-v3 (Intel Haswell, AMD Zen or newer)"],
-										["RAM", "16 GB"],
-										["Storage", "NVMe disk"],
-										["Firmware", "UEFI, with Secure Boot disabled"],
+										["CPU", `${HARDWARE.cpu} (${HARDWARE.cpuNote})`],
+										["RAM", HARDWARE.ram],
+										["Storage", `${HARDWARE.disk}, on ${HARDWARE.storage}`],
+										["Firmware", HARDWARE.firmware],
 									],
 								},
 							],

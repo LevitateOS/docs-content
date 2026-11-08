@@ -1,10 +1,11 @@
 import { distroPage } from "../../types";
 import { rich, bold, code, link } from "../../rich-text";
+import { DISTROS } from "../../distros";
 import { HARDWARE, PAGE_TITLES, pageLink } from "../../pages";
 
 export default distroPage((d) => ({
 	title: PAGE_TITLES["getting-started"],
-	intro: `Download the ${d.osName} live ISO and create bootable installation media.`,
+	intro: `Get the ${d.osName} live ISO and create bootable installation media.`,
 	sections: [
 		{
 			title: "Requirements",
@@ -26,19 +27,22 @@ export default distroPage((d) => ({
 			],
 		},
 		{
-			title: "Download",
+			title: "Get the ISO",
 			content: [
 				{
 					type: "text",
-					content: rich`Download ${d.osName} from ${link("Download", "/download")}. It ships as an x86_64 live ISO that boots into the install environment.`,
+					content: rich`${d.osName} is not released yet, so there is no download; see ${link("Download", "/download")} for its status. It will ship as an x86_64 live ISO that boots into the install environment. Today you build the ISO from the public source, in a checkout of the repository:`,
 				},
-				{ type: "text", content: `Example: download the ${d.osName} ISO and verify its checksum:` },
 				{
 					type: "code",
 					language: "bash",
-					content: `curl -LO https://releases.levitateos.org/latest/${d.isoFile}
-curl -LO https://releases.levitateos.org/latest/${d.isoFile}.sha512
-sha512sum -c ${d.isoFile}.sha512`,
+					content: `cargo xtask setup
+cargo xtask build kernel <distro> --prebuilt
+cargo xtask build live-tools <distro>`,
+				},
+				{
+					type: "text",
+					content: rich`Use the variant's id as <distro> (${DISTROS.map((distro) => distro.id).join(" or ")}). The last command prints the path of the ISO it built; ${code("cargo xtask --help")} lists every build. A release will publish a ${code(`${d.isoFile}.sha512`)} checksum beside the ISO, checked with ${code("sha512sum -c")}.`,
 				},
 			],
 		},

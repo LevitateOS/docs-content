@@ -22,7 +22,7 @@ export default {
 				{
 					type: "code",
 					language: "bash",
-					content: `recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz   # plus --initrd <initramfs> where the system boots one
+					content: `recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz --initrd /mnt/boot/initramfs-installed.img
 recab set-next B      # one trial boot of the staged slot
 reboot                # into B: committed if it comes up healthy, else back to A
 recab rollback        # later, if wanted: back to A, while A still holds its system`,

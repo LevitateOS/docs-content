@@ -106,7 +106,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 				},
 				{
 					type: "text",
-					content: rich`${code("boot.kernel")} defaults to the live media's ${code("/run/live-media/boot/vmlinuz")}. ${code("boot.initrd")} defaults, on systemd systems, to the installed system's initramfs the live media carries, ${code("/run/live-media/boot/initramfs-installed.img")}, and to none on OpenRC ones, which boot without an initramfs; ${code('""')} (or ${code("--no-initrd")}) means none. The live media's own ${code("initramfs.img")} is refused (E030): it only finds the live medium and ignores ${code("root=")}.`,
+					content: rich`${code("boot.kernel")} defaults to the live media's ${code("/run/live-media/boot/vmlinuz")}. ${code("boot.initrd")} defaults to the installed system's initramfs the live media carries (the same busybox initramfs for both distros), ${code("/run/live-media/boot/initramfs-installed.img")}; ${code('""')} (or ${code("--no-initrd")}) means none. The live media's own ${code("initramfs.img")} is refused (E030): it only finds the live medium and ignores ${code("root=")}.`,
 				},
 			],
 		},
@@ -133,13 +133,13 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 						["Time zone", "/etc/localtime link into /usr/share/zoneinfo", "Same"],
 						[
 							"Locale",
-							"locale-gen, else localedef, else the compiled locales only; then LANG in /etc/locale.conf",
-							"musl compiles nothing: LANG in /etc/locale.conf",
+							"LANG in /etc/locale.conf (systemd reads it itself)",
+							"LANG in /etc/locale.conf (exported by /etc/profile.d/locale.sh)",
 						],
 						[
 							"Keymap",
 							"KEYMAP in /etc/vconsole.conf",
-							"keymap in /etc/conf.d/keymaps (or loadkeys) and rc-update add … boot",
+							"keymap in /etc/conf.d/loadkeys and rc-update add loadkeys boot",
 						],
 						["Hostname", "/etc/hostname and /etc/hosts", "Same"],
 						[
@@ -158,15 +158,11 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 							"bootctl install --esp-path=/boot --no-variables",
 							"copy systemd-boot's EFI binary to EFI/BOOT and EFI/systemd",
 						],
-						[
-							"A/B entries",
-							"recab init with both slots and the initramfs",
-							"recab init with both slots, no initramfs",
-						],
+						["A/B entries", "recab init with both slots and the initramfs", "Same"],
 						[
 							"Mutable entry",
 							"kernel and initramfs on the ESP, one entry with root=PARTUUID",
-							"kernel on the ESP, one entry with root=PARTUUID",
+							"Same",
 						],
 						[
 							"Machine id",

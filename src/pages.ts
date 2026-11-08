@@ -27,9 +27,16 @@ export function pageLink(slug: PageSlug, section?: string): InlineLink {
 	return link(section ? `${title}: ${section}` : title, `/docs/${slug}`);
 }
 
-/** What every distro needs; the default A/B layout fits the disk. */
+/**
+ * What every distro needs; the default A/B layout fits the disk. One baseline for both:
+ * the kernel is x86_64_defconfig plus distro/variants/_shared/kconfig (NVMe, SATA/AHCI,
+ * virtio, USB and MMC storage built in), and no build sets a target CPU above generic x86-64.
+ */
 export const HARDWARE = {
 	cpu: "x86-64",
+	cpuNote: "any 64-bit Intel or AMD processor",
+	storage: "NVMe, SATA, virtio, USB or SD/MMC",
+	firmware: "UEFI, with Secure Boot disabled (the boot files are unsigned)",
 	ram: "4 GB (8 GB with the desktop)",
 	qemuRam: "4G",
 	disk: "64 GB",

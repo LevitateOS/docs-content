@@ -20,7 +20,7 @@ export default {
 						rich`${bold("Slot A")} (label ${code("ROOT_A")}): the installed system after a fresh install`,
 						rich`${bold("Slot B")} (label ${code("ROOT_B")}): where the next system is written`,
 						rich`${bold("Persistent state")} (label ${code("STATE")}): mounted at ${code("/var")}, shared by both slots: recab's state and Recipe's packages and state live here. Home directories live in ${code("/var/home")} (the image's ${code("/home")} is a symlink to it), so updates keep them`,
-						rich`${bold("EFI partition")}: systemd-boot, one boot entry per slot, and each slot's kernel (and its initramfs, on a system that boots one)`,
+						rich`${bold("EFI partition")}: systemd-boot, one boot entry per slot, and each slot's kernel and initramfs`,
 					],
 				},
 			],

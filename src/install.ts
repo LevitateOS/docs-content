@@ -237,15 +237,10 @@ export const commands = {
 	reboot: () => "reboot",
 	/**
 	 * Stages a release into the inactive slot, from its ISO mounted at `iso`: the system
-	 * image, the kernel and, where the installed system boots one, the initramfs.
+	 * image, the kernel and the initramfs.
 	 */
 	stage: (d: Facts, iso = "/mnt") =>
-		[
-			`recab stage --rootfs ${iso}/live/filesystem.erofs --kernel ${iso}/boot/vmlinuz`,
-			d.installedInitramfs && `--initrd ${iso}/boot/${d.installedInitramfs}`,
-		]
-			.filter(Boolean)
-			.join(" "),
+		`recab stage --rootfs ${iso}/live/filesystem.erofs --kernel ${iso}/boot/vmlinuz --initrd ${iso}/boot/${d.installedInitramfs}`,
 };
 
 /** A check the preflight step makes on the live system: `path` exists. */

@@ -23,7 +23,7 @@ export default {
 						],
 						[
 							rich`${code("build-install")}`,
-							"Build an initramfs for booting an installed system from disk (systemd-based)",
+							"Build an initramfs for booting an installed system from disk (busybox-based, the same for both distros)",
 						],
 						[rich`${code("modules")}`, "List module presets and the modules in each"],
 					],

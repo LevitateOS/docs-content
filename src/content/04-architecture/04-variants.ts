@@ -1,33 +1,42 @@
 import type { DocsContent } from "../../types";
 import { rich, bold, code, link } from "../../rich-text";
+import { DISTROS } from "../../distros";
+import { DESKTOP_NAME, INIT_NAME, KERNEL_LINE_NAME } from "../../pages";
+
+/** What the generated DISTROS records do not carry: each variant's goal, base and userland. */
+const VARIANT_TEXT = {
+	acorn: {
+		goal: "Daily-driver desktop/workstation, a smaller and simpler base",
+		base: "Alpine APKs",
+		userland: "busybox",
+	},
+	levitate: {
+		goal: "Daily-driver desktop/workstation, maximum compatibility",
+		base: "Locked, signed Fedora RPMs",
+		userland: "GNU",
+	},
+} as const;
 
 export default {
 	title: "Variants",
 	intro:
-		"LevitateOS is a shared build system with two OS variants. They share the recipe engine, the build pipeline and the install and update tools, but differ in their base, libc and init.",
+		"LevitateOS is a shared build system with two OS variants. They share the recipe engine, the build pipeline and the install and update tools, but differ in their base, libc, init, administrator tool, desktop and kernel line.",
 	sections: [
 		{
 			title: "Variant Matrix",
 			content: [
 				{
 					type: "table",
-					headers: ["Variant", "Goal", "Base", "Stack", "Admin"],
-					rows: [
-						[
-							"LevitateOS",
-							"Daily-driver desktop/workstation, maximum compatibility",
-							"Locked, signed Fedora RPMs",
-							"glibc / systemd / GNU",
-							"sudo",
-						],
-						[
-							"AcornOS",
-							"Daily-driver desktop/workstation, a smaller and simpler base",
-							"Alpine APKs",
-							"musl / OpenRC / busybox",
-							"doas",
-						],
-					],
+					headers: ["Variant", "Goal", "Base", "Stack", "Admin", "Desktop", "Kernel"],
+					rows: DISTROS.map((distro) => [
+						distro.osName,
+						VARIANT_TEXT[distro.id].goal,
+						VARIANT_TEXT[distro.id].base,
+						`${distro.profile.libc} / ${INIT_NAME[distro.profile.init]} / ${VARIANT_TEXT[distro.id].userland}`,
+						distro.profile.privilege,
+						DESKTOP_NAME[distro.profile.desktop],
+						`${distro.kernel.version} (${KERNEL_LINE_NAME[distro.profile.kernel_line]})`,
+					]),
 				},
 				{
 					type: "note",
@@ -41,7 +50,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("distro-builder")} builds both from their own contract, ${code("distro/variants/<distro>/distro.toml")} (with the kernel configuration ${code("kconfig")} and the release hooks beside it): what each variant declares for sources, products, the live system and the install screen. Recipes own the package facts; the builder owns orchestration and output locations.`,
+					content: rich`${code("distro-builder")} builds both from their own contract, ${code("distro/variants/<distro>/distro.toml")} (with the kernel configuration ${code("kconfig")} and the release hooks beside it): what each variant declares for sources, products and the live system. The install screen is the same on both (distro/contract/src/install_ux.rs). Recipes own the package facts; the builder owns orchestration and output locations.`,
 				},
 			],
 		},

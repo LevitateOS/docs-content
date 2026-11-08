@@ -35,7 +35,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`recsetup installs systemd-boot on the EFI partition, the way the target supports (${code("bootctl install")} where the target has it, otherwise by copying its EFI binary), then runs ${code("recab init")}: slot A's kernel${d.installedInitramfs ? " and initramfs" : ""} (from the live media) go to ${code(`/boot/${d.osId}-a/`)}, both slot entries are written to ${code("/boot/loader/entries/")} naming their partition by PARTUUID, slot A becomes the default and the known-good slot, and the trial service is enabled. ${d.installedInitramfs ? "" : "The kernel mounts the root itself, so there is no initramfs. "}Add ${code('--options "console=ttyS0,115200n8"')} if you need a serial console.`,
+					content: rich`recsetup installs systemd-boot on the EFI partition, the way the target supports (${code("bootctl install")} where the target has it, otherwise by copying its EFI binary), then runs ${code("recab init")}: slot A's kernel and initramfs (from the live media) go to ${code(`/boot/${d.osId}-a/`)}, both slot entries are written to ${code("/boot/loader/entries/")} naming their partition by PARTUUID, slot A becomes the default and the known-good slot, and the trial service is enabled. Add ${code('--options "console=ttyS0,115200n8"')} if you need a serial console.`,
 				},
 				{
 					type: "text",
