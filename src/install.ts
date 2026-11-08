@@ -24,6 +24,9 @@ export type InstallStepId = RecordedStep | "finish";
 
 export type InstallMode = "ab" | "mutable";
 
+/** How every screen and page names each install mode. */
+export const MODE_NAME: Record<InstallMode, string> = { ab: "A/B", mutable: "mutable" };
+
 /** The disk step's result: recpart's apply handoff, as the later steps need it. */
 export interface DiskResult {
 	disk: string;
