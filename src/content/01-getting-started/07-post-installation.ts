@@ -95,6 +95,16 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
+					content: rich`${code("recab-tui")} shows the slots and does the same steps from a screen: try the other slot, commit, roll back, or write a system into the inactive slot, each with its effect before and after. It changes the boot setup, so open it as root.`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Open the A/B updates screen",
+					command: `${admin(d)} recab-tui`,
+				},
+				{
+					type: "text",
 					content: rich`The hostname, accounts, enabled services, network connections and SSH host keys are carried into the new slot, and ${code("/var")} (with Recipe's packages and state) is shared by both slots, home directories included (${code("/home")} is a symlink to ${code("/var/home")}); the rest of the system comes from the new image. If it starts cleanly, the trial service commits it; if not, the machine reboots into the previous slot by itself. ${code("recab status")} shows which slot runs and how the last trial ended, and ${code(`${admin(d)} recab rollback`)} returns to the previous slot later. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
