@@ -6,12 +6,12 @@ import { DESKTOP_NAME, INIT_NAME, KERNEL_LINE_NAME } from "../../pages";
 /** What the generated DISTROS records do not carry: each variant's goal, base and userland. */
 const VARIANT_TEXT = {
 	acorn: {
-		goal: "Daily-driver desktop/workstation, a smaller and simpler base",
+		goal: "Small, strict system: the fewest parts that do the job",
 		base: "Alpine APKs",
 		userland: "busybox",
 	},
 	levitate: {
-		goal: "Daily-driver desktop/workstation, maximum compatibility",
+		goal: "Daily-driver workstation, maximum compatibility",
 		base: "Locked, signed Fedora RPMs",
 		userland: "GNU",
 	},
