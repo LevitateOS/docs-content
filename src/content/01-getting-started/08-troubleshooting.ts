@@ -183,7 +183,7 @@ export default distroPage((d) => ({
 								},
 								{
 									type: "text",
-									content: rich`Networking is off unless granted: a recipe that downloads needs ${code("--network-host HOST:443")} for each server it uses. The full log of every run is under ${code(`${RECIPE.state}/logs/`)}.`,
+									content: rich`Inspect ${code("recipe explain packagename")}: downloads need every server and redirect target in the recipe's ${code("NEEDS.network")}. Caller ${code("--network-host")} and ${code("--no-network")} can only restrict it. Manual checks require matching cached dependency products; run install separately to prepare a missing dependency. The full log of every run is under ${code(`${RECIPE.state}/logs/`)}.`,
 								},
 								{
 									type: "command",

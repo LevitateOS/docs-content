@@ -292,33 +292,27 @@ let libs = get_all_dependencies(&ctx.rootfs, &bin_path)?;
 								},
 								{
 									type: "text",
-									content: "With Rhai, recipes ARE CODE:",
+									content: rich`This complete offline recipe copies an explicitly supplied script. Save it as ${code("copy-program.rhai")}, supply your script file, and run ${code("recipe install ./copy-program.rhai --input script=./script.sh")}. The returned program path is the validated publication.`,
 								},
 								{
 									type: "code",
 									language: "rhai",
+									filename: "copy-program.rhai",
 									content: `const RECIPE_API = 2;
-let ctx = #{
-    name: "ripgrep",
-    version: "14.1.0",
-    sha256: "…",
-    src: join_path(RUNTIME.paths.build, "ripgrep-14.1.0-x86_64-unknown-linux-musl"),
-};
-
-fn acquire(ctx) {
-    let url = \`https://github.com/BurntSushi/ripgrep/releases/download/\${ctx.version}/ripgrep-\${ctx.version}-x86_64-unknown-linux-musl.tar.gz\`;
-    let archive = download(url, join_path(ctx.runtime.paths.build, "rg.tar.gz"), ctx.sha256);
-    extract(archive, ctx.runtime.paths.build);
-    ctx
+const NEEDS = #{ inputs: #{ script: "file" }, outputs: #{ program: "file" } };
+let ctx = #{ name: "copy-program", program: join_path(RUNTIME.paths.output, "bin/program") };
+fn is_acquired(ctx) { ready(ctx) }
+fn is_built(ctx) { ready(ctx) }
+fn is_installed(ctx) {
+    if !is_file(ctx.program) { return needs_work(ctx, "program is missing"); }
+    if read_file(ctx.program) != read_file("/inputs/script") {
+        return needs_work(ctx, "program has different bytes");
+    }
+    ctx.outputs.program = ctx.program; ready(ctx)
 }
-
 fn install(ctx) {
-    let rg = join_path(ctx.runtime.paths.output, "bin/rg");
-    mkdir(dirname(rg));
-    copy_file(join_path(ctx.src, "rg"), rg);
-    chmod(rg, 0o755);
-    ctx.outputs.rg = rg;
-    ctx
+    mkdir(dirname(ctx.program)); copy_file("/inputs/script", ctx.program);
+    chmod(ctx.program, 0o755); ctx.outputs.program = ctx.program; ctx
 }`,
 								},
 								{
@@ -395,12 +389,12 @@ fn install(ctx) {
 								{
 									type: "text",
 									content:
-										"They run inside a Ginux domain with bounded memory, storage and time, no network unless the caller grants a host, and no view of the host's files beyond the inputs they are given. By default, LevitateOS is A/B: changes are composed into the inactive slot and trial-booted before they are committed.",
+										"They run inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. By default, LevitateOS is A/B: changes are composed into the inactive slot and trial-booted before they are committed.",
 								},
 								{
 									type: "list",
 									items: [
-										"Recipes are code, not config - they can do anything inside their domain",
+										"Recipes are code whose effects remain bounded by the supported configured contract",
 										"Only use recipes from official LevitateOS sources",
 										"You write your own recipes - you control what they do",
 										"Never run recipes downloaded from untrusted sources",

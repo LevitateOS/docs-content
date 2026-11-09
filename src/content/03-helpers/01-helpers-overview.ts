@@ -3,14 +3,14 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "Helpers Overview",
-	intro: rich`Functions available in ${link("recipe scripts", "/docs/recipe-format")} with ${code("const RECIPE_API = 2;")}. Helpers take explicit paths and return explicit results; paths come from ${code("RUNTIME")} during setup and ${code("ctx.runtime")} in hooks.`,
+	intro: rich`Functions available in ${link("recipe scripts", "/docs/recipe-format")} with ${code("const RECIPE_API = 2;")} and a literal ${code("NEEDS")} declaration. Helpers take explicit paths and return explicit results; paths come from ${code("RUNTIME")} during setup and ${code("ctx.runtime")} in hooks.`,
 	sections: [
 		{
 			title: "Where Helpers Run",
 			content: [
 				{
 					type: "text",
-					content: rich`Every helper with an effect runs inside the recipe's Ginux domain, under its filesystem, task, memory and network limits. Paths refer to the domain's filesystem: ${code("/inputs")}, ${code("/work/build")}, ${code("/work/tools")}, ${code("/work/tmp")} and ${code("/out")}. Commands need their binaries in the selected image or in dependency tools. Network helpers need an endpoint the caller granted with ${code("--network-host")}.`,
+					content: rich`Every helper with an effect runs inside the recipe's Ginux domain, under its filesystem, task, memory and network limits. Paths refer to the domain's filesystem: ${code("/inputs")}, ${code("/work/build")}, ${code("/work/tools")}, ${code("/work/tmp")} and ${code("/out")}. Commands need their binaries in the selected image or in dependency tools. Network helpers need an endpoint declared in ${code("NEEDS.network")}. Caller endpoint/limit options only narrow that authority, including dependencies. Declare all imported inputs and returned outputs with their kinds.`,
 				},
 				{
 					type: "text",
@@ -24,48 +24,41 @@ export default {
 				{
 					type: "code",
 					language: "rhai",
-					filename: "foo.rhai",
+					filename: "helper-demo.rhai",
 					content: `const RECIPE_API = 2;
+const NEEDS = #{ outputs: #{ program: "file" } };
 let ctx = #{
-    name: "foo",
+    name: "helper-demo",
     version: "1.0",
-    url: "https://example.com/foo-1.0.tar.gz",
-    sha256: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
-    src: join_path(RUNTIME.paths.build, "foo-1.0"),
-    program: join_path(RUNTIME.paths.output, "bin/foo"),
+    program: join_path(RUNTIME.paths.output, "bin/hello"),
+    payload: "#!/bin/sh\\nprintf 'hello\\\\n'\\n",
 };
 
-fn is_acquired(ctx) {
-    if is_file(join_path(ctx.src, "configure")) { ready(ctx) } else { needs_work(ctx, "source not unpacked") }
-}
-
-fn acquire(ctx) {
-    let archive = download(ctx.url, join_path(ctx.runtime.paths.build, "foo.tar.gz"), ctx.sha256);
-    extract(archive, ctx.runtime.paths.build);
-    ctx
-}
-
-fn is_built(ctx) {
-    if is_file(join_path(ctx.src, "foo")) { ready(ctx) } else { needs_work(ctx, "foo is not built") }
-}
-
-fn build(ctx) {
-    exec_checked("./configure", ["--prefix=/usr"], #{ cwd: ctx.src });
-    exec_checked("make", ["-j" + ctx.runtime.options.jobs], #{ cwd: ctx.src });
-    ctx
-}
+fn is_acquired(ctx) { ready(ctx) }
+fn acquire(ctx) { ctx }
+fn is_built(ctx) { ready(ctx) }
+fn build(ctx) { ctx }
 
 fn is_installed(ctx) {
-    if !is_file(ctx.program) { return needs_work(ctx, "foo is not installed"); }
+    if !is_file(ctx.program) { return needs_work(ctx, "hello output is missing"); }
+    if read_file(ctx.program) != ctx.payload {
+        return needs_work(ctx, "hello output has different contents");
+    }
     ctx.outputs.program = ctx.program;
     ready(ctx)
 }
 
 fn install(ctx) {
     mkdir(dirname(ctx.program));
-    copy_file(join_path(ctx.src, "foo"), ctx.program);
+    write_file(ctx.program, ctx.payload);
     chmod(ctx.program, 0o755);
     ctx.outputs.program = ctx.program;
+    ctx
+}
+
+fn remove(ctx) {
+    if is_file(ctx.program) { rm(ctx.program); }
+    ctx.outputs = #{};
     ctx
 }`,
 				},

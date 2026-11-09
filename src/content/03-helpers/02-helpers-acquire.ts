@@ -11,7 +11,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`Source facts (URL, version, digest) belong in the recipe. Acquire into ${code("ctx.runtime.paths.build")} and let ${code("is_acquired")} check the real files. Every server a recipe contacts, including each redirect target, needs a caller grant such as ${code("--network-host example.com:443")}; networking is off otherwise.`,
+					content: rich`Source facts (URL, version, digest) belong in the recipe. Acquire into ${code("ctx.runtime.paths.build")} and let ${code("is_acquired")} check the real files. Every server a recipe contacts, including each redirect target, must be in ${code("NEEDS.network")}, for example ${code('["example.com:443"]')}. Caller ${code("--network-host")} can only narrow that declaration. These function fragments require a complete recipe with real publisher URLs/digests and declared outputs; example.com is a placeholder.`,
 				},
 				{
 					type: "code",

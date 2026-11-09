@@ -11,7 +11,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`Each request times out after 30 seconds and needs a network grant for its host, such as ${code("--network-host api.github.com:443")}. Metadata tells a recipe author what is new; it never makes an unverified payload trustworthy. For downloading files, see ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
+					content: rich`Each request times out after 30 seconds and needs its host in ${code("NEEDS.network")}, for example ${code('["api.github.com:443"]')}; caller endpoint options only narrow that declaration. Metadata tells a recipe author what is new; it never makes an unverified payload trustworthy. For downloading files, see ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
 				},
 			],
 		},

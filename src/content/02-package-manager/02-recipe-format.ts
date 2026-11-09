@@ -3,7 +3,7 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "Recipe Format",
-	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts executed inside a configured Ginux domain. They own package facts and custom acquire/build/install behavior. Every executable recipe declares ${code("const RECIPE_API = 2;")}.`,
+	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts executed inside a configured Ginux domain. They own package facts and custom acquire/build/install behavior. Every executable recipe must declare ${code("const RECIPE_API = 2;")} and literal ${code("const NEEDS = #{...};")} for typed inputs, outputs and execution authority. An empty declaration has no inputs, outputs or network grants.`,
 	sections: [
 		{
 			title: "A Complete Recipe",
@@ -17,6 +17,7 @@ export default {
 					language: "rhai",
 					filename: "hello.rhai",
 					content: `const RECIPE_API = 2;
+const NEEDS = #{ outputs: #{ program: "file" } };
 let ctx = #{
     name: "hello",
     version: "1.0",
@@ -88,7 +89,7 @@ fn remove(ctx) {
 							"Imported read-only inputs, one per --input NAME=PATH",
 						],
 						["runtime.paths.build", "/work/build", "Owned build and acquisition work"],
-						["runtime.paths.tools", "/work/tools", "Shared dependency products"],
+						["runtime.paths.tools", "/work/tools", "Private snapshots of direct dependency tools"],
 						["runtime.paths.temp", "/work/tmp", "Owned scratch space"],
 						[
 							"runtime.paths.output / .target",
@@ -137,7 +138,7 @@ fn remove(ctx) {
 				},
 				{
 					type: "text",
-					content: rich`${code("download")} requires a full SHA256 and replaces the destination only after the bytes verify. ${code("git_checkout(url, dest, commit)")} requires an exact destination and a full commit id. Networking is off unless the caller grants ${code("--network-host HOST:PORT")}; recipes cannot add grants. See ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
+					content: rich`${code("download")} requires a full SHA256 and replaces the destination only after the bytes verify. ${code("git_checkout(url, dest, commit)")} requires an exact destination and a full commit id. Declare every contacted host, including redirects, in ${code("NEEDS.network")}. Networking is off for an empty declaration. Caller ${code("--network-host HOST:PORT")} restrictions can only narrow those grants across the graph. See ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
 				},
 			],
 		},
@@ -154,7 +155,7 @@ let build_deps = ["compiler-tools"];`,
 				},
 				{
 					type: "text",
-					content: rich`${code("deps")} and ${code("build_deps")} are literal arrays, read before launch. Dependencies use the same contract, install into the shared ${code("/work/tools")}, and their executables are put on ${code("PATH")}. A child recipe can extend one base recipe: the base's setup runs first and the child's functions override the base's. Only one level of ${code("extends")} is supported.`,
+					content: rich`${code("deps")} and ${code("build_deps")} are literal arrays, read before launch. Each dependency runs in its own instance with its own NEEDS and state. Validated direct products are snapshotted into the consumer; a directory output named ${code("tools")} populates its private ${code("/work/tools")} and ${code("PATH")}. Caller restrictions narrow every instance without lending parent grants. A child recipe can extend one base recipe: the base's setup runs first and the child's functions override the base's. Only one level of ${code("extends")} is supported.`,
 				},
 			],
 		},
@@ -163,7 +164,7 @@ let build_deps = ["compiler-tools"];`,
 			content: [
 				{
 					type: "text",
-					content: rich`Callers import immutable inputs with ${code("--input NAME=PATH")} at ${code("/inputs/NAME")}. After successful execution and archive validation, the final JSON contains the published host paths in ${code("ctx.outputs")}. Consumers validate the names and kinds they need instead of guessing build paths. Remove and cleanup change owned files; imported inputs and earlier publications stay immutable.`,
+					content: rich`Declare each input name and kind in ${code("NEEDS.inputs")}, then bind immutable inputs with ${code("--input NAME=PATH")} at ${code("/inputs/NAME")}. Dependencies use ${code("--input DEP::NAME=PATH")} and never implicitly inherit inputs. After successful execution and archive validation, the final JSON contains the published host paths in ${code("ctx.outputs")}. Consumers validate the names and kinds they need instead of guessing build paths. Declare every published name and kind in ${code("NEEDS.outputs")}; install and installed-cache reuse require the complete set, while present intermediate outputs are validated before checkpointing. Manual readiness requires matching cached dependency products and runs only their installed checks, never installation hooks. Explicit dependent-recipe remove/cleanup remains unresolved. Imported inputs and earlier publications stay immutable.`,
 				},
 			],
 		},
