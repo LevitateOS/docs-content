@@ -18,7 +18,7 @@ export const DISTROS = [
 		isoLabel: "ACORNOS",
 		kernel: {
 			localversion: "-acorn",
-			version: "6.12.116",
+			version: "6.18.62",
 		},
 		loginPrompt: "acornos login:",
 		osId: "acornos",
