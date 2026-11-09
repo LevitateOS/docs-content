@@ -69,7 +69,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`The producer must declare source as a directory in NEEDS.inputs and its returned products in NEEDS.outputs. Inputs are imported read-only at ${code("/inputs/NAME")}. A named ${code("target")} input seeds owned ${code("/out")} for fresh state. Final JSON contains validated published host paths in ${code("ctx.outputs")}; diagnostics go to stderr. Use the same inputs, recipe and destination for manual readiness; matching cached dependencies are required, and their install hooks never run. Explicit dependent-recipe remove/cleanup is unresolved. Published products retain coordinator ownership; privileged producers require matching consumer privileges or explicit product installation.`,
+					content: rich`The producer must declare source as a directory in NEEDS.inputs and its returned products in NEEDS.outputs. Inputs are imported read-only at ${code("/inputs/NAME")}. A named ${code("target")} input seeds owned ${code("/out")} for fresh state. Final JSON contains validated published host paths in ${code("ctx.outputs")}; diagnostics go to stderr. Use the same inputs, recipe and destination for manual readiness; matching cached dependencies are required, and their install hooks never run. Explicit remove/cleanup uses that same cached-dependency rule and fails before the main hook if matching products are unavailable. Published products retain coordinator ownership; privileged producers require matching consumer privileges or explicit product installation.`,
 				},
 			],
 		},
