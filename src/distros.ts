@@ -18,7 +18,7 @@ export const DISTROS = [
 		isoLabel: "ACORNOS",
 		kernel: {
 			localversion: "-acorn",
-			version: "7.3.3",
+			version: "6.12.116",
 		},
 		loginPrompt: "acornos login:",
 		osId: "acornos",
@@ -32,7 +32,7 @@ export const DISTROS = [
 		profile: {
 			desktop: "lxqt",
 			init: "openrc",
-			kernel_line: "latest",
+			kernel_line: "lts",
 			libc: "musl",
 			packages: "apk",
 			privilege: "doas",
@@ -54,7 +54,7 @@ export const DISTROS = [
 		isoLabel: "LEVITATEOS",
 		kernel: {
 			localversion: "-levitate",
-			version: "6.12.116",
+			version: "7.3.3",
 		},
 		loginPrompt: "levitateos login:",
 		osId: "levitateos",
@@ -68,7 +68,7 @@ export const DISTROS = [
 		profile: {
 			desktop: "plasma",
 			init: "systemd",
-			kernel_line: "lts",
+			kernel_line: "latest",
 			libc: "glibc",
 			packages: "rpm",
 			privilege: "sudo",
