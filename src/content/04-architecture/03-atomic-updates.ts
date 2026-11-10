@@ -55,7 +55,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`The immutability work in the checkout protects the system root and supplies writable per-slot ${code("/etc")} overlays. Older images may still remount root writable; this is not the intended A/B policy. Root's current Recipe profile is shared on ${code("/var")}, so package activation there is not yet isolated to a system slot. Recab remains responsible for closing these gaps.`,
+					content: rich`Installed immutable boot now protects the root device and keeps ordinary ${code("/etc")} read-only. Nonempty legacy overlays require explicit adoption. Durable generation/preparation records exist, but ${code("prepare")} stops before copying until incremental synchronization is implemented. Runtime configuration migration and installed boot validation remain outstanding; older images may still remount root writable. Root's current Recipe profile is shared on ${code("/var")}, so package activation there is not yet isolated to a system slot. Recab remains responsible for closing these gaps.`,
 				},
 				{
 					type: "text",

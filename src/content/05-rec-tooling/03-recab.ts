@@ -33,11 +33,11 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The full lifecycle above is required but incomplete. Today's ${code("init")} leaves B unpopulated; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Incremental continuation, preparation sessions, update discovery/download and Recipe targeting of the inactive system are missing. Staging again would discard X already prepared there.`,
+					content: rich`The full lifecycle above is required but incomplete. Today's ${code("init")} leaves B unpopulated; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} records intent and removes the inactive boot entry, then stops at ${code("awaiting_synchronization")}; it does not yet clone a continuation. Incremental synchronization, update discovery/download and Recipe targeting remain missing. Staging refuses an existing preparation to protect X.`,
 				},
 				{
 					type: "text",
-					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; preparation progress and generation readiness still need extending.`,
+					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 3 also reports preparation identity/revision/progress and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
 				},
 			],
 		},
@@ -46,7 +46,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`This existing update path replaces the inactive system. It does not preserve a pending continuation. Start with ${code("recab status")}; the example assumes A is running. When B is running, the trial target is A.`,
+					content: rich`This existing update path replaces the inactive system. It refuses an existing preparation; it cannot yet apply an update while preserving a pending continuation. Start with ${code("recab status")}; the example assumes A is running. When B is running, the trial target is A.`,
 				},
 				{
 					type: "code",
@@ -85,7 +85,7 @@ recab rollback       # select A for the next boot, while A still holds its syste
 					type: "list",
 					items: [
 						rich`${bold("Protected fallback")}: never prepare over the fallback while the running trial is uncommitted. Starting a new preparation over the older system ends that older rollback; the committed active system remains protected.`,
-						rich`${bold("Generation readiness")}: incomplete preparation must not be trial-booted. The current ESP-file presence check alone does not establish a completed system.`,
+						rich`${bold("Generation readiness")}: incomplete preparation must not be trial-booted. Recab requires recorded generation readiness and matching boot artifacts; ESP-file presence alone is insufficient.`,
 						rich`${bold("Shared state")}: user data and caches can remain on ${code("/var")}; system selection and configuration belong to their generation. Today's root Recipe profile is shared, so it does not yet provide that system isolation. Boot rollback does not reverse all shared application data.`,
 					],
 				},
