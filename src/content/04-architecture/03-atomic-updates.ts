@@ -51,11 +51,11 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The complete lifecycle is not implemented yet. Today's installation populates A and leaves B without a system kernel. ${code("recab stage")} formats the inactive slot and extracts a release image, carrying selected configuration from the running system. It cannot yet preserve pending changes in that slot, synchronize whole-system deltas, or direct Recipe changes into a continuation.`,
+					content: rich`The complete lifecycle is not implemented yet. Today's installation populates A and leaves B without a system kernel. ${code("recab stage")} formats the inactive slot and extracts a release image, carrying selected configuration from the running system. It refuses an existing preparation. Whole-system delta synchronization is now available through ${code("recab prepare")}; Recipe targeting, update merging and boot finalization remain incomplete.`,
 				},
 				{
 					type: "text",
-					content: rich`Installed immutable boot now protects the root device and keeps ordinary ${code("/etc")} read-only. Nonempty legacy overlays require explicit adoption. Durable generation/preparation records exist, but ${code("prepare")} stops before copying until incremental synchronization is implemented. Runtime configuration migration and installed boot validation remain outstanding; older images may still remount root writable. Root's current Recipe profile is shared on ${code("/var")}, so package activation there is not yet isolated to a system slot. Recab remains responsible for closing these gaps.`,
+					content: rich`Installed immutable boot now protects the root device and keeps ordinary ${code("/etc")} read-only. Nonempty legacy overlays require explicit adoption. Durable generation/preparation records exist, and ${code("prepare")} synchronizes the inactive filesystem using changed ranges while preserving metadata, links and its slot identity. Reopening preserves pending changes. Synchronization alone does not finalize a bootable candidate. Runtime configuration migration and installed boot validation remain outstanding; older images may still remount root writable. Root's current Recipe profile is shared on ${code("/var")}, so package activation there is not yet isolated to a system slot. Recab remains responsible for closing these gaps.`,
 				},
 				{
 					type: "text",

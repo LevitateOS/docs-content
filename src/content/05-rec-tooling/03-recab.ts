@@ -33,11 +33,11 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The full lifecycle above is required but incomplete. Today's ${code("init")} leaves B unpopulated; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} records intent and removes the inactive boot entry, then stops at ${code("awaiting_synchronization")}; it does not yet clone a continuation. Incremental synchronization, update discovery/download and Recipe targeting remain missing. Staging refuses an existing preparation to protect X.`,
+					content: rich`The full lifecycle above is required but incomplete. Today's ${code("init")} leaves B unpopulated; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Boot finalization, update discovery/download and Recipe targeting remain missing. Staging refuses an existing preparation to protect X.`,
 				},
 				{
 					type: "text",
-					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 3 also reports preparation identity/revision/progress and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
+					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 4 also reports preparation identity/revision/progress, synchronization write counters and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
 				},
 			],
 		},
