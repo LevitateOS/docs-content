@@ -243,11 +243,9 @@ export const commands = {
 			.map((mount) => `umount ${shellQuote(mount.path)}`),
 	reboot: () => "reboot",
 	/**
-	 * Stages a release into the inactive slot, from its ISO mounted at `iso`: the system
-	 * image, the kernel and the initramfs.
+	 * Merge and finalize the verified release from its mounted ISO.
 	 */
-	stage: (d: Facts, iso = "/mnt") =>
-		`recab stage --rootfs ${iso}/live/filesystem.erofs --kernel ${iso}/boot/vmlinuz --initrd ${iso}/boot/${d.installedInitramfs}`,
+	stage: (_d: Facts, iso = "/mnt") => `recab stage --manifest ${shellQuote(`${iso}/release.json`)}`,
 };
 
 /** A check the preflight step makes on the live system: `path` exists. */

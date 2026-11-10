@@ -33,11 +33,11 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Recipe install/update/remove now apply isolated payloads and generation-owned receipts to the preparation; configuration edits use a bounded temporary file. The builder and recab now share a release manifest binding identity, inventory, boot artifacts and compatibility. Import verifies the complete set without changing a preparation. Signed discovery/download now run through Recipe with pinned inputs, verified caching and retry. Offline selection preserves X; P09 release merging remains incomplete. Staging refuses an existing preparation to protect X.`,
+					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} uses the preserving release merge and finalizes when conflict-free. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Recipe install/update/remove now apply isolated payloads and generation-owned receipts to the preparation; configuration edits use a bounded temporary file. The builder and recab now share a release manifest binding identity, inventory, boot artifacts and compatibility. Import verifies the complete set without changing a preparation. Signed discovery/download now run through Recipe with pinned inputs, verified caching and retry. Release merging preserves X or reports structured conflicts, and resumes its captured plan after interruption. Staging accepts an existing preparation through this same engine.`,
 				},
 				{
 					type: "text",
-					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 8 also reports update acquisition/selection, lifecycle, and pending/completed Recipe publications, preparation identity/revision/progress, synchronization/finalization write counters, boot seals and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
+					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 9 also reports update acquisition/selection, lifecycle, and pending/completed Recipe publications, preparation identity/revision/progress, synchronization/finalization write counters, boot seals and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
 				},
 			],
 		},
@@ -79,7 +79,7 @@ reboot`,
 				},
 				{
 					type: "text",
-					content: rich`Import checks compatibility, actual EROFS metadata and matching kernel/modules/initramfs, then retains the exact verified bytes in a content-addressed cache. It leaves the running system, preparation X, ledger and boot entries unchanged. ${code("stage --manifest PATH")} and ${code("stage --from-media MEDIA")} use the same verifier before replacing the inactive system. Configured online discovery/download is implemented. Merging release files into X remains P09.`,
+					content: rich`Import checks compatibility, actual EROFS metadata and matching kernel/modules/initramfs, then retains the exact verified bytes in a content-addressed cache. It leaves the running system, preparation X, ledger and boot entries unchanged. ${code("stage --manifest PATH")} and ${code("stage --from-media MEDIA")} use the same verifier and preserving merge. Online discovery/download, offline merging and structured conflicts are implemented.`,
 				},
 			],
 		},
@@ -97,11 +97,14 @@ reboot`,
 recab update download
 recab update status
 recab update download <release-id>   # retry that exact manifest
-recab update apply <release-id>      # offline selection; merge awaits P09`,
+recab update apply <release-id>      # offline merge; retains X or reports conflicts
+recab update conflicts
+recab update recover
+recab finalize`,
 				},
 				{
 					type: "text",
-					content: rich`Retry rehashes completed artifacts and restarts the incomplete artifact. Cached inputs work offline and are verified again. P08 apply reports ${code("awaiting_merge")}, ${code("merge_complete: false")}; finalization waits for P09 merging or cancellation. ${code("recab update cancel --preparation ID --revision N")} restores the preparation without discarding X. Artifact and process I/O counters are not SSD/SMART totals.`,
+					content: rich`Retry rehashes completed artifacts and restarts the incomplete artifact. Cached inputs work offline and are verified again. Apply compares original release O, prepared C and incoming N, preserving unchanged-side edits and deliberate removals. Conflicts and required Recipe reproduction block finalization. ${code("update resolve ID --choice local|release|edited --preparation ID --revision N")} records an explicit choice; edited input uses ${code("--file")}. Before writes start, ${code("update cancel")} retains X. After a partial merge, ${code("update recover")} resumes the captured plan. Accounts merge by fields and member presence; numeric-ID conflicts stop without remapping shared data. Artifact and process I/O counters are not SSD/SMART totals.`,
 				},
 			],
 		},
@@ -110,7 +113,7 @@ recab update apply <release-id>      # offline selection; merge awaits P09`,
 			content: [
 				{
 					type: "text",
-					content: rich`This path verifies the media manifest and replaces the inactive system. It refuses an existing preparation; it cannot yet apply an update while preserving a pending continuation. Start with ${code("recab status")}; the example assumes A is running. When B is running, the trial target is A.`,
+					content: rich`This path verifies the media manifest and merges into the inactive preparation. Existing X participates in the merge; unresolved conflicts stop before release files are applied. Start with ${code("recab status")}; the example assumes A is running. When B is running, the trial target is A.`,
 				},
 				{
 					type: "code",
@@ -124,7 +127,7 @@ recab rollback       # select A for the next boot, while A still holds its syste
 				},
 				{
 					type: "text",
-					content: rich`${code("stage")} extracts an EROFS release using ${code("recstrap")}, carries the paths listed in ${code("/usr/lib/recab/carried")}, and installs the kernel and installed-system initramfs. The carried-path baseline is not a whole-system delta or conflict-aware merge. Staging refuses an uncommitted running system and a target selected for next boot. ${code("--change-flavour")} explicitly permits switching base/desktop flavour.`,
+					content: rich`${code("stage")} uses the O/C/N merge and existing range writer, without formatting. Raw artifact paths require their corresponding manifest. A missing original baseline requires explicit verified ${code("update adopt-baseline --manifest OLD/release.json")}; personalized C is never invented as O. Staging refuses an uncommitted running system and a target selected for next boot. ${code("--change-flavour")} explicitly permits switching base/desktop flavour.`,
 				},
 			],
 		},

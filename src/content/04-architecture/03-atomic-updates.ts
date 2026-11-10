@@ -51,7 +51,7 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The complete lifecycle is not implemented yet. Installation now finishes with equivalent personalized A/B systems and shared immutable boot payloads. A is committed/default and B is ready at first use; interrupted installation resumes its saved generation. ${code("recab stage")} formats the inactive slot and extracts a release image, carrying selected configuration from the running system. It refuses an existing preparation. Whole-system delta synchronization is now available through ${code("recab prepare")}; Finalization validates and seals either inactive slot before publishing its boot entry. Recipe targeting and update merging remain incomplete.`,
+					content: rich`The complete lifecycle is not implemented yet. Installation now finishes with equivalent personalized A/B systems and shared immutable boot payloads. A is committed/default and B is ready at first use; interrupted installation resumes its saved generation. ${code("recab stage")} and ${code("update apply")} now merge a verified release into the preparation without formatting or discarding X. Structured conflicts block finalization; recovery uses the originally captured O/C/N plan. Whole-system delta synchronization is now available through ${code("recab prepare")}; Finalization validates and seals either inactive slot before publishing its boot entry. Recipe targeting, preserved selection and baseline-aware merging are implemented. Health/fallback assessment and complete frontend flows remain later plan steps; no new VM boot evidence is implied.`,
 				},
 				{
 					type: "text",

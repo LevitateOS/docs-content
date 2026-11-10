@@ -33,7 +33,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`On immutable A/B installations, root's Recipe package commands apply software to the prepared inactive system. The catalog starts with ${code("ripgrep")}, which provides ${code("rg")}. System changes, bundled apps and system updates belong to ${code("recab")}'s A/B continuation lifecycle, using the same Recipe/Ginux engine. The running root stays unchanged; finalize and trial-boot the preparation to activate its changes. Downloaded-release merging remains incomplete.`,
+					content: rich`On immutable A/B installations, root's Recipe package commands apply software to the prepared inactive system. The catalog starts with ${code("ripgrep")}, which provides ${code("rg")}. System changes, bundled apps and system updates belong to ${code("recab")}'s A/B continuation lifecycle, using the same Recipe/Ginux engine. The running root stays unchanged; finalize and trial-boot the preparation to activate its changes. Release merging now preserves prepared changes or reports conflicts.`,
 				},
 				{
 					type: "note",
@@ -94,7 +94,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: `Recab imports and verifies one release manifest without changing a preparation. For unsigned local media, pass --trusted-local explicitly; a configured distribution key always requires its signature. Recab owns ${d.osName} system updates. The required flow preserves local changes and downloaded updates in one prepared continuation, in either direction. With a producer-configured source and public key, recab update check and recab update download discover and cache signed updates through Recipe without changing the running system or X. Offline update apply currently selects verified inputs and waits for P09 merging; it does not apply release files yet. The release-image path below is destructive: it formats the inactive slot and replaces its system. Do not use it to preserve pending work already prepared there.`,
+					content: `Recab imports and verifies one release manifest without changing a preparation. For unsigned local media, pass --trusted-local explicitly; a configured distribution key always requires its signature. Recab owns ${d.osName} system updates. The required flow preserves local changes and downloaded updates in one prepared continuation, in either direction. With a producer-configured source and public key, recab update check and recab update download discover and cache signed updates through Recipe without changing the running system or X. Offline update apply merges the verified release into the preparation, preserving local changes/removals or reporting conflicts. Use update conflicts, resolve and recover before finalize. Media staging uses this same merge and does not format the inactive slot. A missing original baseline needs explicit verified adoption; finalization uses the merged release’s matching boot set.`,
 				},
 				{
 					type: "command",
@@ -105,7 +105,7 @@ export default distroPage((d) => ({
 				{
 					type: "command",
 					language: "bash",
-					description: "Write the new system into the inactive slot",
+					description: "Merge the verified release and finalize if conflict-free",
 					command: `${admin(d)} ${commands.stage(d)}`,
 				},
 				{
@@ -131,7 +131,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`Current staging carries only selected machine configuration from the running system; it does not preserve every local system change or changes already made in the inactive slot. Shared ${code("/var")} and user homes persist, while system package selection is isolated by slot. A healthy trial commits; a judged failure requests fallback. ${code("recab rollback")} selects the previous known-good system while it still exists, without restoring all shared data. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")} for the complete required lifecycle and remaining gaps.`,
+					content: rich`Staging now compares the original release, prepared continuation and incoming release. It preserves prepared changes and explicit deletions or reports conflicts; it never silently replaces X. Shared ${code("/var")} and user homes persist, while system package selection is isolated by slot. A healthy trial commits; a judged failure requests fallback. ${code("recab rollback")} selects the previous known-good system while it still exists, without restoring all shared data. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")} for the complete required lifecycle and remaining gaps.`,
 				},
 			],
 		},
