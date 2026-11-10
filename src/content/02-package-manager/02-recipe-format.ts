@@ -18,18 +18,43 @@ export default {
 						],
 						[
 							"recipes/",
-							"The user-managed software catalog. This collection is currently empty; activation and software updates on the installed system remain to be implemented.",
+							"The user-managed software catalog, starting with ripgrep. Recipe activates its package output independently of the OS image.",
 						],
 					],
 					monospaceCol: 0,
 				},
 				{
 					type: "text",
-					content: rich`Both collections use the engine in ${code("tools/recipe")}, the same API 2 declarations and the same lifecycle below. Their directory and consumer identify their purpose; there is no second recipe format or engine-level ownership flag. Apps bundled in a desktop system image are currently owned by that image and updated with it.`,
+					content: rich`Both collections use the engine in ${code("tools/recipe")}, the same API 2 declarations and the same lifecycle below. Their directory and consumer identify their purpose. A named package output selects CLI activation; the OS builder uses ${code("--no-activate")}. There is no second recipe format or engine. Apps bundled in a desktop system image are currently owned by that image and updated with it.`,
 				},
 				{
 					type: "text",
-					content: rich`The ${code("install")} hook prepares files in the recipe's output tree. The OS builder consumes those published files to assemble an image. User software still needs a separate activation step in Recipe to make its files available on the running system. ${code("remove")} changes the recipe's retained output tree; earlier publications remain intact.`,
+					content: rich`The ${code("install")} hook prepares files in the recipe's output tree. The OS builder consumes published files to assemble an image. For a named ${code("package")} directory output, the Recipe CLI copies the publication into an active software profile. Normal package removal deactivates files using the installed receipt; ${code("--no-activate")} selects the recipe's producer remove hook instead. Earlier publications remain intact.`,
+				},
+			],
+		},
+		{
+			title: "User Package Outputs",
+			content: [
+				{
+					type: "code",
+					language: "rhai",
+					content: `const RECIPE_API = 2;
+const NEEDS = #{ outputs: #{ "package": "directory" } };
+// After writing the package files, set this in install/is_installed:
+ctx.outputs["package"] = join_path(ctx.runtime.paths.output, "package");`,
+				},
+				{
+					type: "text",
+					content: rich`${code("package")} is a reserved Rhai word, so quote the map key and use bracket access. This is a named directory output in the existing API 2 contract. The snippet shows the output declaration and assignment; the recipe still needs its usual lifecycle hooks and ${code("ctx.name")} and ${code("ctx.version")} package metadata.`,
+				},
+				{
+					type: "list",
+					items: [
+						rich`Put executable regular files at ${code("bin/COMMAND")} and shared regular files under ${code("share/")}, relative to the package output directory. The ripgrep recipe supplies ${code("bin/rg")}, its man page and license files.`,
+						rich`Activation accepts directories and regular files only. Symlinks, special files, setuid/setgid permissions and arbitrary host paths are rejected; activation does not run host-side installation scripts.`,
+						rich`${code("recipe install")} activates this output after successful managed production. ${code("recipe update")} produces the selected catalog version for an already active package. ${code("recipe remove")} uses the installed receipt and does not execute the recipe's remove hook. Use ${code("--no-activate")} when only the producer lifecycle is wanted.`,
+					],
 				},
 			],
 		},
@@ -38,7 +63,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`This recipe installs a small program into its output tree without downloading or compiling anything. Run it with ${code("recipe install ./hello.rhai --build-dir ./hello-work")}.`,
+					content: rich`This recipe installs a small program into its output tree without downloading or compiling anything. Run it with ${code("recipe install ./hello.rhai --no-activate --build-dir ./hello-work")}.`,
 				},
 				{
 					type: "code",
@@ -83,7 +108,7 @@ fn remove(ctx) {
 				},
 				{
 					type: "text",
-					content: rich`The final JSON's ${code("outputs.program")} is the published host path; inside hooks the same file is ${code("/out/bin/hello")}.`,
+					content: rich`The final JSON's ${code("outputs.program")} is the published host path; inside hooks the same file is ${code("/out/bin/hello")}. This example is a producer: it publishes a single file and does not declare an activatable package tree.`,
 				},
 			],
 		},

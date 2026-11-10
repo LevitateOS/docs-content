@@ -64,10 +64,12 @@ export const KERNEL_LINE_NAME: Record<Profile["kernel_line"], string> = {
 };
 
 /**
- * Where root's Recipe keeps its recipes, state and image cache on every installed system:
- * on /var, shared by both A/B slots (distro/builder/os-recipes/install-tools.rhai packages them).
+ * Root's mutable Recipe data lives on /var, shared by A/B slots. The OS image
+ * supplies the default catalog; user overrides and active packages persist separately.
  */
 export const RECIPE = {
+	catalog: "/usr/share/recipe/recipes",
+	profile: "/var/lib/recipe/profile",
 	recipes: "/var/lib/recipe/recipes",
 	state: "/var/lib/recipe/state",
 	cache: "/var/cache/recipe",

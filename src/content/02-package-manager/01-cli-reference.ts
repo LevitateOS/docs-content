@@ -3,7 +3,7 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "CLI Reference",
-	intro: rich`The Recipe CLI is the shared engine for OS-building recipes and user-managed software recipes. It executes Rhai recipes inside a configured Ginux domain and returns named published files. Live-system software activation and updates are still unimplemented (see ${link("Post-Installation", "/docs/post-installation")}). Prepare the launcher, verified image and worker before executing recipes using the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")}.`,
+	intro: rich`The Recipe CLI uses one engine for OS-building recipes and user-managed software. It executes recipes in Ginux, publishes their named outputs, and activates a declared package output unless ${code("--no-activate")} is selected. See ${link("Post-Installation", "/docs/post-installation")} for the ripgrep workflow and the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")} for runtime setup on a development host.`,
 	sections: [
 		{
 			title: "Commands",
@@ -14,17 +14,25 @@ export default {
 					rows: [
 						[
 							"recipe install RECIPE",
-							"Run necessary acquire/build/install work and publish output files; does not activate them on the running system.",
+							"Run necessary acquire/build/install work, publish outputs and activate a declared package directory. --no-activate keeps producer-only behavior.",
 						],
 						[
 							"recipe isinstalled RECIPE",
-							"Check the owned selected target; work needed returns nonzero.",
+							"Check the active package receipt. With --no-activate, run the producer readiness check; work needed returns nonzero.",
+						],
+						[
+							"recipe update PACKAGE",
+							"Produce and activate the selected catalog recipe for an already installed package.",
+						],
+						[
+							"recipe installed",
+							"List active package receipts without executing recipes or starting Ginux.",
 						],
 						["recipe isbuilt RECIPE", "Run the custom build readiness check."],
 						["recipe isacquired RECIPE", "Run the custom source readiness check."],
 						[
 							"recipe remove RECIPE",
-							"Remove owned target files; earlier publications remain immutable.",
+							"Deactivate an installed package using its receipt, without recipe execution. --no-activate runs the producer remove hook.",
 						],
 						["recipe cleanup RECIPE", "Run optional cleanup with reason manual by default."],
 						[
@@ -54,7 +62,24 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`${code("RECIPE")} is a path to a ${code(".rhai")} file, or a name looked up in ${code("--recipes-path")} (default ${code("$RECIPE_PATH")}, else ${code("~/.local/share/recipe/recipes")}), with ${code(".rhai")} appended if needed. Run ${code("recipe --help")} and ${code("recipe <command> --help")} for the full syntax.`,
+					content: rich`${code("RECIPE")} is a path to a ${code(".rhai")} file or a name, with ${code(".rhai")} appended if needed. Default lookup checks ${code("$XDG_DATA_HOME/recipe/recipes")} (normally ${code("~/.local/share/recipe/recipes")}) before the shipped ${code("/usr/share/recipe/recipes")}; a local recipe overrides the same name. ${code("--recipes-path")} or ${code("RECIPE_PATH")} selects only that collection. Run ${code("recipe --help")} and ${code("recipe <command> --help")} for the full syntax.`,
+				},
+			],
+		},
+		{
+			title: "User Package Lifecycle",
+			content: [
+				{
+					type: "text",
+					content: rich`${code("recipe update ripgrep")} uses the currently selected recipe's pinned version and sources. It requires an active installation and does not discover an unpinned latest upstream release or change the catalog. After the catalog changes, run update to produce and activate that version. A failed production or activation keeps the old profile active.`,
+				},
+				{
+					type: "text",
+					content: rich`The active profile is ${code("<package-root>/profile")}; put ${code("<package-root>/profile/bin")} on ${code("PATH")}. Installation, update and removal switch complete profile generations. ${code("remove")} uses the active receipt, so a changed or missing recipe and unavailable Ginux runtime do not prevent removing an installed package. Old generations remain inactive on disk.`,
+				},
+				{
+					type: "text",
+					content: rich`An image built by the current OS builder supplies ${code("/usr/libexec/recipe/ginux")} and ${code("/usr/share/recipe/runtime/rootfs.tar")} with its digest reference in ${code("root-reference")}. Explicit ${code("GINUX_BIN")}, ${code("GINUX_ROOTFS")} and ${code("GINUX_ROOT")} selections override those defaults. The native launcher needs root bootstrap privileges; receipt inspection and removal do not start it.`,
 				},
 			],
 		},
@@ -64,7 +89,7 @@ export default {
 				{
 					type: "code",
 					language: "bash",
-					content: `recipe install ./producer.rhai \\
+					content: `recipe install ./producer.rhai --no-activate \\
   --input source=./offline-source \\
   --build-dir .artifacts/work/example \\
   --state-dir .artifacts/state/example \\
@@ -72,7 +97,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`The producer must declare source as a directory in NEEDS.inputs and its returned products in NEEDS.outputs. Inputs are imported read-only at ${code("/inputs/NAME")}. A named ${code("target")} input seeds owned ${code("/out")} for fresh state. Final JSON contains validated published host paths in ${code("ctx.outputs")}; diagnostics go to stderr. Use the same inputs, recipe and destination for manual readiness; matching cached dependencies are required, and their install hooks never run. Explicit remove/cleanup uses that same cached-dependency rule and fails before the main hook if matching products are unavailable. Published products retain coordinator ownership; privileged producers require matching consumer privileges or explicit product installation.`,
+					content: rich`The producer must declare source as a directory in NEEDS.inputs and its returned products in NEEDS.outputs. Inputs are imported read-only at ${code("/inputs/NAME")}. A named ${code("target")} input seeds owned ${code("/out")} for fresh state. Final JSON contains validated published host paths in ${code("ctx.outputs")}; diagnostics go to stderr. Use the same inputs, recipe and destination for producer readiness; matching cached dependencies are required, and their install hooks never run. Producer remove (${code("--no-activate")}) and cleanup use that cached-dependency rule and fail before the main hook if matching products are unavailable. Published products retain coordinator ownership. User packages are copied from a validated publication into a new active profile generation; the engine's prior publications remain unchanged.`,
 				},
 			],
 		},
@@ -83,7 +108,18 @@ export default {
 					type: "table",
 					headers: ["Option", "Purpose"],
 					rows: [
-						["--recipes-path DIR", "Name/module/dependency search directory."],
+						[
+							"--recipes-path DIR",
+							"Select one recipe collection; disable the default catalog fallback.",
+						],
+						[
+							"--package-root DIR",
+							"Package receipts and profile storage; root defaults to /var/lib/recipe, other users to $XDG_DATA_HOME/recipe.",
+						],
+						[
+							"--no-activate",
+							"Keep install/remove/isinstalled on the producer lifecycle; the OS builder passes this explicitly.",
+						],
 						[
 							"--build-dir DIR",
 							"Logical build destination and lock; default a stable directory under the state directory.",
