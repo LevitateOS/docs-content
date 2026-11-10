@@ -113,7 +113,7 @@ export const GUIDE = [
 	{
 		slug: "installation-boot",
 		title: "Boot & Finish",
-		steps: ["Install the Boot Loader and Entries", "Review Services", "Unmount and Reboot"],
+		steps: ["Review Services", "Install the Boot Loader and Entries", "Unmount and Reboot"],
 	},
 ] as const;
 
@@ -294,7 +294,7 @@ export const STEP_INFO: { [S in InstallStepId]: { title: string; about: string }
 	},
 	boot: {
 		title: "Boot",
-		about: "Install the boot loader and the boot entries for the disk's layout.",
+		about: "For A/B, populate and seal both personalized systems, then publish their boot entries.",
 	},
 	finish: {
 		title: "Finish",

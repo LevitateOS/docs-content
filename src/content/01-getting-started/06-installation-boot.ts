@@ -21,29 +21,6 @@ export default distroPage((d) => ({
 	intro: `Installation ${guideSteps(SLUG)}. Finish from the live shell. Keep the installed root at ${target} and its EFI partition at ${target}/boot.`,
 	sections: [
 		{
-			title: guideStep(SLUG, "Install the Boot Loader and Entries"),
-			content: [
-				{
-					type: "text",
-					content: rich`Use the slot A and B devices reported by ${code("recpart apply")}. Previewing with ${code("recsetup plan")} runs no installation commands.`,
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Install systemd-boot, write slot entries and initialize machine identity",
-					command: commands.boot(target, args(EXAMPLE_DISK)),
-				},
-				{
-					type: "text",
-					content: rich`${code("recsetup")} calls ${code("recab init")}, which copies the target's systemd-boot EFI binary and writes the boot layout. Currently only A receives its kernel and initramfs under ${code(`/boot/${d.osId}-a/`)}; both entries name their partitions by PARTUUID, and A becomes the known-good default. The required installation must instead finish with equivalent personalized systems and boot artifacts in both slots; populating B is not yet implemented. Add ${code('--options "console=ttyS0,115200n8"')} for a serial console.`,
-				},
-				{
-					type: "text",
-					content: rich`For an explicitly selected mutable layout, use ${code(args(MUTABLE))} instead of the A/B arguments.`,
-				},
-			],
-		},
-		{
 			title: guideStep(SLUG, "Review Services"),
 			content: [
 				{
@@ -65,6 +42,30 @@ export default distroPage((d) => ({
 					language: "bash",
 					description: "WiFi: keep the networks saved in the live session",
 					command: network(d).keepWifi(target),
+				},
+			],
+		},
+		{
+			title: guideStep(SLUG, "Install the Boot Loader and Entries"),
+			content: [
+				{
+					type: "text",
+					content: rich`Use the slot A and B devices reported by ${code("recpart apply")}. Previewing with ${code("recsetup plan")} runs no installation commands.`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description:
+						"Populate both personalized systems, seal their roots and publish both boot entries",
+					command: commands.boot(target, args(EXAMPLE_DISK)),
+				},
+				{
+					type: "text",
+					content: rich`${code("recsetup")} calls ${code("recab init")}, which copies the target's systemd-boot EFI binary and writes the boot layout. It copies the personalized A into B, checks their normalized equivalence, protects both root devices read-only, and publishes both entries with matching hash-named kernel/initramfs objects. A becomes committed/default; B is ready at first use without being recorded as a successful trial. Retry the same command after an interruption: completed settings and passwords are preserved, and a later live generation is never reset. Finish all service/network choices before this step. Add ${code('--options "console=ttyS0,115200n8"')} for a serial console.`,
+				},
+				{
+					type: "text",
+					content: rich`For an explicitly selected mutable layout, use ${code(args(MUTABLE))} instead of the A/B arguments.`,
 				},
 			],
 		},

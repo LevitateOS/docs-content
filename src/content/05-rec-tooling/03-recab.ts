@@ -33,7 +33,7 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The full lifecycle above is required but incomplete. Today's ${code("init")} leaves B unpopulated; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Update discovery/download and Recipe targeting remain missing. Staging refuses an existing preparation to protect X.`,
+					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Update discovery/download and Recipe targeting remain missing. Staging refuses an existing preparation to protect X.`,
 				},
 				{
 					type: "text",
