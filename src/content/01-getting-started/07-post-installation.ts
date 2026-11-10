@@ -94,7 +94,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: `Recab owns ${d.osName} system updates. The required flow preserves local changes and downloaded updates in one prepared continuation, in either direction. Downloaded-release merging is not implemented yet. The release-image path below is destructive: it formats the inactive slot and replaces its system. Do not use it to preserve pending work already prepared there.`,
+					content: `Recab imports and verifies one release manifest without changing a preparation. For unsigned local media, pass --trusted-local explicitly; a configured distribution key always requires its signature. Recab owns ${d.osName} system updates. The required flow preserves local changes and downloaded updates in one prepared continuation, in either direction. Downloaded-release merging is not implemented yet. The release-image path below is destructive: it formats the inactive slot and replaces its system. Do not use it to preserve pending work already prepared there.`,
 				},
 				{
 					type: "command",

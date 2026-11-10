@@ -33,7 +33,7 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Recipe install/update/remove now apply isolated payloads and generation-owned receipts to the preparation; configuration edits use a bounded temporary file. Update discovery/download and release merging remain missing. Staging refuses an existing preparation to protect X.`,
+					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Recipe install/update/remove now apply isolated payloads and generation-owned receipts to the preparation; configuration edits use a bounded temporary file. The builder and recab now share a release manifest binding identity, inventory, boot artifacts and compatibility. Import verifies the complete set without changing a preparation. Update discovery/download and release merging remain missing. Staging refuses an existing preparation to protect X.`,
 				},
 				{
 					type: "text",
@@ -66,17 +66,35 @@ reboot`,
 			],
 		},
 		{
+			title: "Verified Release Inputs",
+			content: [
+				{
+					type: "text",
+					content: rich`Media and online payloads use one ${code("release.json")}, binding distro/profile, architecture, channel/sequence, intended system inventory and exact rootfs/kernel/initramfs hashes and sizes. The installed distribution key verifies detached Ed25519 signatures. With no configured key, unsigned local input requires explicit ${code("--trusted-local")}; that flag cannot bypass a configured key.`,
+				},
+				{
+					type: "code",
+					language: "bash",
+					content: "recab release import /mnt/release/release.json --trusted-local",
+				},
+				{
+					type: "text",
+					content: rich`Import checks compatibility, actual EROFS metadata and matching kernel/modules/initramfs, then retains the exact verified bytes in a content-addressed cache. It leaves the running system, preparation X, ledger and boot entries unchanged. ${code("stage --manifest PATH")} and ${code("stage --from-media MEDIA")} use the same verifier before replacing the inactive system. Configured online discovery/download and merging into X remain P08/P09.`,
+				},
+			],
+		},
+		{
 			title: "Current Release Image Staging",
 			content: [
 				{
 					type: "text",
-					content: rich`This existing update path replaces the inactive system. It refuses an existing preparation; it cannot yet apply an update while preserving a pending continuation. Start with ${code("recab status")}; the example assumes A is running. When B is running, the trial target is A.`,
+					content: rich`This path verifies the media manifest and replaces the inactive system. It refuses an existing preparation; it cannot yet apply an update while preserving a pending continuation. Start with ${code("recab status")}; the example assumes A is running. When B is running, the trial target is A.`,
 				},
 				{
 					type: "code",
 					language: "bash",
 					content: `recab status
-recab stage --from-media /mnt/release
+recab stage --from-media /mnt/release  # add --trusted-local for unsigned local media
 recab set-next B      # example: A is running
 reboot
 # After a healthy trial, B is committed and A remains the rollback target.
