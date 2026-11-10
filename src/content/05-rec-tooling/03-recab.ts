@@ -33,11 +33,35 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Update discovery/download and Recipe targeting remain missing. Staging refuses an existing preparation to protect X.`,
+					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Recipe install/update/remove now apply isolated payloads and generation-owned receipts to the preparation; configuration edits use a bounded temporary file. Update discovery/download and release merging remain missing. Staging refuses an existing preparation to protect X.`,
 				},
 				{
 					type: "text",
-					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 5 also reports preparation identity/revision/progress, synchronization/finalization write counters, boot seals and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
+					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 6 also reports pending/completed Recipe publications, preparation identity/revision/progress, synchronization/finalization write counters, boot seals and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
+				},
+			],
+		},
+		{
+			title: "Prepared System Software",
+			content: [
+				{
+					type: "text",
+					content: rich`Root's ${code("recipe install")}, ${code("update")} and ${code("remove")} commands on immutable A/B installations delegate to recab. ${code("--system")} selects this explicitly. Recipe runs inside Ginux with isolated payload outputs; recab applies them only to the inactive preparation. Updates/removals refuse incompatible ownership and administrator edits. The running system stays unchanged until a finalized candidate is trial-booted.`,
+				},
+				{
+					type: "code",
+					language: "bash",
+					content: `recipe --system install service
+recipe --system installed
+recipe --system isinstalled service --prepared
+recab edit /etc/example.conf
+recab finalize
+recab set-next B      # A is running; use A when B is running
+reboot`,
+				},
+				{
+					type: "text",
+					content: rich`System packages and their receipts belong to the slot, under ${code("/usr/lib/recipe")}. ${code("installed")} distinguishes active and prepared selection; ${code("isinstalled")} defaults to the active system. An interrupted publication requires ${code("recab change recover")} or explicit discard before more edits/finalization. Independent ${code("--package-root")} profiles and ${code("--no-activate")} builders retain their own routes.`,
 				},
 			],
 		},
@@ -86,7 +110,7 @@ recab rollback       # select A for the next boot, while A still holds its syste
 					items: [
 						rich`${bold("Protected fallback")}: never prepare over the fallback while the running trial is uncommitted. Starting a new preparation over the older system ends that older rollback; the committed active system remains protected.`,
 						rich`${bold("Generation readiness")}: incomplete preparation must not be trial-booted. Recab requires recorded generation readiness and matching boot artifacts; ESP-file presence alone is insufficient.`,
-						rich`${bold("Shared state")}: user data and caches can remain on ${code("/var")}; system selection and configuration belong to their generation. Today's root Recipe profile is shared, so it does not yet provide that system isolation. Boot rollback does not reverse all shared application data.`,
+						rich`${bold("Shared state")}: user data and caches can remain on ${code("/var")}; system selection and configuration belong to their generation. On immutable A/B installs, root's Recipe package commands target the inactive system; its system profile belongs to that slot. Boot rollback does not reverse all shared application data.`,
 					],
 				},
 			],

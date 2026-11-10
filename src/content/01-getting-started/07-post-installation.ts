@@ -19,8 +19,12 @@ export default distroPage((d) => ({
 				{
 					type: "command",
 					language: "bash",
-					description: "Start a service now and at every boot",
+					description: "Mutable installations: start a service now and at every boot",
 					command: services(d).enable("SERVICE"),
+				},
+				{
+					type: "text",
+					content: rich`On immutable A/B installations, persistent service configuration belongs to a Recipe system change in the inactive preparation. Commands that write ordinary ${code("/etc")} cannot change the running root. Finalize and trial-boot the prepared configuration.`,
 				},
 			],
 		},
@@ -29,7 +33,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`Recipe currently activates independent software in a shared profile. The catalog starts with ${code("ripgrep")}, which provides ${code("rg")}. System changes, bundled apps and system updates belong to ${code("recab")}'s A/B continuation lifecycle, using the same Recipe/Ginux engine. Recipe targeting of an inactive system is still missing; the profile commands below do not implement that lifecycle.`,
+					content: rich`On immutable A/B installations, root's Recipe package commands apply software to the prepared inactive system. The catalog starts with ${code("ripgrep")}, which provides ${code("rg")}. System changes, bundled apps and system updates belong to ${code("recab")}'s A/B continuation lifecycle, using the same Recipe/Ginux engine. The running root stays unchanged; finalize and trial-boot the preparation to activate its changes. Downloaded-release merging remains incomplete.`,
 				},
 				{
 					type: "note",
@@ -45,8 +49,15 @@ export default distroPage((d) => ({
 				{
 					type: "command",
 					language: "bash",
-					description: "Install ripgrep and run its command",
-					command: [`${admin(d)} recipe install ripgrep`, "rg --version"],
+					description: "Prepare ripgrep, finalize and trial-boot it (A is running)",
+					command: [
+						`${admin(d)} recipe --system install ripgrep`,
+						`${admin(d)} recab finalize`,
+						`${admin(d)} recab set-next B`,
+						`${admin(d)} reboot`,
+						"# After a successful trial boot:",
+						"rg --version",
+					],
 				},
 				{
 					type: "command",
@@ -56,21 +67,21 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`${code("recipe update ripgrep")} runs the currently selected recipe and activates its pinned version after successful production. It does not fetch an unpinned upstream release or edit the recipe's version and checksum. A newer shipped catalog arrives with an OS image update; an administrator can also maintain a recipe override in ${code(RECIPE.recipes)}.`,
+					content: rich`${code("recipe update ripgrep")} runs the currently selected recipe and applies its pinned version to the inactive preparation after successful production. Finalize and trial-boot that system to activate it. It does not fetch an unpinned upstream release or edit the recipe's version and checksum. A newer shipped catalog arrives with an OS image update; an administrator can also maintain a recipe override in ${code(RECIPE.recipes)}.`,
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "Remove ripgrep from the active software profile",
+					description: "Remove ripgrep from the prepared system",
 					command: `${admin(d)} recipe remove ripgrep`,
 				},
 				{
 					type: "text",
-					content: rich`Removal uses the installed receipt, so it works without the source recipe or a Ginux runtime. It removes this package's commands and shared files from the active profile; older generations remain on disk but are inactive. ${code("recipe installed")} reads the active package receipts, whereas ${code("recipe list")} lists available recipes.`,
+					content: rich`Removal uses the installed receipt, so it works without the source recipe or a Ginux runtime. It removes only unchanged owned files from the prepared selection, retaining other owners and refusing administrator edits. Finalize and trial-boot to activate the removal. ${code("recipe installed")} reports active and prepared receipts, whereas ${code("recipe list")} lists available recipes.`,
 				},
 				{
 					type: "text",
-					content: rich`Root's package profile is ${code(RECIPE.profile)}, on shared ${code("/var")}; its commands are in ${code(`${RECIPE.profile}/bin`)}. The installed system's login profile adds that directory and the user's own Recipe profile to ${code("PATH")}. When using a custom ${code("--package-root DIR")}, add ${code("DIR/profile/bin")} to your shell's ${code("PATH")}.`,
+					content: rich`System software is in the booted slot's ${code("/usr/lib/recipe/profile")}; login adds its commands and ordinary users' independent profiles to ${code("PATH")}. Root's immutable-system commands do not activate the shared ${code(RECIPE.profile)}. When using a custom ${code("--package-root DIR")}, add ${code("DIR/profile/bin")} to your shell's ${code("PATH")}.`,
 				},
 				{
 					type: "text",
@@ -83,7 +94,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: `Recab owns ${d.osName} system updates. The required flow preserves local changes and downloaded updates in one prepared continuation, in either direction. Today only the destructive release-image path below exists: it formats the inactive slot and replaces its system. Do not use it to preserve pending work already prepared there.`,
+					content: `Recab owns ${d.osName} system updates. The required flow preserves local changes and downloaded updates in one prepared continuation, in either direction. Downloaded-release merging is not implemented yet. The release-image path below is destructive: it formats the inactive slot and replaces its system. Do not use it to preserve pending work already prepared there.`,
 				},
 				{
 					type: "command",
@@ -120,7 +131,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`Current staging carries only selected machine configuration from the running system; it does not preserve every local system change or changes already made in the inactive slot. Shared ${code("/var")} and user homes persist, including today's root Recipe profile, which is not isolated by slot. A healthy trial commits; a judged failure requests fallback. ${code("recab rollback")} selects the previous known-good system while it still exists, without restoring all shared data. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")} for the complete required lifecycle and remaining gaps.`,
+					content: rich`Current staging carries only selected machine configuration from the running system; it does not preserve every local system change or changes already made in the inactive slot. Shared ${code("/var")} and user homes persist, while system package selection is isolated by slot. A healthy trial commits; a judged failure requests fallback. ${code("recab rollback")} selects the previous known-good system while it still exists, without restoring all shared data. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")} for the complete required lifecycle and remaining gaps.`,
 				},
 			],
 		},
