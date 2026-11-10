@@ -33,11 +33,11 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Recipe install/update/remove now apply isolated payloads and generation-owned receipts to the preparation; configuration edits use a bounded temporary file. The builder and recab now share a release manifest binding identity, inventory, boot artifacts and compatibility. Import verifies the complete set without changing a preparation. Update discovery/download and release merging remain missing. Staging refuses an existing preparation to protect X.`,
+					content: rich`The full lifecycle above is required but incomplete. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Recipe install/update/remove now apply isolated payloads and generation-owned receipts to the preparation; configuration edits use a bounded temporary file. The builder and recab now share a release manifest binding identity, inventory, boot artifacts and compatibility. Import verifies the complete set without changing a preparation. Signed discovery/download now run through Recipe with pinned inputs, verified caching and retry. Offline selection preserves X; P09 release merging remains incomplete. Staging refuses an existing preparation to protect X.`,
 				},
 				{
 					type: "text",
-					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 6 also reports pending/completed Recipe publications, preparation identity/revision/progress, synchronization/finalization write counters, boot seals and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
+					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 8 also reports update acquisition/selection, lifecycle, and pending/completed Recipe publications, preparation identity/revision/progress, synchronization/finalization write counters, boot seals and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled.`,
 				},
 			],
 		},
@@ -79,7 +79,29 @@ reboot`,
 				},
 				{
 					type: "text",
-					content: rich`Import checks compatibility, actual EROFS metadata and matching kernel/modules/initramfs, then retains the exact verified bytes in a content-addressed cache. It leaves the running system, preparation X, ledger and boot entries unchanged. ${code("stage --manifest PATH")} and ${code("stage --from-media MEDIA")} use the same verifier before replacing the inactive system. Configured online discovery/download and merging into X remain P08/P09.`,
+					content: rich`Import checks compatibility, actual EROFS metadata and matching kernel/modules/initramfs, then retains the exact verified bytes in a content-addressed cache. It leaves the running system, preparation X, ledger and boot entries unchanged. ${code("stage --manifest PATH")} and ${code("stage --from-media MEDIA")} use the same verifier before replacing the inactive system. Configured online discovery/download is implemented. Merging release files into X remains P09.`,
+				},
+			],
+		},
+		{
+			title: "Discover and Download an Update",
+			content: [
+				{
+					type: "text",
+					content: rich`The image producer must configure the installed source, acquisition recipe and distribution public key. ${code("check")} verifies a signed index and release manifest. ${code("download")} uses Recipe inside Ginux, with only a request file and bounded access to that endpoint. Both commands leave the running system, prepared X, slot ledger and boot eligibility unchanged. Checked-in development variants have no production endpoint or key.`,
+				},
+				{
+					type: "code",
+					language: "bash",
+					content: `recab update check
+recab update download
+recab update status
+recab update download <release-id>   # retry that exact manifest
+recab update apply <release-id>      # offline selection; merge awaits P09`,
+				},
+				{
+					type: "text",
+					content: rich`Retry rehashes completed artifacts and restarts the incomplete artifact. Cached inputs work offline and are verified again. P08 apply reports ${code("awaiting_merge")}, ${code("merge_complete: false")}; finalization waits for P09 merging or cancellation. ${code("recab update cancel --preparation ID --revision N")} restores the preparation without discarding X. Artifact and process I/O counters are not SSD/SMART totals.`,
 				},
 			],
 		},
