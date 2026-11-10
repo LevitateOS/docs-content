@@ -11,7 +11,8 @@
 		"./distros": "./src/distros.ts",
 		"./install": "./src/install.ts",
 		"./syntax-theme": "./src/syntax-theme.ts",
-		"./pages": "./src/pages.ts"
+		"./pages": "./src/pages.ts",
+		"./brand": "./src/brand.ts"
 	},
 	"scripts": {
 		"build": "bun scripts/build.ts",
