@@ -5,40 +5,71 @@ import { TOOL_HELP } from "../../tool-help";
 export default {
 	title: "recab",
 	intro:
-		"A/B slot management: which slot runs, which boots next, commit and rollback (systemd-boot backend).",
+		"System updates and symmetric A/B continuation: prepare the next system, apply changes and updates through Recipe, trial-boot it, commit or fall back.",
 	sections: [
 		{
-			title: "How It Works",
+			title: "Required Update Lifecycle",
 			content: [
 				{
+					type: "list",
+					ordered: true,
+					items: [
+						"Installation populates A and B with equivalent personalized systems and matching boot artifacts. Both are bootable at first use; only partition references, boot paths and slot identity differ.",
+						"While committed A runs with an immutable system root, prepare writable B as its continuation and apply system change X through Recipe.",
+						"Discover and download a system update and apply it to that same prepared B. Preserve X or report a conflict; do not erase the preparation.",
+						"Finalize B and its matching kernel and initramfs, then trial-boot it. Commit a healthy result or return to A after a failed trial triggers a reboot.",
+						"For change Y while running committed B, bring inactive A up to B's current system using only differences, retain X and the update, then apply Y. Repeat in either direction.",
+					],
+				},
+				{
 					type: "text",
-					content: rich`${code("recab")} is implemented on systemd-boot, with systemd (LevitateOS) or OpenRC (AcornOS) as init: it finds the running slot by matching the kernel's ${code("root=")} against the slot entries, stages trial boots by writing systemd-boot's ${code("LoaderEntryOneShot")} variable itself (no ${code("bootctl")} needed), lets its trial service commit a healthy trial or reboot out of a failed one, and keeps its state in ${code("/var/lib/recab")}. ${code("recab status --json")} prints the JSON described by ${code("tools/recab/docs/status.schema.json")}.`,
+					content: rich`${code("recab")} owns this system update lifecycle. ${code("Recipe")} owns software acquisition, builds, installation, update and removal inside Ginux; recab coordinates those operations for the prepared system. Slot letters have identical capabilities.`,
 				},
 			],
 		},
 		{
-			title: "An Update",
+			title: "Implementation Status",
 			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`The full lifecycle above is required but incomplete. Today's ${code("init")} leaves B unpopulated; ${code("stage")} formats the inactive slot and carries selected configuration from the running system. Incremental continuation, preparation sessions, update discovery/download and Recipe targeting of the inactive system are missing. Staging again would discard X already prepared there.`,
+				},
+				{
+					type: "text",
+					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; preparation progress and generation readiness still need extending.`,
+				},
+			],
+		},
+		{
+			title: "Current Release Image Staging",
+			content: [
+				{
+					type: "text",
+					content: rich`This existing update path replaces the inactive system. It does not preserve a pending continuation. Start with ${code("recab status")}; the example assumes A is running. When B is running, the trial target is A.`,
+				},
 				{
 					type: "code",
 					language: "bash",
-					content: `recab stage --rootfs /mnt/live/filesystem.erofs --kernel /mnt/boot/vmlinuz --initrd /mnt/boot/initramfs-installed.img
-recab set-next B      # one trial boot of the staged slot
-reboot                # into B: committed if it comes up healthy, else back to A
-recab rollback        # later, if wanted: back to A, while A still holds its system`,
+					content: `recab status
+recab stage --from-media /mnt/release
+recab set-next B      # example: A is running
+reboot
+# After a healthy trial, B is committed and A remains the rollback target.
+recab rollback       # select A for the next boot, while A still holds its system`,
 				},
 				{
 					type: "text",
-					content: rich`${code("stage")} formats the inactive slot, extracts the image with ${code("recstrap")}, and carries over the hostname, machine id, locale, time settings, accounts (merged by name), SSH host keys, enabled services and network connections, as the image's ${code("/usr/lib/recab/carried")} lists them. For the carried directories (systemd units and links, OpenRC runlevels, conf.d) it records what the image shipped in ${code("/usr/lib/recab/baseline")}; the next update carries only what the machine added or changed there, drops what it removed, and takes the rest from the new image. It refuses while the running slot is uncommitted or while the target slot is the next boot, and it refuses an image of the other flavour (${code("REC_FLAVOUR")} in its os-release: the base system over a desktop install, or the reverse) unless ${code("--change-flavour")} is given.`,
+					content: rich`${code("stage")} extracts an EROFS release using ${code("recstrap")}, carries the paths listed in ${code("/usr/lib/recab/carried")}, and installs the kernel and installed-system initramfs. The carried-path baseline is not a whole-system delta or conflict-aware merge. Staging refuses an uncommitted running system and a target selected for next boot. ${code("--change-flavour")} explicitly permits switching base/desktop flavour.`,
 				},
 			],
 		},
 		{
-			title: "Usage",
+			title: "Current CLI",
 			content: [
 				{
 					type: "text",
-					content: rich`Options as printed by ${code("recab --help")}:`,
+					content: rich`Implemented options from ${code("recab --help")}; these do not yet expose the full required lifecycle:`,
 				},
 				{
 					type: "code",
@@ -48,14 +79,14 @@ recab rollback        # later, if wanted: back to A, while A still holds its sys
 			],
 		},
 		{
-			title: "Design Intent",
+			title: "Safety and Persistence",
 			content: [
 				{
 					type: "list",
 					items: [
-						rich`${bold("Slot state machine")}: called by people, installers (${code("recsetup")} runs ${code("recab init")}) and the update scenarios`,
-						rich`${bold("Never selects an unbootable slot")}: ${code("set-next")}, ${code("commit")} and ${code("rollback")} refuse a slot whose entry names files missing from the ESP`,
-						rich`${bold("Non-goal")}: building the system it stages, or package management`,
+						rich`${bold("Protected fallback")}: never prepare over the fallback while the running trial is uncommitted. Starting a new preparation over the older system ends that older rollback; the committed active system remains protected.`,
+						rich`${bold("Generation readiness")}: incomplete preparation must not be trial-booted. The current ESP-file presence check alone does not establish a completed system.`,
+						rich`${bold("Shared state")}: user data and caches can remain on ${code("/var")}; system selection and configuration belong to their generation. Today's root Recipe profile is shared, so it does not yet provide that system isolation. Boot rollback does not reverse all shared application data.`,
 					],
 				},
 			],
@@ -66,8 +97,8 @@ recab rollback        # later, if wanted: back to A, while A still holds its sys
 				{
 					type: "list",
 					items: [
-						rich`${link("recpart", "/docs/recpart")} - Install disk/backend handoff`,
-						rich`${link("Atomic Updates (A/B)", "/docs/atomic-updates")} - A/B model context`,
+						rich`${link("recpart", "/docs/recpart")} - Installation disk layout`,
+						rich`${link("Atomic Updates (A/B)", "/docs/atomic-updates")} - The system lifecycle and implementation limits`,
 					],
 				},
 			],

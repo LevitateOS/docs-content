@@ -24,7 +24,7 @@ export default {
 							"No",
 							"Atomic editions only",
 							"Yes (generations)",
-							"Yes (A/B slots)",
+							"Release-image A/B; continuation incomplete",
 						],
 						["Rolling release", "Yes", "No (6mo)", "Yes", "No (follows Fedora releases)"],
 						[
@@ -48,7 +48,7 @@ export default {
 						rich`${bold("Maintained base")}: the core comes from Fedora's signed builds and their security updates`,
 						rich`${bold("Programmable recipes")}: Rhai scripts can do anything, not just declare dependencies`,
 						rich`${bold("No build dependencies")}: You don't need gcc to install software`,
-						rich`${bold("A/B by default")}: updates go to the inactive slot, are trial-booted and kept only if healthy, with rollback; a mutable root is an explicit opt-in`,
+						rich`${bold("A/B by default")}: recab provides release-image staging, trial boot and rollback; equivalent initial slots and incremental continuation with Recipe changes remain incomplete`,
 						rich`${bold("Isolated builds")}: every recipe runs in its own build domain with no network unless you grant it`,
 					],
 				},

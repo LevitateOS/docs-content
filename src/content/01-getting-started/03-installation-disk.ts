@@ -1,5 +1,5 @@
 import { distroPage } from "../../types";
-import { rich, bold, code } from "../../rich-text";
+import { rich, bold, code, link } from "../../rich-text";
 import {
 	commands,
 	EXAMPLE_DISK,
@@ -136,7 +136,7 @@ export default distroPage((d) => ({
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("Why this layout:")} slot A holds the installed system and slot B is where the next system is written, so an update never touches the running one and rollback is a reboot. Only ${code("/var")} is shared by both slots, so it is where what must survive an update lives; home directories live in ${code("/var/home")} (${code("/home")} is a symlink to it), so they survive updates.`,
+					content: rich`${bold("Why this layout:")} A and B are interchangeable system slots. Installation must populate both with equivalent personalized systems; updates and system changes continue the active system in the inactive slot. The current installer still leaves B unpopulated. ${code("/var")} holds shared persistent data, including homes in ${code("/var/home")}. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")} for the lifecycle and current gaps.`,
 				},
 				{
 					type: "list",

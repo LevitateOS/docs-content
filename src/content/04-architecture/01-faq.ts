@@ -389,7 +389,7 @@ fn install(ctx) {
 								{
 									type: "text",
 									content:
-										"They run inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. By default, LevitateOS is A/B: changes are composed into the inactive slot and trial-booted before they are committed.",
+										"They run inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. LevitateOS defaults to A/B. System changes must be prepared in the inactive slot through recab and Recipe and trial-booted before commitment; current release-image staging does not yet implement incremental continuation or Recipe targeting of that slot.",
 								},
 								{
 									type: "list",

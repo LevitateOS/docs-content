@@ -8,6 +8,16 @@ export default {
 		"Configure and boot an extracted system: time zone, locale, keymap, hostname, accounts, systemd-boot, boot entries, machine id and services. It plans first, shows every command, then applies them.",
 	sections: [
 		{
+			title: "A/B Installation Contract",
+			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`Installation must finish with equivalent personalized systems and boot artifacts in both A and B. Today's ${code("recab init")} only prepares A and both entries; B population and synchronization after final personalization remain missing. The commands below describe the current installer, not a completed implementation of that contract.`,
+				},
+			],
+		},
+		{
 			title: "Overview",
 			content: [
 				{
@@ -106,7 +116,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 				},
 				{
 					type: "text",
-					content: rich`${code("boot.kernel")} defaults to the live media's ${code("/run/live-media/boot/vmlinuz")}. ${code("boot.initrd")} defaults to the installed system's initramfs the live media carries (the same busybox initramfs for both distros), ${code("/run/live-media/boot/initramfs-installed.img")}; ${code('""')} (or ${code("--no-initrd")}) means none. The live media's own ${code("initramfs.img")} is refused (E030): it only finds the live medium and ignores ${code("root=")}.`,
+					content: rich`${code("boot.kernel")} defaults to the live media's ${code("/run/live-media/boot/vmlinuz")}. ${code("boot.initrd")} defaults to ${code("/run/live-media/boot/initramfs-installed.img")}, the installed-system initramfs for both distros. Immutable A/B boot requires that initramfs; ${code("--no-initrd")} is not supported for A/B. The live medium's ${code("initramfs.img")} is refused (E030), because it finds the live medium and ignores ${code("root=")}.`,
 				},
 			],
 		},
@@ -236,7 +246,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 						rich`${link("Configuration", "/docs/installation-config")} - Steps 10-14 by hand`,
 						rich`${link("Bootloader & Finish", "/docs/installation-boot")} - Steps 15-18 by hand`,
 						rich`${link("recpart", "/docs/recpart")} - Partitions, and the slot devices for ${code("--boot ab")}`,
-						rich`${link("recab", "/docs/recab")} - The A/B layout ${code("recsetup")} sets up`,
+						rich`${link("recab", "/docs/recab")} - System updates, initial A/B population and continuation`,
 					],
 				},
 			],

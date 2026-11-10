@@ -28,7 +28,7 @@ export default {
 						[
 							rich`${link("recab", "/docs/recab")}`,
 							"CLI",
-							"A/B slot state machine",
+							"System updates and symmetric A/B continuation",
 							"Installed system",
 						],
 						[
@@ -95,7 +95,7 @@ export default {
 						rich`${bold("Partition backend")}: ${code("recpart")} (inspect/plan/apply and handoff only)`,
 						rich`${bold("Build pipeline")}: ${code("recinit")}, ${code("reciso")}`,
 						rich`${bold("Test VMs")}: ${code("recqemu")}, ${code("recshuttle")}`,
-						rich`${bold("A/B control-plane")}: ${code("recab")}`,
+						rich`${bold("System updates and continuation")}: ${code("recab")}, using Recipe for software operations in the prepared system`,
 					],
 				},
 			],

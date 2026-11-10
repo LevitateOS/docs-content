@@ -15,7 +15,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recstrap")} extracts the system's EROFS image from the live ISO to a mounted target directory. This is the equivalent of Arch Linux's ${code("pacstrap")} command. ${code("recab stage")} uses it on the installed system to write a new system into the inactive slot.`,
+					content: rich`${code("recstrap")} extracts the system's EROFS image from the live ISO to a mounted target directory. ${code("recab")} owns system updates and continuation; its current ${code("stage")} implementation uses recstrap for destructive release-image extraction. Incremental continuation is still missing.`,
 				},
 				{
 					type: "text",

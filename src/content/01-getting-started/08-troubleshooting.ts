@@ -99,7 +99,7 @@ export default distroPage((d) => ({
 							answer: [
 								{
 									type: "text",
-									content: rich`A trial boot that fails, or does not finish starting, is not committed: the machine reboots into the known-good slot. ${code("recab status")} shows the running and known-good slots and how the last trial ended. Fix the cause, then stage and trial the slot again.`,
+									content: rich`A trial judged failed is not committed and requests a reboot into the known-good slot. Health-checker errors and hard hangs still have recovery gaps; a hang needs a watchdog or manual reboot. ${code("recab status")} shows the running and known-good slots and the last recorded trial. Fix the cause before retrying. Current ${code("stage")} replaces the inactive system and would discard pending changes there.`,
 								},
 								{
 									type: "command",

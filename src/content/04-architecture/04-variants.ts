@@ -41,7 +41,7 @@ export default {
 				{
 					type: "note",
 					variant: "info",
-					content: rich`Both variants are A/B by default, with a trial boot and rollback managed by ${code("recab")}; a mutable root is an explicit opt-in. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`Both variants use A/B by default. ${code("recab")} owns system updates and symmetric continuation; trial boot and rollback exist, while matching initial slots and incremental preparation remain incomplete. Mutable mode is an explicit opt-in. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
 		},

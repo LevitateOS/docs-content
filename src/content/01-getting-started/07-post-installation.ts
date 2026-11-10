@@ -29,7 +29,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`Recipe manages software independently of the system image. The first catalog package is ${code("ripgrep")}, which provides the ${code("rg")} command. OS-building recipes and user packages use the same engine; ${code("recab")} continues to manage the system image and its bundled desktop apps.`,
+					content: rich`Recipe currently activates independent software in a shared profile. The catalog starts with ${code("ripgrep")}, which provides ${code("rg")}. System changes, bundled apps and system updates belong to ${code("recab")}'s A/B continuation lifecycle, using the same Recipe/Ginux engine. Recipe targeting of an inactive system is still missing; the profile commands below do not implement that lifecycle.`,
 				},
 				{
 					type: "note",
@@ -83,7 +83,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: `A new ${d.osName} release is written into the inactive slot (slot B after a fresh install) and trial-booted once. Mount the new release ISO, then stage its system image, kernel and initramfs:`,
+					content: `Recab owns ${d.osName} system updates. The required flow preserves local changes and downloaded updates in one prepared continuation, in either direction. Today only the destructive release-image path below exists: it formats the inactive slot and replaces its system. Do not use it to preserve pending work already prepared there.`,
 				},
 				{
 					type: "command",
@@ -100,7 +100,8 @@ export default distroPage((d) => ({
 				{
 					type: "command",
 					language: "bash",
-					description: "Boot the staged slot once, as a trial",
+					description:
+						"Boot the staged slot once (example assumes A is running; use A when B is running)",
 					command: [
 						`${admin(d)} umount /mnt`,
 						`${admin(d)} recab set-next B`,
@@ -119,7 +120,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`The hostname, accounts, enabled services, network connections and SSH host keys are carried into the new slot, and ${code("/var")} (with Recipe's active software profile, package generations, recipe overrides, retained state and cache) is shared by both slots, home directories included (${code("/home")} is a symlink to ${code("/var/home")}); the rest of the system, including bundled desktop apps, comes from the new image. If it starts cleanly, the trial service commits it; if not, the machine reboots into the previous slot by itself. ${code("recab status")} shows which slot runs and how the last trial ended, and ${code(`${admin(d)} recab rollback`)} returns to the previous slot later. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`Current staging carries only selected machine configuration from the running system; it does not preserve every local system change or changes already made in the inactive slot. Shared ${code("/var")} and user homes persist, including today's root Recipe profile, which is not isolated by slot. A healthy trial commits; a judged failure requests fallback. ${code("recab rollback")} selects the previous known-good system while it still exists, without restoring all shared data. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")} for the complete required lifecycle and remaining gaps.`,
 				},
 			],
 		},

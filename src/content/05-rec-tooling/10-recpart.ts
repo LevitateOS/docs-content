@@ -110,7 +110,7 @@ export default {
 					items: [
 						rich`${bold("Does")}: disk inspection, planning, layout checks against the install mode, apply, and install handoff metadata (install target, mounts, slot A and B devices)`,
 						rich`${bold("Does not")}: rootfs extraction (${code("recstrap")}), fstab generation (${code("recfstab")}), or system configuration (${code("recsetup")})`,
-						rich`${bold("Does not")}: A/B slot commit/rollback state machine (${code("recab")})`,
+						rich`${bold("Does not")}: system updates, continuation, trial boot, commit and rollback (${code("recab")})`,
 					],
 				},
 			],
@@ -124,7 +124,7 @@ export default {
 						rich`${link("recstrap", "/docs/recstrap")} - Extract rootfs`,
 						rich`${link("recfstab", "/docs/recfstab")} - Generate fstab`,
 						rich`${link("recchroot", "/docs/recchroot")} - Enter target system`,
-						rich`${link("recab", "/docs/recab")} - A/B slot state machine`,
+						rich`${link("recab", "/docs/recab")} - System updates and A/B continuation`,
 					],
 				},
 			],

@@ -4,48 +4,77 @@ import { rich, bold, code, link } from "../../rich-text";
 export default {
 	title: "Atomic Updates (A/B)",
 	intro:
-		"LevitateOS and AcornOS default to an A/B system layout: write the next system into the inactive slot, trial-boot it, then commit. Roll back by booting the previous slot. The system changes only this way; software you add with Recipe is kept on the shared /var.",
+		"Recab owns system updates and continuation between interchangeable A/B slots. The active system root stays immutable; changes and updates are prepared in the other slot, trial-booted, then committed or rolled back.",
 	sections: [
 		{
-			title: "What “A/B” Means",
+			title: "Two Equivalent Initial Systems",
 			content: [
 				{
 					type: "text",
 					content:
-						"A/B systems keep two system slots on disk (A and B). Only one is active at a time. Updates write to the inactive slot and switch boot to it on reboot.",
+						"Installation must populate A and B with the same system and final machine configuration, including matching kernels and initramfs images. Both must be bootable at first use. Their partition references, boot paths and slot identity differ; the system contents are equivalent. A initially runs committed, and B is its matching inactive copy.",
 				},
 				{
 					type: "list",
 					items: [
-						rich`${bold("Slot A")} (label ${code("ROOT_A")}): the installed system after a fresh install`,
-						rich`${bold("Slot B")} (label ${code("ROOT_B")}): where the next system is written`,
-						rich`${bold("Persistent state")} (label ${code("STATE")}): mounted at ${code("/var")}, shared by both slots: recab's state and Recipe's packages and state live here. Home directories live in ${code("/var/home")} (the image's ${code("/home")} is a symlink to it), so updates keep them`,
-						rich`${bold("EFI partition")}: systemd-boot, one boot entry per slot, and each slot's kernel and initramfs`,
+						rich`${bold("A and B")}: interchangeable system slots, labelled ${code("ROOT_A")} and ${code("ROOT_B")}. Active and inactive are roles that reverse after a successful trial.`,
+						rich`${bold("Persistent data")}: ${code("STATE")} is mounted at ${code("/var")}. User homes and caches can be shared without becoming part of the system delta.`,
+						rich`${bold("EFI partition")}: systemd-boot, a boot entry per slot, and each slot's matching kernel and initramfs.`,
 					],
 				},
 			],
 		},
 		{
-			title: "Update Lifecycle (Default)",
+			title: "Required Continuation and Update Lifecycle",
 			content: [
 				{
 					type: "list",
 					ordered: true,
 					items: [
-						rich`Write the new system into the inactive slot with ${code("recab stage")}. The machine's hostname, accounts, enabled services, network connections and SSH host keys come along, as the image's ${code("/usr/lib/recab/carried")} lists them.`,
-						rich`Trial-boot it once with ${code("recab set-next")}, then reboot`,
-						rich`If slot B comes up with no failed services, recab's trial service (a systemd unit or an OpenRC service, with the system's init) commits it. If services fail, startup never finishes, the new system cannot mount its root, or its kernel or init crashes, the machine reboots into slot A by itself. ${code("recab status")} shows how the last trial ended.`,
-						rich`Later, ${code("recab rollback")} returns to the previous slot while it still holds that system`,
+						"Boot committed A with an immutable system root. To make system change X, prepare writable B as a continuation of A, synchronizing only differences.",
+						"Recipe applies X to B. If an update is available, recab coordinates its download and application to the same prepared B. Preserve X or report conflicts before activation.",
+						"Finalize B and its matching boot artifacts. Schedule one trial boot while A remains the protected fallback.",
+						"A healthy trial commits B. A failed trial returns to A after a reboot; hard-hang recovery requires a watchdog.",
+						"For change Y while running committed B, synchronize inactive A to B's current system using only differences, then apply Y. Keep X and the previous update. Repeat B→A→B with the same capabilities.",
 					],
 				},
 				{
+					type: "text",
+					content:
+						"Synchronization includes deletions, metadata and links and preserves destination-specific identity. It excludes shared data and runtime mounts. Unchanged system data should not be rewritten on every continuation. A prepared system can receive several changes and updates before one reboot.",
+				},
+			],
+		},
+		{
+			title: "Current Implementation Limits",
+			content: [
+				{
 					type: "note",
-					variant: "info",
-					content: rich`Each slot's root is remounted read-write after boot; A/B gives you a second, untouched system to return to, not a read-only root.`,
+					variant: "warning",
+					content: rich`The complete lifecycle is not implemented yet. Today's installation populates A and leaves B without a system kernel. ${code("recab stage")} formats the inactive slot and extracts a release image, carrying selected configuration from the running system. It cannot yet preserve pending changes in that slot, synchronize whole-system deltas, or direct Recipe changes into a continuation.`,
 				},
 				{
 					type: "text",
-					content: rich`See ${link("recab", "/docs/recab")} for every command, and ${link("Post-Installation", "/docs/post-installation")} for an update from a new release.`,
+					content: rich`The immutability work in the checkout protects the system root and supplies writable per-slot ${code("/etc")} overlays. Older images may still remount root writable; this is not the intended A/B policy. Root's current Recipe profile is shared on ${code("/var")}, so package activation there is not yet isolated to a system slot. Recab remains responsible for closing these gaps.`,
+				},
+				{
+					type: "text",
+					content: rich`See ${link("recab", "/docs/recab")} for existing commands and ${link("Post-Installation", "/docs/post-installation")} for the current release-image update procedure and its limitations.`,
+				},
+			],
+		},
+		{
+			title: "Fallback and Rollback Scope",
+			content: [
+				{
+					type: "text",
+					content:
+						"While a trial is uncommitted, its known-good fallback must not be overwritten. After commitment, beginning the next continuation overwrites the older system and ends that older rollback; the running committed system becomes the protected fallback. Two slots do not retain an unlimited history.",
+				},
+				{
+					type: "text",
+					content:
+						"System package selection and configuration must follow the corresponding system generation. Shared user and application data remain shared; a boot rollback does not undo every data migration or change under /var.",
 				},
 			],
 		},
@@ -54,13 +83,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`Mutable mode is one root partition changed in place, chosen at install time with ${code("recpart --mode mutable")} and ${code("recsetup apply --boot mutable")}. It has no second slot, so there is no trial boot and no rollback, and every change lands on the running system.`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content:
-						"Mutable mode is an explicit opt-in. Prefer A/B unless you have a reason to change the running system directly.",
+					content: rich`Mutable mode is one root partition changed in place, chosen explicitly at install time with ${code("recpart --mode mutable")} and ${code("recsetup apply --boot mutable")}. It has no second slot, trial boot or A/B rollback. It is separate from the required immutable A/B lifecycle.`,
 				},
 			],
 		},

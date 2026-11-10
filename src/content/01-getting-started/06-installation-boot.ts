@@ -35,7 +35,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`recsetup installs systemd-boot on the EFI partition, the way the target supports (${code("bootctl install")} where the target has it, otherwise by copying its EFI binary), then runs ${code("recab init")}: slot A's kernel and initramfs (from the live media) go to ${code(`/boot/${d.osId}-a/`)}, both slot entries are written to ${code("/boot/loader/entries/")} naming their partition by PARTUUID, slot A becomes the default and the known-good slot, and the trial service is enabled. Add ${code('--options "console=ttyS0,115200n8"')} if you need a serial console.`,
+					content: rich`${code("recsetup")} calls ${code("recab init")}, which copies the target's systemd-boot EFI binary and writes the boot layout. Currently only A receives its kernel and initramfs under ${code(`/boot/${d.osId}-a/`)}; both entries name their partitions by PARTUUID, and A becomes the known-good default. The required installation must instead finish with equivalent personalized systems and boot artifacts in both slots; populating B is not yet implemented. Add ${code('--options "console=ttyS0,115200n8"')} for a serial console.`,
 				},
 				{
 					type: "text",
