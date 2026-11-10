@@ -1,8 +1,8 @@
 /**
  * The install procedure, written once for every distro: the steps in order, what each
  * one does, the guide section that has it in full, the programs it runs and its
- * commands. The guide pages, install-hub, the install state, disk-plan, base-system and
- * the website all render it, so an install command exists only here.
+ * commands. The guide pages, install-hub, the install state, disk-plan, base-system,
+ * system-setup and the website all render it, so an install command exists only here.
  *
  * Every command runs on both live userlands (GNU and busybox): no `mount --mkdir`, no
  * `umount -R`, no fdisk dialogue. Per-distro commands are functions of the distro facts.
@@ -55,8 +55,14 @@ export interface StepResults {
 		/** The fstab the generated entries went into. */
 		fstab: string;
 	};
-	/** Configuration is typed in a shell; the user marks it done. */
-	setup: { manual: true };
+	setup: {
+		/** Typed in a shell and marked done by the user; false when system-setup applied it. */
+		manual: boolean;
+		/** What system-setup set; null when it set none, or the step was done by hand. */
+		hostname: string | null;
+		/** The administrator system-setup created. */
+		user: string | null;
+	};
 	boot: { mode: InstallMode };
 }
 
@@ -200,6 +206,7 @@ export const commands = {
 	partition: (disk: string, dryRun = false) =>
 		`recpart apply --disk ${shellQuote(disk)} ${dryRun ? "--dry-run" : "--confirm DESTROY"}`,
 	baseSystem: () => "base-system",
+	systemSetup: () => "system-setup",
 	extract: (target: string) => `recstrap ${shellQuote(target)}`,
 	fstab: (target: string) => `recfstab --write ${shellQuote(target)}`,
 	inspect: (target: string, json = false) =>
@@ -258,8 +265,6 @@ export type StepRun =
 	| { kind: "checks"; checks: readonly Check[] }
 	/** Run these commands as they are. */
 	| { kind: "commands"; lines: readonly string[] }
-	/** Commands to type, with the user's own values for the examples. */
-	| { kind: "type"; lines: readonly string[] }
 	/** Not possible yet, and why. */
 	| { kind: "unavailable"; why: string };
 
@@ -304,7 +309,7 @@ export interface InstallContext {
 }
 
 /** Every install step, in order, for distro `d` given what the earlier steps recorded. */
-export function installSteps(d: Facts, ctx: InstallContext): InstallStep[] {
+export function installSteps(_d: Facts, ctx: InstallContext): InstallStep[] {
 	const { disk } = ctx;
 	const target = disk?.target;
 	const noDisk = (what: string): StepRun => ({
@@ -354,24 +359,8 @@ export function installSteps(d: Facts, ctx: InstallContext): InstallStep[] {
 			id: "setup",
 			...STEP_INFO.setup,
 			guide: guideRef("installation-config", "Set Timezone, Locale and Keymap"),
-			programs: ["recsetup", "recchroot"],
-			run: target
-				? {
-						kind: "type",
-						lines: [
-							commands.inspect(target),
-							commands.configure(target, {
-								timezone: EXAMPLE_SETUP.timezone,
-								locale: EXAMPLE_SETUP.locale,
-								keymap: EXAMPLE_SETUP.keymap,
-								hostname: d.defaultHostname,
-							}),
-							commands.password(target),
-							...commands.createUser(target, EXAMPLE_SETUP.user),
-							commands.password(target, EXAMPLE_SETUP.user),
-						],
-					}
-				: noDisk("where the system is"),
+			programs: ["system-setup", "recsetup", "recchroot", "loadkeys"],
+			run: target ? { kind: "app", argv: [commands.systemSetup()] } : noDisk("where the system is"),
 		},
 		{
 			id: "boot",

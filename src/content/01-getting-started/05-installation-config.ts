@@ -1,5 +1,5 @@
 import { distroPage } from "../../types";
-import { rich, code } from "../../rich-text";
+import { rich, bold, code } from "../../rich-text";
 import {
 	commands,
 	EXAMPLE_DISK,
@@ -21,6 +21,17 @@ export default distroPage((d) => ({
 		{
 			title: guideStep(SLUG, "Inspect Available Choices"),
 			content: [
+				{
+					type: "note",
+					variant: "info",
+					content: rich`${bold("These steps in one tool:")} ${code("system-setup")} asks for the keyboard layout, time zone, language, hostname, root password and a user, shows the commands ${code("recsetup")} would run, and applies them after you confirm. The install screen starts it from the configuration step. The commands below do the same by hand.`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Answer the questions, review and apply",
+					command: commands.systemSetup(),
+				},
 				{
 					type: "command",
 					language: "bash",
