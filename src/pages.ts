@@ -65,7 +65,7 @@ export const KERNEL_LINE_NAME: Record<Profile["kernel_line"], string> = {
 
 /**
  * Where root's Recipe keeps its recipes, state and image cache on every installed system:
- * on /var, shared by both A/B slots (distro/builder/recipes/install-tools.rhai packages them).
+ * on /var, shared by both A/B slots (distro/builder/os-recipes/install-tools.rhai packages them).
  */
 export const RECIPE = {
 	recipes: "/var/lib/recipe/recipes",

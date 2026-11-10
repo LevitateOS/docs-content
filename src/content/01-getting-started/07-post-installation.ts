@@ -25,38 +25,40 @@ export default distroPage((d) => ({
 			],
 		},
 		{
-			title: "Package Management",
+			title: "Software with Recipe",
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recipe")} is the package manager. A package is a Rhai recipe: ${code("recipe")} looks a name up in root's recipes, ${code(RECIPE.recipes)}, or takes a path to a ${code(".rhai")} file. Its recipes, state and image cache are on ${code("/var")}, which both slots share, so they stay through a system update.`,
+					content: rich`Recipe is the software manager for ${d.osName}. The OS builder and user-managed software share one recipe format and engine. The builder produces the system image, including its bundled desktop apps; ${code("recab")} handles that image's updates. User-managed recipes are a separate catalog for software managed independently of the system image.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`The user catalog is not populated yet, and Recipe does not yet activate, update or remove software on the running system. ${code("recipe install")} produces files in an isolated output tree. It also needs a configured Ginux launcher and root image, which ${d.osName} does not ship yet. See the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")} for environment preparation.`,
+				},
+				{
+					type: "text",
+					content: rich`${code("recipe")} looks names up in root's recipe directory, ${code(RECIPE.recipes)}, or accepts a path to a ${code(".rhai")} file. The directory starts empty. Its recipe files, retained state and image cache live on ${code("/var")}, which both slots share. Preserving that data across system updates does not make a published program active on the system.`,
 				},
 				{
 					type: "command",
 					language: "bash",
-					description: "List the recipes",
+					description: "List available recipe files (not installed applications)",
 					command: `${admin(d)} recipe list`,
+				},
+				{
+					type: "text",
+					content: rich`To inspect a recipe without running it, save the ${code("hello.rhai")} example from ${link("Recipe Format", "/docs/recipe-format")} and run:`,
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Show a recipe's name, version and description",
-					command: `${admin(d)} recipe info ripgrep`,
-				},
-				{
-					type: "command",
-					language: "bash",
-					description: "Build and install a package from its recipe",
-					command: `${admin(d)} recipe install ripgrep`,
+					command: "recipe info ./hello.rhai",
 				},
 				{
 					type: "text",
-					content: rich`${code("recipe install")} runs the recipe in a Ginux domain and publishes what it produces under ${code(".artifacts/ginux-export")} in the current directory; its JSON names the paths in ${code("ctx.outputs")}. It does not change the running system.`,
-				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${code("recipe install")} needs the Ginux launcher (${code("GINUX_BIN")}) and a Ginux root image, which ${d.osName} does not ship yet. ${code("recipe list")} and ${code("recipe info")} need neither.`,
+					content: rich`${code("recipe install")} runs the recipe in a Ginux domain and publishes what it produces under ${code(".artifacts/ginux-export")} in the current directory; its JSON names the paths in ${code("ctx.outputs")}. ${code("recipe remove")} changes the retained output tree and leaves earlier publications intact. ${code("recipe list")} and ${code("recipe info")} need no Ginux environment.`,
 				},
 				{
 					type: "text",
@@ -105,7 +107,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`The hostname, accounts, enabled services, network connections and SSH host keys are carried into the new slot, and ${code("/var")} (with Recipe's packages and state) is shared by both slots, home directories included (${code("/home")} is a symlink to ${code("/var/home")}); the rest of the system comes from the new image. If it starts cleanly, the trial service commits it; if not, the machine reboots into the previous slot by itself. ${code("recab status")} shows which slot runs and how the last trial ended, and ${code(`${admin(d)} recab rollback`)} returns to the previous slot later. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`The hostname, accounts, enabled services, network connections and SSH host keys are carried into the new slot, and ${code("/var")} (with Recipe's recipe files, retained state and cache) is shared by both slots, home directories included (${code("/home")} is a symlink to ${code("/var/home")}); the rest of the system, including bundled desktop apps, comes from the new image. If it starts cleanly, the trial service commits it; if not, the machine reboots into the previous slot by itself. ${code("recab status")} shows which slot runs and how the last trial ended, and ${code(`${admin(d)} recab rollback`)} returns to the previous slot later. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
 				},
 			],
 		},

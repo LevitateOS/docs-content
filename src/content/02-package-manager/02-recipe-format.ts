@@ -6,6 +6,34 @@ export default {
 	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts executed inside a configured Ginux domain. They own package facts and custom acquire/build/install behavior. Every executable recipe must declare ${code("const RECIPE_API = 2;")} and literal ${code("const NEEDS = #{...};")} for typed inputs, outputs and execution authority. An empty declaration has no inputs, outputs or network grants.`,
 	sections: [
 		{
+			title: "Two Uses, One Format",
+			content: [
+				{
+					type: "table",
+					headers: ["Collection in the source tree", "Owner and purpose"],
+					rows: [
+						[
+							"distro/builder/os-recipes/",
+							"The OS builder: root filesystems, kernels, build tools and live overlays. Its products become system images managed by recab.",
+						],
+						[
+							"recipes/",
+							"The user-managed software catalog. This collection is currently empty; activation and software updates on the installed system remain to be implemented.",
+						],
+					],
+					monospaceCol: 0,
+				},
+				{
+					type: "text",
+					content: rich`Both collections use the engine in ${code("tools/recipe")}, the same API 2 declarations and the same lifecycle below. Their directory and consumer identify their purpose; there is no second recipe format or engine-level ownership flag. Apps bundled in a desktop system image are currently owned by that image and updated with it.`,
+				},
+				{
+					type: "text",
+					content: rich`The ${code("install")} hook prepares files in the recipe's output tree. The OS builder consumes those published files to assemble an image. User software still needs a separate activation step in Recipe to make its files available on the running system. ${code("remove")} changes the recipe's retained output tree; earlier publications remain intact.`,
+				},
+			],
+		},
+		{
 			title: "A Complete Recipe",
 			content: [
 				{

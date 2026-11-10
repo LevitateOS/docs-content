@@ -3,7 +3,7 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "CLI Reference",
-	intro: rich`The Recipe CLI executes Rhai recipes inside a configured Ginux domain and returns named published products: the producers that build each distro, and the packages of an installed system (see ${link("Post-Installation", "/docs/post-installation")}). Prepare the launcher, verified image and worker first using the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")}.`,
+	intro: rich`The Recipe CLI is the shared engine for OS-building recipes and user-managed software recipes. It executes Rhai recipes inside a configured Ginux domain and returns named published files. Live-system software activation and updates are still unimplemented (see ${link("Post-Installation", "/docs/post-installation")}). Prepare the launcher, verified image and worker before executing recipes using the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")}.`,
 	sections: [
 		{
 			title: "Commands",
@@ -14,7 +14,7 @@ export default {
 					rows: [
 						[
 							"recipe install RECIPE",
-							"Run necessary acquire/build/install work with custom readiness.",
+							"Run necessary acquire/build/install work and publish output files; does not activate them on the running system.",
 						],
 						[
 							"recipe isinstalled RECIPE",
@@ -27,7 +27,10 @@ export default {
 							"Remove owned target files; earlier publications remain immutable.",
 						],
 						["recipe cleanup RECIPE", "Run optional cleanup with reason manual by default."],
-						["recipe list", "List declared metadata without evaluating recipe setup."],
+						[
+							"recipe list",
+							"List recipe files and declared metadata, not installed applications; does not run setup.",
+						],
 						[
 							"recipe info RECIPE",
 							"Show declared/inherited metadata; dynamic values are unavailable.",
