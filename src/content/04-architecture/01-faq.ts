@@ -194,7 +194,7 @@ export default {
 									items: [
 										rich`${bold("systemd-boot everywhere")} - no GRUB or isolinux`,
 										rich`${bold("Live ISO")}: Unified Kernel Images built by ${code("reciso")}, each one PE binary holding the kernel, initramfs and command line, which systemd-boot finds on its own`,
-										rich`${bold("Installed system")}: one boot entry per slot, naming the slot's kernel and initramfs in ${code("/boot/levitateos-a/")} or ${code("/boot/levitateos-b/")} and its root by ${code("root=PARTUUID=")}. ${code("recab")} rewrites a slot's kernel and trial options without touching the other slot`,
+										rich`${bold("Installed system")}: one generation-bound boot entry per slot, naming shared hash-addressed kernel/initramfs objects under ${code("/boot/recab/objects/")} and its root by ${code("root=PARTUUID=")}. ${code("recab")} seals the prepared generation before publishing its entry`,
 									],
 								},
 							],
@@ -389,7 +389,7 @@ fn install(ctx) {
 								{
 									type: "text",
 									content:
-										"They run inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. LevitateOS defaults to A/B. System changes must be prepared in the inactive slot through recab and Recipe and trial-booted before commitment; current release-image staging does not yet implement incremental continuation or Recipe targeting of that slot.",
+										"They run inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. LevitateOS defaults to A/B. System changes must be prepared in the inactive slot through recab and Recipe and trial-booted before commitment; incremental continuation and Recipe targeting of that slot are implemented. Release updates preserve prepared changes or report conflicts, and trial failures select the matching protected generation.",
 								},
 								{
 									type: "list",

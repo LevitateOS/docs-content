@@ -48,7 +48,7 @@ export default {
 						rich`${bold("Maintained base")}: the core comes from Fedora's signed builds and their security updates`,
 						rich`${bold("Programmable recipes")}: Rhai scripts can do anything, not just declare dependencies`,
 						rich`${bold("No build dependencies")}: You don't need gcc to install software`,
-						rich`${bold("A/B by default")}: recab provides release-image staging, trial boot and rollback; equivalent initial slots and incremental continuation with Recipe changes remain incomplete`,
+						rich`${bold("A/B by default")}: recab prepares the inactive system incrementally, applies Recipe changes and verified release updates while preserving prepared work, then seals and trial-boots it; installation starts with equivalent personalized slots. Full boot validation and production publishing remain outstanding`,
 						rich`${bold("Isolated builds")}: every recipe runs in its own build domain with no network unless you grant it`,
 					],
 				},

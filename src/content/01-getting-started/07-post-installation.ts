@@ -121,7 +121,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`${code("recab-tui")} shows the slots and does the same steps from a screen: try the other slot, commit, roll back, or write a system into the inactive slot, each with its effect before and after. It changes the boot setup, so open it as root.`,
+					content: rich`${code("recab-tui")} shows both systems, prepared changes, available/downloaded releases and conflicts. It exposes preparation, Recipe changes, configuration edits, release merging, resolution/recovery, finalization and trial controls through recab’s guarded operations. It changes the boot setup, so open it as root.`,
 				},
 				{
 					type: "command",

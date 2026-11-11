@@ -136,7 +136,7 @@ recab rollback       # select A for the next boot, while A still holds its syste
 			content: [
 				{
 					type: "text",
-					content: rich`Implemented options from ${code("recab --help")}; these do not yet expose the full required lifecycle:`,
+					content: rich`Commands and options come from ${code("recab --help")}; the CLI and frontends expose the complete preparation/update/trial lifecycle:`,
 				},
 				{
 					type: "code",

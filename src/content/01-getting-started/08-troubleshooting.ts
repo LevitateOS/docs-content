@@ -99,7 +99,7 @@ export default distroPage((d) => ({
 							answer: [
 								{
 									type: "text",
-									content: rich`A trial judged failed is not committed and requests a reboot into the known-good slot. Health-checker errors and hard hangs still have recovery gaps; a hang needs a watchdog or manual reboot. ${code("recab status")} shows the running and known-good slots and the last recorded trial. Fix the cause before retrying. Current ${code("stage")} replaces the inactive system and would discard pending changes there.`,
+									content: rich`A trial judged failed is not committed and requests a reboot into the known-good slot. Health-checker errors and bounded helper timeouts trigger generation-bound recovery; a hard hang still needs a watchdog or manual reboot. ${code("recab status")} shows the running and known-good slots and the last recorded trial. Fix the cause before retrying. ${code("stage")} uses the same preserving merge as ${code("update apply")}; unresolved conflicts keep the candidate unbootable. Old development installations are read-only to this release and need compatible recovery media or a fresh installation.`,
 								},
 								{
 									type: "command",

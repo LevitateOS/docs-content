@@ -13,7 +13,7 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`Installation must finish with equivalent personalized systems and boot artifacts in both A and B. Today's ${code("recab init")} only prepares A and both entries; B population and synchronization after final personalization remain missing. The commands below describe the current installer, not a completed implementation of that contract.`,
+					content: rich`Installation finishes with equivalent personalized systems in A and B. After personalization, ${code("recab init")} populates B, checks both inventories and matching boot payloads, seals both roots and publishes both entries. A starts committed/default; B is immediately bootable. Interrupted installation resumes the same generation, and completion requires verification of both systems. Old development installations cannot be upgraded by resetting their state; use compatible recovery media or a fresh installation.`,
 				},
 			],
 		},
