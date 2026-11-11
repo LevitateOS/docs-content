@@ -63,7 +63,7 @@ export interface StepResults {
 		/** The administrator system-setup created. */
 		user: string | null;
 	};
-	boot: { mode: InstallMode };
+	boot: { mode: InstallMode; verified_slots?: string[]; generation?: string };
 }
 
 /** A place in the install guide: a page and, optionally, one of its numbered steps. */
@@ -233,7 +233,7 @@ export const commands = {
 		`recsetup apply --root ${shellQuote(target)} --request /tmp/user-setup.json`,
 	],
 	boot: (target: string, args: string) =>
-		`recsetup apply --root ${shellQuote(target)} ${args} --machine-id`,
+		`recsetup apply --root ${shellQuote(target)} ${args} --machine-id${args.includes("--boot ab") ? ` && recab verify-installation --root ${shellQuote(target)}` : ""}`,
 	service: (target: string, service: string) =>
 		`recsetup apply --root ${shellQuote(target)} --service ${service}`,
 	/** Unmounts everything under the target, deepest first (busybox umount has no -R). */
@@ -364,7 +364,7 @@ export function installSteps(_d: Facts, ctx: InstallContext): InstallStep[] {
 			id: "boot",
 			...STEP_INFO.boot,
 			guide: guideRef("installation-boot", "Install the Boot Loader and Entries"),
-			programs: ["recsetup"],
+			programs: disk?.mode === "mutable" ? ["recsetup"] : ["recsetup", "recab"],
 			run:
 				disk && typeof boot === "string"
 					? { kind: "commands", lines: [commands.boot(disk.target, boot)] }
@@ -376,9 +376,18 @@ export function installSteps(_d: Facts, ctx: InstallContext): InstallStep[] {
 			id: "finish",
 			...STEP_INFO.finish,
 			guide: guideRef("installation-boot", "Unmount and Reboot"),
-			programs: ["umount", "reboot"],
+			programs: disk?.mode === "mutable" ? ["umount", "reboot"] : ["recab", "umount", "reboot"],
 			run: disk
-				? { kind: "commands", lines: [...commands.unmount(disk), commands.reboot()] }
+				? {
+						kind: "commands",
+						lines: [
+							...(disk.mode === "ab"
+								? [`recab verify-installation --root ${shellQuote(disk.target)}`]
+								: []),
+							...commands.unmount(disk),
+							commands.reboot(),
+						],
+					}
 				: noDisk("what to unmount"),
 		},
 	];
