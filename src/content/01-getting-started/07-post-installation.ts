@@ -149,7 +149,8 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: "Open Recdirstat and choose Browse to see folders and a map of their sizes. Select a folder to inspect it before deciding what to keep. The two systems page compares the running system with the other slot; read the role shown there to tell whether it is the next system or the one from before.",
+					content:
+						"Open Recdirstat and choose Browse to see folders and a map of their sizes. Select a folder to inspect it before deciding what to keep. The two systems page compares the running system with the other slot; read the role shown there to tell whether it is the next system or the one from before.",
 				},
 			],
 		},
