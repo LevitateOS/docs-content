@@ -8,6 +8,15 @@ export default distroPage((d) => ({
 	intro: rich`After rebooting, log in with your user account and start using your new ${d.osName} system. Administrative commands go through ${code(admin(d))}.`,
 	sections: [
 		{
+			title: "Desktop",
+			content: [
+				{
+					type: "text",
+					content: `The desktop edition uses ${DESKTOP_NAME[d.profile.desktop]}. Open the applications menu with the icon at the bottom left. Recipe is the window for finding and managing software; Recab shows the running system and the other system slot; Recdirstat shows where disk space goes. The screenshots on the website show development previews with sample data.`,
+				},
+			],
+		},
+		{
 			title: "Services",
 			content: [
 				{
@@ -132,6 +141,15 @@ export default distroPage((d) => ({
 				{
 					type: "text",
 					content: rich`Staging now compares the original release, prepared continuation and incoming release. It preserves prepared changes and explicit deletions or reports conflicts; it never silently replaces X. Shared ${code("/var")} and user homes persist, while system package selection is isolated by slot. A healthy trial commits; a judged failure requests fallback. ${code("recab rollback")} selects the previous known-good system while it still exists, without restoring all shared data. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")} for the complete required lifecycle and remaining gaps.`,
+				},
+			],
+		},
+		{
+			title: "Disk Usage",
+			content: [
+				{
+					type: "text",
+					content: "Open Recdirstat and choose Browse to see folders and a map of their sizes. Select a folder to inspect it before deciding what to keep. The two systems page compares the running system with the other slot; read the role shown there to tell whether it is the next system or the one from before.",
 				},
 			],
 		},
