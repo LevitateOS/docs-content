@@ -135,7 +135,7 @@ export const DISTROS = [
 			configFile: "/etc/sudoers",
 		},
 		profile: {
-			appearance: "light",
+			appearance: "dark",
 			desktop: "plasma",
 			init: "systemd",
 			kernel_line: "latest",
