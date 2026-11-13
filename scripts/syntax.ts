@@ -1,8 +1,9 @@
 import { createHighlighter, createJavaScriptRegexEngine } from "shiki";
-import type { ContentBlock, DocsContent, DocsSyntaxLanguage, HighlightedLines } from "../src/types";
+import type { ContentBlock, DocsContent, DocsSyntaxLanguage } from "../src/types";
 import { INDUSTRIAL_PASTEL_1984_THEMES } from "../src/syntax-theme";
 
-const APPEARANCES = ["light", "dark"] as const;
+const SNAPSHOT_THEME = INDUSTRIAL_PASTEL_1984_THEMES.dark;
+const SNAPSHOT_THEME_NAME = SNAPSHOT_THEME.name;
 const SHIKI_LANGUAGES = ["bash", "rust", "toml"] as const;
 const DOCS_SYNTAX_LANGUAGES = ["bash", "rust", "rhai", "toml", "text"] as const;
 
@@ -150,7 +151,7 @@ function normalizeTokenLines(result: ShikiTokenResult, context: SyntaxContext): 
 async function getHighlighter(): Promise<SyntaxHighlighter> {
 	if (!highlighterPromise) {
 		highlighterPromise = createHighlighter({
-			themes: APPEARANCES.map((appearance) => INDUSTRIAL_PASTEL_1984_THEMES[appearance]),
+			themes: [SNAPSHOT_THEME],
 			langs: [...SHIKI_LANGUAGES],
 			engine: createJavaScriptRegexEngine(),
 		});
@@ -164,24 +165,21 @@ function highlightSource(
 	language: DocsSyntaxLanguage,
 	context: SyntaxContext,
 	highlighter: SyntaxHighlighter,
-): HighlightedLines {
-	const lines = (appearance: (typeof APPEARANCES)[number]): string[] => {
-		if (source.length === 0) {
-			return [""];
-		}
+): string[] {
+	if (source.length === 0) {
+		return [""];
+	}
 
-		if (language === "text") {
-			return source.split("\n").map(escapeStyleText);
-		}
+	if (language === "text") {
+		return source.split("\n").map(escapeStyleText);
+	}
 
-		const tokens = highlighter.codeToTokens(source, {
-			lang: shikiLanguageFor(language),
-			theme: INDUSTRIAL_PASTEL_1984_THEMES[appearance].name,
-		}) as ShikiTokenResult;
+	const tokens = highlighter.codeToTokens(source, {
+		lang: shikiLanguageFor(language),
+		theme: SNAPSHOT_THEME_NAME,
+	}) as ShikiTokenResult;
 
-		return normalizeTokenLines(tokens, context);
-	};
-	return { light: lines("light"), dark: lines("dark") };
+	return normalizeTokenLines(tokens, context);
 }
 
 function snapshotBlock(
