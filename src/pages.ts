@@ -47,6 +47,17 @@ export const DESKTOP_NAME: Record<Profile["desktop"], string> = {
 	lxqt: "LXQt",
 };
 
+/** What each desktop's session runs on. LXQt's X server is Alpine's X.Org server. */
+export const DISPLAY_SERVER_NAME: Record<Profile["desktop"], string> = {
+	plasma: "Wayland",
+	lxqt: "X11 (X.Org server)",
+};
+
+/** A desktop with what it runs on: "KDE Plasma on Wayland". */
+export function desktopOn(desktop: Profile["desktop"]): string {
+	return `${DESKTOP_NAME[desktop]} on ${DISPLAY_SERVER_NAME[desktop]}`;
+}
+
 /** The terminal each desktop opens, where the desktop ISO's install screen runs. */
 export const TERMINAL_NAME: Record<Profile["desktop"], string> = {
 	plasma: "Konsole",
@@ -124,7 +135,7 @@ export function intendedDifferences(): { headers: string[]; rows: string[][] } {
 		headers: ["", ...DISTROS.map((distro) => distro.osName)],
 		rows: [
 			["Administrator commands", ...DISTROS.map((distro) => distro.profile.privilege)],
-			["Desktop edition", ...DISTROS.map((distro) => DESKTOP_NAME[distro.profile.desktop])],
+			["Desktop edition", ...DISTROS.map((distro) => desktopOn(distro.profile.desktop))],
 			[
 				"Kernel",
 				...DISTROS.map(

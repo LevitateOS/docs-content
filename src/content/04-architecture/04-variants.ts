@@ -1,7 +1,7 @@
 import type { DocsContent } from "../../types";
 import { rich, bold, code, link } from "../../rich-text";
 import { DISTROS } from "../../distros";
-import { DESKTOP_NAME, INIT_NAME, KERNEL_LINE_NAME } from "../../pages";
+import { desktopOn, INIT_NAME, KERNEL_LINE_NAME } from "../../pages";
 
 /** What the generated DISTROS records do not carry: each variant's goal, base and userland. */
 const VARIANT_TEXT = {
@@ -34,7 +34,7 @@ export default {
 						VARIANT_TEXT[distro.id].base,
 						`${distro.profile.libc} / ${INIT_NAME[distro.profile.init]} / ${VARIANT_TEXT[distro.id].userland}`,
 						distro.profile.privilege,
-						DESKTOP_NAME[distro.profile.desktop],
+						desktopOn(distro.profile.desktop),
 						`${distro.kernel.version} (${KERNEL_LINE_NAME[distro.profile.kernel_line]})`,
 					]),
 				},
