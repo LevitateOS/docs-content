@@ -11,7 +11,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 		tokenColors: [
 			{
 				scope: ["comment", "punctuation.definition.comment", "comment.block.documentation"],
-				settings: { foreground: "#7b808d", fontStyle: "italic" },
+				settings: { foreground: "#686c78", fontStyle: "italic" },
 			},
 			{
 				scope: [
@@ -23,11 +23,11 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 					"storage.modifier",
 					"keyword.operator.word",
 				],
-				settings: { foreground: "#7c658f" },
+				settings: { foreground: "#715c82" },
 			},
 			{
 				scope: ["string", "string.quoted", "string.template", "string.regexp"],
-				settings: { foreground: "#4d7c72" },
+				settings: { foreground: "#436c64" },
 			},
 			{
 				scope: [
@@ -37,7 +37,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 					"constant.character.escape",
 					"constant.other",
 				],
-				settings: { foreground: "#b2665f" },
+				settings: { foreground: "#99504a" },
 			},
 			{
 				scope: [
@@ -48,7 +48,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 					"meta.function-call",
 					"variable.function",
 				],
-				settings: { foreground: "#5e77a0" },
+				settings: { foreground: "#506689" },
 			},
 			{
 				scope: [
@@ -58,7 +58,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 					"support.type",
 					"support.class",
 				],
-				settings: { foreground: "#7b9371" },
+				settings: { foreground: "#586a51" },
 			},
 			{
 				scope: [
@@ -76,7 +76,7 @@ export const INDUSTRIAL_PASTEL_1984_THEMES = {
 			},
 			{
 				scope: ["punctuation", "meta.brace", "meta.delimiter"],
-				settings: { foreground: "#6f7482" },
+				settings: { foreground: "#616571" },
 			},
 			{
 				scope: ["invalid", "invalid.illegal"],

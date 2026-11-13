@@ -63,7 +63,11 @@ function normalizeHexColor(value: unknown): string | null {
 }
 
 function escapeStyleText(value: string): string {
-	return value.replaceAll("{", "\\{").replaceAll("}", "\\}").replaceAll("[[", "\\[[");
+	return value
+		.replaceAll("\\", "\\\\")
+		.replaceAll("{", "\\{")
+		.replaceAll("}", "\\}")
+		.replaceAll("[[", "\\[[");
 }
 
 function isDocsSyntaxLanguage(value: string): value is DocsSyntaxLanguage {
