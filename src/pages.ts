@@ -47,10 +47,11 @@ export const DESKTOP_NAME: Record<Profile["desktop"], string> = {
 	lxqt: "LXQt",
 };
 
-/** What each desktop's session runs on. LXQt's X server is Alpine's X.Org server. */
+/** What each desktop's session runs on. AcornOS's X server is XLibre, built from source
+ * (`display_server_recipe_script` in its distro.toml). */
 export const DISPLAY_SERVER_NAME: Record<Profile["desktop"], string> = {
 	plasma: "Wayland",
-	lxqt: "X11 (X.Org server)",
+	lxqt: "X11 (XLibre)",
 };
 
 /** A desktop with what it runs on: "KDE Plasma on Wayland". */
