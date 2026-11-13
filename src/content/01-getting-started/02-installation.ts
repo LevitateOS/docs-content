@@ -1,13 +1,7 @@
 import { distroPage } from "../../types";
 import { rich, bold, code, link } from "../../rich-text";
 import { GUIDE, guideSteps } from "../../install";
-import {
-	DESKTOP_NAME,
-	HARDWARE,
-	intendedDifferences,
-	PAGE_TITLES,
-	pageLink,
-} from "../../pages";
+import { DESKTOP_NAME, HARDWARE, intendedDifferences, PAGE_TITLES, pageLink } from "../../pages";
 
 /** What each guide page covers, for the step list. */
 const COVERS = {
