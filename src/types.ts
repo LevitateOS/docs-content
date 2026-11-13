@@ -55,6 +55,13 @@ export interface TextBlock {
 	content: string | RichText;
 }
 
+/** A build-time snapshot of syntax-coloured lines, one set per appearance: `[[fg=#hex]]…[[/]]`
+ * markup in the colours of the light or the dark syntax theme (`syntax-theme.ts`). */
+export interface HighlightedLines {
+	light: string[];
+	dark: string[];
+}
+
 export interface CodeBlock {
 	type: "code";
 	/** Language for syntax highlighting. */
@@ -63,7 +70,7 @@ export interface CodeBlock {
 	/** Optional filename - when present, shows file header with icon */
 	filename?: string;
 	/** Build-time snapshot of syntax-colored lines for TUI rendering */
-	highlightedLines?: string[];
+	highlightedLines?: HighlightedLines;
 }
 
 export interface TableBlock {
@@ -110,7 +117,7 @@ export interface CommandBlock {
 	/** Optional expected output (shown dimmer, not copied) */
 	output?: string;
 	/** Build-time snapshot of syntax-colored command lines for TUI rendering */
-	highlightedCommandLines?: string[];
+	highlightedCommandLines?: HighlightedLines;
 }
 
 /** Navigation section for docs sidebar */
