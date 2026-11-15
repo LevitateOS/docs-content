@@ -2,7 +2,7 @@
 
 ## What is docs-content?
 
-Single source of truth for LevitateOS documentation. Consumed by both website and TUI.
+Single source of truth for the documentation of LevitateOS and AcornOS, consumed by the website and the install guide viewer in `tools/tui`.
 
 ## What Belongs Here
 
@@ -15,7 +15,7 @@ Single source of truth for LevitateOS documentation. Consumed by both website an
 
 | Don't put here | Put it in |
 |----------------|-----------|
-| TUI rendering | `tui/apps/live-tools/install-docs` |
+| TUI rendering | `tools/tui/apps/live-tools/install-docs` |
 | Website rendering | `docs/website` |
 
 ## Key Rules

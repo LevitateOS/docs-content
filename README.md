@@ -2,7 +2,7 @@
 
 > **STOP. READ. THEN ACT.** Before writing code, read the existing content files. Before deleting anything, read it first.
 
-Structured documentation content library for LevitateOS. Single source of truth consumed by both website and TUI viewer.
+Structured documentation content for LevitateOS and AcornOS. Single source of truth, consumed by the website and by the install guide viewer (`install-docs` in `tools/tui`).
 
 ## Status
 
@@ -10,17 +10,17 @@ Structured documentation content library for LevitateOS. Single source of truth 
 |--------|-------|
 | Stage | Beta |
 | Target | TypeScript/Bun |
-| Last verified | 2026-01-23 |
 
 ### Works
 
 - Structured content types (text, code, table, list, interactive, command, qa, note); every renderer handles each
 - One install guide for every distro: distro pages are written once from the distro facts
-- The install procedure (`./install`), which the guide, the install TUIs and the website render
+- The install procedure (`src/install.ts`), which the guide, the install TUIs and the website render
+- Pages for installation, Recipe (the package manager), the helpers, the two roots of an A/B install (recab) and the rec* tools
 
 ### Known Issues
 
-- See parent repo issues
+- None recorded here. Open an issue in the LevitateOS repository.
 
 ---
 
