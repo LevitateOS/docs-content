@@ -11,7 +11,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: `The desktop edition uses ${DESKTOP_NAME[d.profile.desktop]}. Open the applications menu with the icon at the bottom left. Recipe is the window for finding and managing software; Recab shows the running system and the other system slot; Recdirstat shows where disk space goes. The screenshots on the website show development previews with sample data.`,
+					content: `The desktop edition uses ${DESKTOP_NAME[d.profile.desktop]}. Open the applications menu with the icon at the bottom left. Recipe is the window for finding and managing software; Recab shows the two roots: the booted one, locked, and the other, unlocked; Recdirstat shows where disk space goes. The screenshots on the website show development previews with sample data.`,
 				},
 			],
 		},
@@ -41,7 +41,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`On A/B installations, root's Recipe package commands write system software into the other root, which is unlocked. The catalog starts with ${code("ripgrep")}, which provides ${code("rg")}. The booted root stays unchanged; run ${code("recab boot-other")} and reboot to start the root that holds the change. Mutable installations have one root, and Recipe changes it directly.`,
+					content: rich`On A/B installations, root's Recipe package commands write system software into the other root, which is unlocked. The catalog starts with ${code("ripgrep")}, which provides ${code("rg")}. The booted root stays unchanged; run ${code("recab boot-other")} and reboot to start the root that holds the change. Mutable installations have one root, and Recipe changes it directly. The ${link("Recipe page", "/recipe")} explains how recipes, sources, scopes and isolation work.`,
 				},
 				{
 					type: "note",

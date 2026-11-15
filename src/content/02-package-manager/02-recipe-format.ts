@@ -3,7 +3,7 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "Recipe Format",
-	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts executed inside a configured Ginux domain. They own package facts and custom acquire/build/install behavior. Every executable recipe must declare ${code("const RECIPE_API = 2;")} and literal ${code("const NEEDS = #{...};")} for typed inputs, outputs and execution authority. An empty declaration has no inputs, outputs or network grants.`,
+	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts. A recipe that starts no program runs on the host, confined by Recipe; any other runs inside a configured Ginux domain. They own package facts and custom acquire/build/install behavior. Every executable recipe must declare ${code("const RECIPE_API = 2;")} and literal ${code("const NEEDS = #{...};")} for typed inputs, outputs and execution authority. An empty declaration has no inputs, outputs or network grants.`,
 	sections: [
 		{
 			title: "Two Uses, One Format",

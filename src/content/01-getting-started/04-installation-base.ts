@@ -16,13 +16,18 @@ export default distroPage((d) => ({
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("These steps in one tool:")} ${code("base-system")} checks the target, copies the system with a progress bar, shows the fstab entries (and any lines already in the target's fstab they would replace) and writes them. It reads the target from the disk step, so after ${code("disk-plan")} it needs no arguments. The steps below do the same by hand.`,
+					content: rich`${bold("Option 1, the helper app:")} ${code("base-system")} checks the target, copies the system with a progress bar, shows the fstab entries (and any lines already in the target's fstab they would replace) and writes them. It reads the target from the disk step, so after ${code("disk-plan")} it needs no arguments. When it says the system is on the disk, go to ${pageLink("installation-config")}. ${bold("Option 2, by hand:")} skip ${code("base-system")} and use the commands below. Either way the system is copied, not installed: it has no boot files yet.`,
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Check, copy and write the fstab interactively",
 					command: commands.baseSystem(),
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("base-system")} already checked the media.`,
 				},
 				{
 					type: "text",
@@ -40,6 +45,11 @@ export default distroPage((d) => ({
 		{
 			title: guideStep(SLUG, "Extract Base System"),
 			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("base-system")} already extracted the system.`,
+				},
 				{
 					type: "text",
 					content: rich`Use ${code("recstrap")} to extract the EROFS image to your mounted root:`,
@@ -66,6 +76,11 @@ export default distroPage((d) => ({
 			title: guideStep(SLUG, "Generate fstab"),
 			content: [
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("base-system")} already wrote the fstab.`,
+				},
+				{
 					type: "text",
 					content: rich`Use ${code("recfstab")} (like Arch's ${code("genfstab")}) to detect the mounted filesystems and write their fstab entries:`,
 				},
@@ -91,6 +106,11 @@ export default distroPage((d) => ({
 			title: guideStep(SLUG, "Inspect the New System"),
 			content: [
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} This only reads the system. ${code("system-setup")} shows the same choices on its own pages.`,
+				},
+				{
 					type: "text",
 					content: rich`Stay in the live shell. ${code("recsetup")} reads the mounted target and lists the configuration choices it ships: its init system, libc and privilege tool among them.`,
 				},
@@ -102,7 +122,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`Continue from the live shell to ${pageLink("installation-config")} (${guideSteps("installation-config")}).`,
+					content: rich`The system is copied, not installed. Continue from the live shell to ${pageLink("installation-config")} (${guideSteps("installation-config")}).`,
 				},
 			],
 		},

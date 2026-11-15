@@ -1,5 +1,5 @@
 import { distroPage } from "../../types";
-import { rich, code } from "../../rich-text";
+import { rich, bold, code } from "../../rich-text";
 import {
 	bootArgs,
 	commands,
@@ -18,11 +18,26 @@ const args = (disk: DiskResult) => bootArgs(disk) as string;
 
 export default distroPage((d) => ({
 	title: guideTitle(SLUG),
-	intro: `Installation ${guideSteps(SLUG)}. Finish from the live shell. Keep the installed root at ${target} and its EFI partition at ${target}/boot.`,
+	intro: `Installation ${guideSteps(SLUG)}. Required, whichever way you did the earlier parts: the helper apps do not do this. Run it in the live terminal, with the new system's root at ${target} and its EFI partition at ${target}/boot.`,
 	sections: [
+		{
+			title: "What Installed Means",
+			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Not installed yet.")} Copying the system and configuring it leaves a disk the firmware cannot boot. The installation is complete only when the boot files and boot entries exist on the EFI partition ${bold("and")} the verification has passed. The Boot step below writes them and shows its progress and its result in the terminal; the Finish step comes after a passing result. Do not reboot before then.`,
+				},
+			],
+		},
 		{
 			title: guideStep(SLUG, "Review Services"),
 			content: [
+				{
+					type: "note",
+					variant: "info",
+					content: rich`${bold("Optional.")} Nothing here is needed to finish; read it if you want another service started at boot.`,
+				},
 				{
 					type: "text",
 					content: rich`The system recipe starts ${network(d).daemon} at boot. Live-session autologin and shell overrides stay on the ISO.`,
@@ -50,7 +65,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`Use the root A and B devices reported by ${code("recpart apply")}. Previewing with ${code("recsetup plan")} runs no installation commands.`,
+					content: rich`${bold("Required.")} Use the root A and B devices reported by ${code("recpart apply")} (or by ${code("disk-plan")}). Previewing with ${code("recsetup plan")} runs no installation commands. The command prints a line as each step starts (${code("recsetup: step N/M: ...")}), ends with ${code("Completed N setup steps.")} when the boot files and entries are written, and on A/B then runs the verification, which ends with ${code("verify-installation: PASSED")}. Any other ending, ${code("FAILED")} or an error, means the system is not installed: fix the cause and run the same command again.`,
 				},
 				{
 					type: "command",
@@ -72,6 +87,17 @@ export default distroPage((d) => ({
 			title: guideStep(SLUG, "Unmount and Reboot"),
 			content: [
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Required, after the Boot step passed.")} On A/B that is ${code("verify-installation: PASSED")}. On a mutable installation, which has no recab, it is the boot entry you can list here.`,
+				},
+				{
+					type: "command",
+					language: "bash",
+					description: "Mutable installations: confirm the boot entry exists on the EFI partition",
+					command: `ls ${target}/boot/loader/entries`,
+				},
+				{
 					type: "command",
 					language: "bash",
 					description: "Unmount the installed system, deepest mount first",
@@ -85,7 +111,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`Continue to ${pageLink("post-installation")}.`,
+					content: rich`After the reboot, ${d.osName} is installed. Continue to ${pageLink("post-installation")}.`,
 				},
 			],
 		},

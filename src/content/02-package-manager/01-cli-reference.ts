@@ -3,7 +3,7 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "CLI Reference",
-	intro: rich`The Recipe CLI uses one engine for OS-building recipes and user-managed software. It executes recipes in Ginux, publishes their named outputs, and activates a declared package output unless ${code("--no-activate")} is selected. See ${link("Post-Installation", "/docs/post-installation")} for the ripgrep workflow and the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")} for runtime setup on a development host.`,
+	intro: rich`The Recipe CLI uses one engine for OS-building recipes and user-managed software. It runs each recipe on the host when it starts no program and in an isolated Ginux domain otherwise (the Recipe page explains which), publishes their named outputs, and activates a declared package output unless ${code("--no-activate")} is selected. See ${link("Post-Installation", "/docs/post-installation")} for the ripgrep workflow and the ${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")} for runtime setup on a development host.`,
 	sections: [
 		{
 			title: "Commands",

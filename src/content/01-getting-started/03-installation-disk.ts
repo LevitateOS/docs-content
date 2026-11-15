@@ -25,7 +25,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`Boot from the ${d.osName} ISO (see ${pageLink("getting-started")}). The install screen opens beside this guide. On the left, ${code("install-hub")} lists the install steps and does each one: it starts ${code("disk-plan")} for the disk and ${code("base-system")} for the base system, runs this guide's commands for the boot loader, and opens a shell for the rest (${code("s")} at any time; ${code("exit")} returns). The commands below work the same typed by hand. Ctrl-] switches between the panes.`,
+					content: rich`Boot from the ${d.osName} ISO (see ${pageLink("getting-started")}). The install screen is a root terminal on the left and this guide on the right. Type the commands in the terminal; Ctrl-] switches between the panes. For each part of the install you choose one way: a helper app, or the commands by hand.`,
 				},
 				{
 					type: "note",
@@ -78,7 +78,7 @@ export default distroPage((d) => ({
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("These steps in one tool:")} ${code("disk-plan")} lists the disks, lets you choose A/B or mutable and erase the whole disk or edit its partitions (for example to keep Windows), shows the plan and every command, runs recpart's safety checks, and partitions, formats and mounts the disk once you confirm. The steps below do the same with ${code("recpart")} directly.`,
+					content: rich`${bold("Option 1, the helper app:")} ${code("disk-plan")} lists the disks, lets you choose A/B or mutable and erase the whole disk or edit its partitions (for example to keep Windows), shows the plan and every command, runs recpart's safety checks, and partitions, formats and mounts the disk once you confirm. When it says the disk is ready, go straight to ${pageLink("installation-base")}. ${bold("Option 2, by hand:")} skip ${code("disk-plan")} and use the commands below, which do the same with ${code("recpart")} directly.`,
 				},
 				{
 					type: "command",
@@ -87,9 +87,14 @@ export default distroPage((d) => ({
 					command: commands.diskPlan(),
 				},
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} If ${code("disk-plan")} partitioned and mounted the disk, go to ${pageLink("installation-base")}.`,
+				},
+				{
 					type: "command",
 					language: "bash",
-					description: "List candidate disks",
+					description: "By hand: list candidate disks",
 					command: "recpart list-disks",
 					output: `recpart candidate disks
   ${disk}
@@ -112,6 +117,11 @@ export default distroPage((d) => ({
 		{
 			title: guideStep(SLUG, "Plan the Partitions"),
 			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("disk-plan")} already planned the layout.`,
+				},
 				{
 					type: "text",
 					content: rich`${code("recpart plan")} shows the layout, the exact sfdisk script and every command, without touching the disk. The default A/B layout:`,
@@ -143,7 +153,7 @@ export default distroPage((d) => ({
 					items: [
 						rich`${bold("Sizes:")} ${code("--efi-size-mb")}, ${code("--root-a-size-mb")}, ${code("--root-b-size-mb")} and ${code("--state-size-mb")} change them; both roots must be the same size.`,
 						rich`${bold("Mutable layout:")} ${code("--mode mutable")} creates only EFI and one root (label ROOT).`,
-						rich`${bold("Dual boot:")} don't erase the disk. Use ${code("disk-plan")}'s editor, or pass an explicit layout with ${code("--layout layout.json")}, to keep the existing EFI partition and Windows, shrink a partition to make room, and create the slots and state partition in the free space.`,
+						rich`${bold("Dual boot:")} don't erase the disk. Use ${code("disk-plan")}'s editor, or pass an explicit layout with ${code("--layout layout.json")}, to keep the existing EFI partition and Windows, shrink a partition to make room, and create the two roots and the state partition in the free space.`,
 					],
 				},
 			],
@@ -151,6 +161,11 @@ export default distroPage((d) => ({
 		{
 			title: guideStep(SLUG, "Partition, Format and Mount"),
 			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("disk-plan")} already partitioned, formatted and mounted the disk once you confirmed.`,
+				},
 				{
 					type: "text",
 					content: rich`${bold("WARNING: the default layout erases all data on the disk.")} Review the steps with ${code("--dry-run")} first; the real run needs the confirmation token ${code("DESTROY")}.`,
@@ -189,7 +204,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`You should see root A on ${code(target)}, the EFI partition on ${code(`${target}/boot`)} and the state partition on ${code(`${target}/var`)}.`,
+					content: rich`Run this after either way. You should see root A on ${code(target)}, the EFI partition on ${code(`${target}/boot`)} and the state partition on ${code(`${target}/var`)}.`,
 				},
 				{
 					type: "text",
@@ -200,6 +215,11 @@ export default distroPage((d) => ({
 		{
 			title: "Manual Partitioning (Alternative)",
 			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} This is the by-hand alternative to the plan and apply steps above, and to ${code("disk-plan")}. Do not run it after either.`,
+				},
 				{
 					type: "text",
 					content: rich`If you would rather partition by hand, do this instead of the plan and apply steps. It creates the same layout and labels as ${code("recpart")}, with util-linux's ${code("sfdisk")}.`,

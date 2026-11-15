@@ -20,7 +20,13 @@ export default {
 						["Learning curve", "Medium", "Low", "High", "Medium"],
 						["Community size", "Huge", "Large", "Medium", "Growing"],
 						["Two roots, one locked (A/B)", "No", "Atomic editions only", "No", "Yes"],
-						["Rolling release", "Yes", "No (6mo)", "Yes", "No (follows Fedora releases)"],
+						[
+							"Rolling release",
+							"Yes",
+							"No (6mo)",
+							"Yes",
+							"No (each release is built from one Fedora release)",
+						],
 						[
 							"Package source",
 							"Compile AUR",
@@ -39,11 +45,11 @@ export default {
 					type: "list",
 					items: [
 						rich`${bold("Speed")}: Extract pre-built packages in minutes, not hours of compilation`,
-						rich`${bold("Maintained base")}: the core comes from Fedora's signed builds and their security updates`,
+						rich`${bold("Maintained packages")}: the userland is built from Fedora's signed packages`,
 						rich`${bold("Programmable recipes")}: Rhai scripts can do anything, not just declare dependencies`,
 						rich`${bold("No build dependencies")}: You don't need gcc to install software`,
 						rich`${bold("A/B by default")}: the booted root is locked and Recipe writes system changes into the other, unlocked root; boot it and the roles swap, and a root that does not finish starting is left behind at the next boot`,
-						rich`${bold("Isolated builds")}: every recipe runs in its own build domain with no network unless you grant it`,
+						rich`${bold("Isolated builds")}: a recipe that starts programs runs in its own Ginux domain with no network unless you grant it; one that starts none runs on the host, confined to its own folders and declared hosts`,
 					],
 				},
 			],
@@ -60,7 +66,7 @@ export default {
 					type: "list",
 					items: [
 						rich`${bold("Smaller community")}: We're new. Arch and Fedora have decades of community knowledge.`,
-						rich`${bold("Fewer packages than AUR")}: only a small core comes from Fedora. Everything else needs a recipe.`,
+						rich`${bold("Fewer packages than AUR")}: only the userland comes from Fedora's packages. Everything else needs a recipe.`,
 						rich`${bold("Not Nix-level reproducibility")}: A/B roots and locked package sets help, but LevitateOS does not aim for NixOS-level reproducibility.`,
 						rich`${bold("Less documentation")}: Arch Wiki is comprehensive. Our docs are growing but not there yet.`,
 						rich`${bold("Younger project")}: Less battle-tested edge cases compared to established distros.`,
@@ -84,7 +90,7 @@ export default {
 					type: "list",
 					items: [
 						"You want Arch's philosophy without compilation wait times",
-						"You want a maintained Fedora base without Fedora's defaults",
+						"You want an independent system whose userland is built from Fedora's packages, without Fedora's defaults",
 						"You want real scripting power in your package manager",
 						"You want changes made in a second root while the booted one stays locked",
 						"You want to install and configure your system yourself, step by step",

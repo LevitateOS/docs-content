@@ -8,7 +8,8 @@ const COVERS = {
 	"installation-disk": "Boot, identify the disk, partition, format and mount it",
 	"installation-base": "Extract with recstrap, generate fstab, inspect the target",
 	"installation-config": "Timezone, locale, keymap, hostname, passwords, user account",
-	"installation-boot": "Install the boot loader and A/B boot entries, review services, reboot",
+	"installation-boot":
+		"Required after the helper apps: write the boot files and entries, verify, unmount, reboot",
 } as const;
 
 export default distroPage((d) => ({
@@ -20,7 +21,17 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: `Installing ${d.osName} follows the same process as Arch Linux. You boot the live ISO, partition the disk with recpart, extract the system with recstrap, configure it with recsetup, and reboot. No network connection is required.`,
+					content: `Installing ${d.osName} follows the same process as Arch Linux. You boot the live ISO, partition the disk with recpart, extract the system with recstrap, configure it with recsetup, write the boot files, and reboot. No network connection is required.`,
+				},
+				{
+					type: "note",
+					variant: "info",
+					content: rich`${bold("Helper app or by hand, never both.")} Each of the first three parts has a helper app (${code("disk-plan")}, ${code("base-system")}, ${code("system-setup")}) and the plain commands it runs. Use the helper ${bold("or")} the commands. Where a helper did the work, the manual sections that follow it say ${bold("Skip this - only if doing it by hand")}.`,
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("The helper apps do not install the system.")} After ${code("disk-plan")}, ${code("base-system")} and ${code("system-setup")}, the machine still has no boot files. The Boot and Finish steps (${pageLink("installation-boot")}) are required: the installation is complete only when the boot files and entries are on the EFI partition and the verification has passed.`,
 				},
 				{
 					type: "note",
@@ -35,12 +46,12 @@ export default distroPage((d) => ({
 				{
 					type: "list",
 					items: [
-						rich`${bold("Boot")} - Boot the live ISO into the install screen: the install steps (${code("install-hub")}), with a shell one key away, beside this guide`,
-						rich`${bold("Partition")} - Create the default A/B layout with ${code("disk-plan")} or ${code("recpart")}: EFI, root A, root B and the ${code("/var")} state partition`,
-						rich`${bold("Extract")} - Use ${code("recstrap")} to extract the system (like pacstrap)`,
-						rich`${bold("Configure")} - Set time zone, locale, keymap, hostname and users with ${code("recsetup")}`,
-						rich`${bold("Boot loader")} - Install systemd-boot and the A/B boot entries with ${code("recsetup")}`,
-						rich`${bold("Reboot")} - Boot into your new ${d.osName} installation`,
+						rich`${bold("Boot")} - Boot the live ISO into the install screen: a root terminal on the left, this guide on the right (Ctrl-] switches panes)`,
+						rich`${bold("Partition")} - Create the default A/B layout with ${code("disk-plan")}, or by hand with ${code("recpart")}: EFI, root A, root B and the ${code("/var")} state partition`,
+						rich`${bold("Extract")} - ${code("base-system")}, or by hand ${code("recstrap")} (like pacstrap) and ${code("recfstab")}`,
+						rich`${bold("Configure")} - ${code("system-setup")}, or by hand ${code("recsetup")}: time zone, locale, keymap, hostname and users`,
+						rich`${bold("Boot loader (required, no helper app)")} - ${code("recsetup")} installs systemd-boot and the boot entries on the EFI partition, then verification checks them`,
+						rich`${bold("Finish (required)")} - Unmount, reboot, and remove the install media. Only now is ${d.osName} installed`,
 					],
 				},
 			],

@@ -7,12 +7,12 @@ import { desktopOn, INIT_NAME, KERNEL_LINE_NAME } from "../../pages";
 const VARIANT_TEXT = {
 	acorn: {
 		goal: "Small, strict system: the fewest parts that do the job",
-		base: "Alpine APKs",
+		base: "Alpine 3.24 APK packages",
 		userland: "busybox",
 	},
 	levitate: {
 		goal: "Daily-driver workstation, maximum compatibility",
-		base: "Locked, signed Fedora RPMs",
+		base: "Fedora 45 RPM packages, signed and locked",
 		userland: "GNU",
 	},
 } as const;
@@ -20,14 +20,22 @@ const VARIANT_TEXT = {
 export default {
 	title: "Variants",
 	intro:
-		"LevitateOS is a shared build system with two OS variants. They share the recipe engine, the build pipeline and the install tools, but differ in their base, libc, init, administrator tool, desktop and kernel line.",
+		"LevitateOS and AcornOS are two independent operating systems built by one pipeline. They share the recipe engine, the build pipeline and the install tools, but differ in the packages their userland is built from, libc, init, administrator tool, desktop and kernel line.",
 	sections: [
 		{
 			title: "Variant Matrix",
 			content: [
 				{
 					type: "table",
-					headers: ["Variant", "Goal", "Base", "Stack", "Admin", "Desktop", "Kernel"],
+					headers: [
+						"Variant",
+						"Goal",
+						"Userland built from",
+						"Stack",
+						"Admin",
+						"Desktop",
+						"Kernel",
+					],
 					rows: DISTROS.map((distro) => [
 						distro.osName,
 						VARIANT_TEXT[distro.id].goal,

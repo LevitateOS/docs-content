@@ -1,7 +1,7 @@
 /**
  * The install procedure, written once for every distro: the steps in order, what each
  * one does, the guide section that has it in full, the programs it runs and its
- * commands. The guide pages, install-hub, the install state, disk-plan, base-system,
+ * commands. The guide pages, the install state, disk-plan, base-system,
  * system-setup and the website all render it, so an install command exists only here.
  *
  * Every command runs on both live userlands (GNU and busybox): no `mount --mkdir`, no
@@ -17,10 +17,9 @@ export const LIVE_ROOTFS = "/run/live-rootfs.erofs";
 /** Exists only when the machine booted in UEFI mode. */
 export const UEFI_VARS = "/sys/firmware/efi/efivars";
 
-/** A recorded step, in order; recording one drops the ones after it. */
-export const RECORDED_STEPS = ["preflight", "disk", "base", "setup", "boot"] as const;
+/** A step whose result a helper app records, in order; recording one drops the ones after it. */
+export const RECORDED_STEPS = ["disk", "base", "setup"] as const;
 export type RecordedStep = (typeof RECORDED_STEPS)[number];
-export type InstallStepId = RecordedStep | "finish";
 
 export type InstallMode = "ab" | "mutable";
 
@@ -35,7 +34,7 @@ export interface DiskResult {
 	target: string;
 	/** Every mount under the target, in the order recpart made them. */
 	mounts: { path: string; device: string }[];
-	/** A/B: the two system slots' devices. */
+	/** A/B: the two roots' devices. */
 	slot_a: string | null;
 	slot_b: string | null;
 	/** The device mounted at `target` (mutable: the root device for the boot entry). */
@@ -44,7 +43,6 @@ export interface DiskResult {
 
 /** What each recorded step leaves for the steps after it. */
 export interface StepResults {
-	preflight: { uefi: true; media: true };
 	disk: DiskResult;
 	base: {
 		target: string;
@@ -63,7 +61,6 @@ export interface StepResults {
 		/** The administrator system-setup created. */
 		user: string | null;
 	};
-	boot: { mode: InstallMode; verified_slots?: string[]; generation?: string };
 }
 
 /** A place in the install guide: a page and, optionally, one of its numbered steps. */
@@ -243,148 +240,3 @@ export const commands = {
 			.map((mount) => `umount ${shellQuote(mount.path)}`),
 	reboot: () => "reboot",
 };
-
-/** A check the preflight step makes on the live system: `path` exists. */
-export interface Check {
-	path: string;
-	label: string;
-	fix: string;
-}
-
-/** How a step is done. */
-export type StepRun =
-	/** Start the step's app; it records its own result. */
-	| { kind: "app"; argv: readonly string[] }
-	/** Check the live system; nothing to run. */
-	| { kind: "checks"; checks: readonly Check[] }
-	/** Run these commands as they are. */
-	| { kind: "commands"; lines: readonly string[] }
-	/** Not possible yet, and why. */
-	| { kind: "unavailable"; why: string };
-
-export interface InstallStep {
-	id: InstallStepId;
-	title: string;
-	/** One line on what the step does. */
-	about: string;
-	/** Where the guide has the step in full. */
-	guide: GuideRef;
-	/** The programs the step's commands and apps run, which the live ISO must ship. */
-	programs: readonly string[];
-	run: StepRun;
-}
-
-/** Each step's title and what it does, in order. */
-export const STEP_INFO: { [S in InstallStepId]: { title: string; about: string } } = {
-	preflight: { title: "Preflight", about: "Check that this machine can take the install." },
-	disk: {
-		title: "Disk",
-		about: "Choose a disk and a layout, then partition, format and mount it.",
-	},
-	base: { title: "Base system", about: "Copy the system onto the disk and write its fstab." },
-	setup: {
-		title: "Configuration",
-		about: "Time zone, locale, keymap, hostname, root password and a user.",
-	},
-	boot: {
-		title: "Boot",
-		about: "For A/B, make root B a copy of root A, then write both boot entries.",
-	},
-	finish: {
-		title: "Finish",
-		about:
-			"Unmount the new system and reboot into it. Remove the install media when the machine restarts.",
-	},
-};
-
-/** What the steps before have recorded. */
-export interface InstallContext {
-	disk?: DiskResult;
-}
-
-/** Every install step, in order, for distro `d` given what the earlier steps recorded. */
-export function installSteps(_d: Facts, ctx: InstallContext): InstallStep[] {
-	const { disk } = ctx;
-	const target = disk?.target;
-	const noDisk = (what: string): StepRun => ({
-		kind: "unavailable",
-		why: `The disk step says ${what}.`,
-	});
-	const boot = disk ? bootArgs(disk) : null;
-	return [
-		{
-			id: "preflight",
-			...STEP_INFO.preflight,
-			guide: guideRef("installation-disk", "Boot the Live Environment"),
-			programs: [],
-			run: {
-				kind: "checks",
-				checks: [
-					{
-						path: UEFI_VARS,
-						label: "Booted in UEFI mode",
-						fix: "Reboot and pick the UEFI entry for the install media in the firmware's boot menu.",
-					},
-					{
-						path: LIVE_ROOTFS,
-						label: `Install media mounted (${LIVE_ROOTFS})`,
-						fix: "Boot the live ISO again; the system image it installs is missing.",
-					},
-				],
-			},
-		},
-		{
-			id: "disk",
-			...STEP_INFO.disk,
-			guide: guideRef("installation-disk", "Identify Target Disk"),
-			programs: ["disk-plan", "recpart"],
-			run: { kind: "app", argv: [commands.diskPlan()] },
-		},
-		{
-			id: "base",
-			...STEP_INFO.base,
-			guide: guideRef("installation-base", "Extract Base System"),
-			programs: ["base-system", "recstrap", "recfstab"],
-			run: target
-				? { kind: "app", argv: [commands.baseSystem()] }
-				: noDisk("where the system goes"),
-		},
-		{
-			id: "setup",
-			...STEP_INFO.setup,
-			guide: guideRef("installation-config", "Set Timezone, Locale and Keymap"),
-			programs: ["system-setup", "recsetup", "recchroot", "loadkeys"],
-			run: target ? { kind: "app", argv: [commands.systemSetup()] } : noDisk("where the system is"),
-		},
-		{
-			id: "boot",
-			...STEP_INFO.boot,
-			guide: guideRef("installation-boot", "Install the Boot Loader and Entries"),
-			programs: disk?.mode === "mutable" ? ["recsetup"] : ["recsetup", "recab"],
-			run:
-				disk && typeof boot === "string"
-					? { kind: "commands", lines: [commands.boot(disk.target, boot)] }
-					: boot && typeof boot === "object"
-						? { kind: "unavailable", why: `Not runnable: ${boot.missing}.` }
-						: noDisk("which partitions to boot"),
-		},
-		{
-			id: "finish",
-			...STEP_INFO.finish,
-			guide: guideRef("installation-boot", "Unmount and Reboot"),
-			programs: disk?.mode === "mutable" ? ["umount", "reboot"] : ["recab", "umount", "reboot"],
-			run: disk
-				? {
-						kind: "commands",
-						lines: [
-							...(disk.mode === "ab"
-								? [`recab verify-installation --root ${shellQuote(disk.target)}`]
-								: []),
-							...commands.unmount(disk),
-							commands.reboot(),
-						],
-					}
-				: noDisk("what to unmount"),
-		},
-	];
-}

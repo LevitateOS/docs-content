@@ -22,7 +22,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recsetup")} does the install's configuration and boot steps against the system that ${link("recstrap", "/docs/recstrap")} extracted. install-hub runs it for the boot step and shows its commands for the configuration step, and the commands it prints are the manual install for anyone who would rather type them.`,
+					content: rich`${code("recsetup")} does the install's configuration and boot steps against the system that ${link("recstrap", "/docs/recstrap")} extracted. ${code("system-setup")} runs it for the configuration step as a helper; the Boot step, which writes the boot files and entries, is typed in the install terminal.`,
 				},
 				{
 					type: "list",

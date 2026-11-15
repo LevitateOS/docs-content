@@ -18,7 +18,7 @@ export default {
 							answer: [
 								{
 									type: "text",
-									content: rich`LevitateOS is a daily driver Linux distribution competing directly with Arch Linux. It borrows Arch's philosophy (you maintain your own packages on a minimal base) but takes its core system (glibc, systemd, coreutils, OpenSSH and the rest of a minimal base) pre-built from Fedora instead of compiling it, and it keeps two root filesystems, A and B: the booted one is locked and changes are made in the other.`,
+									content: rich`LevitateOS is an independent operating system for daily use, competing directly with Arch Linux. It borrows Arch's philosophy (you maintain your own packages on a minimal base). Its userland (glibc, systemd, coreutils, OpenSSH and the rest of a minimal base) is built from Fedora 45 RPM packages instead of being compiled, and it keeps two root filesystems, A and B: the booted one is locked and changes are made in the other.`,
 								},
 								{
 									type: "table",
@@ -30,7 +30,7 @@ export default {
 										[
 											"Binary Source",
 											"Compiled from source",
-											"Core extracted from signed Fedora RPMs",
+											"Userland built from signed Fedora 45 RPM packages",
 										],
 										["System changes", "In place", "Written into the other root, then booted"],
 										["Build Time", "Hours (compiling)", "Minutes (extracting)"],
@@ -38,7 +38,7 @@ export default {
 								},
 								{
 									type: "text",
-									content: rich`Its sibling ${bold("AcornOS")} is built by the same pipeline on musl, OpenRC and busybox, from Alpine packages. See ${link("Variants", "/docs/variants")}.`,
+									content: rich`Its sibling ${bold("AcornOS")} is also an independent operating system, built by the same pipeline on musl, OpenRC and busybox, with its userland built from Alpine 3.24 APK packages. See ${link("Variants", "/docs/variants")}.`,
 								},
 							],
 						},
@@ -48,7 +48,7 @@ export default {
 								{
 									type: "text",
 									content:
-										"Arch requires compiling AUR packages. That means build dependencies, compiler toolchains, and waiting. LevitateOS extracts its core from signed Fedora RPMs in minutes. Same philosophy, less waiting.",
+										"Arch requires compiling AUR packages. That means build dependencies, compiler toolchains, and waiting. LevitateOS builds its userland from signed Fedora RPM packages in minutes. Same philosophy, less waiting.",
 								},
 								{
 									type: "text",
@@ -63,12 +63,12 @@ export default {
 								{
 									type: "text",
 									content:
-										"Fedora is GNOME-focused and opinionated. It makes choices for you. LevitateOS is a base system - you build what you want on top of it.",
+										"Fedora is a distribution of its own, GNOME-focused and opinionated. LevitateOS is a separate operating system: it uses Fedora's packages as parts, not its installer, package manager, kernel or update channels, and you build what you want on top of a minimal system.",
 								},
 								{
 									type: "text",
 									content:
-										"Fedora ships a complete desktop experience. LevitateOS ships a foundation. Different goals, different users.",
+										"Fedora ships a complete desktop experience. LevitateOS ships a minimal system with Recipe. Different goals, different users.",
 								},
 							],
 						},
@@ -130,12 +130,12 @@ export default {
 					type: "qa",
 					items: [
 						{
-							question: "Why take the base from Fedora instead of building it from source?",
+							question: "Why build the userland from Fedora packages instead of from source?",
 							answer: [
 								{
 									type: "list",
 									items: [
-										rich`${bold("Current, maintained packages")}: Fedora's release plus its security updates`,
+										rich`${bold("Current, maintained packages")}: one Fedora 45 release, locked to exact package versions`,
 										rich`${bold("glibc-based")} (not musl) for maximum compatibility`,
 										rich`${bold("No compilation required")} - binaries are pre-built`,
 										rich`${bold("Builds in minutes")} instead of hours`,
@@ -145,7 +145,7 @@ export default {
 								{
 									type: "text",
 									content:
-										"Fedora keeps the toolchain and libraries current, which matters for a desktop where users build new software, and the two A/B roots keep the previous working root bootable.",
+										"Fedora keeps the toolchain and libraries current, which matters for a desktop where users build new software, and the two A/B roots keep the previous working root bootable. Fedora is our parts supplier and nothing more: the installer, the rec* tools, A/B booting and Recipe are our own.",
 								},
 							],
 						},
@@ -321,7 +321,7 @@ fn install(ctx) {
 										rich`${bold("Real programming")} - Variables, conditionals, loops, functions`,
 										rich`${bold("Infinite extensibility")} - Recipes define logic, not just data`,
 										rich`${bold("Minimal implementation")} - The executor provides helpers, runs the readiness checks and calls acquire(), build() and install()`,
-										rich`${bold("Isolated")} - Every recipe runs inside a Ginux build domain, never on the host`,
+										rich`${bold("Isolated")} - A recipe that starts programs runs inside an isolated Ginux domain. A recipe that starts none runs on the host, confined by Recipe to its own folders and declared network hosts`,
 									],
 								},
 							],
@@ -389,7 +389,7 @@ fn install(ctx) {
 								{
 									type: "text",
 									content:
-										"They run inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. On an A/B installation the booted root is locked, so Recipe writes system changes into the other, unlocked root. If the other root does not finish starting, the machine starts the previous root again.",
+										"A recipe that starts programs runs inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. A recipe that starts no program runs on the host, confined by Recipe to its own folders and declared network hosts. The Recipe page explains both. On an A/B installation the booted root is locked, so Recipe writes system changes into the other, unlocked root. If the other root does not finish starting, the machine starts the previous root again.",
 								},
 								{
 									type: "list",
@@ -529,7 +529,11 @@ fn install(ctx) {
 					type: "table",
 					headers: ["Decision", "Alternative", "Why Chosen"],
 					rows: [
-						["Fedora base", "Compile from source", "Minutes vs hours, maintained packages"],
+						[
+							"Userland from Fedora packages",
+							"Compile from source",
+							"Minutes vs hours, maintained packages",
+						],
 						[
 							"A/B roots",
 							"Change in place",
@@ -538,8 +542,8 @@ fn install(ctx) {
 						["EROFS", "Large initramfs", "RAM savings, scalability, single source"],
 						["Rhai recipes", "S-expressions/YAML", "Real programming, infinite extensibility"],
 						[
-							"Ginux build domains",
-							"Build on the host",
+							"Ginux domains for recipes that start programs",
+							"Run everything on the host",
 							"Isolation, explicit inputs, no network by default",
 						],
 						["E2E scenarios", "Unit tests", "Catches integration issues"],

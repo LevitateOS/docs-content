@@ -10,7 +10,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`Every helper with an effect runs inside the recipe's Ginux domain, under its filesystem, task, memory and network limits. Paths refer to the domain's filesystem: ${code("/inputs")}, ${code("/work/build")}, ${code("/work/tools")}, ${code("/work/tmp")} and ${code("/out")}. Commands need their binaries in the selected image or in dependency tools. Network helpers need an endpoint declared in ${code("NEEDS.network")}. Caller endpoint/limit options only narrow that authority, including dependencies. Declare all imported inputs and returned outputs with their kinds.`,
+					content: rich`A recipe that starts no program runs on the host, where helpers reach only the run's own folders (spelled with ${code("RUNTIME.paths")}) and the hosts in ${code("NEEDS.network")}. Any other recipe runs inside its Ginux domain, under its filesystem, task, memory and network limits, where paths refer to the domain's filesystem: ${code("/inputs")}, ${code("/work/build")}, ${code("/work/tools")}, ${code("/work/tmp")} and ${code("/out")}. Commands need their binaries in the selected image or in dependency tools. Network helpers need an endpoint declared in ${code("NEEDS.network")}. Caller endpoint/limit options only narrow that authority, including dependencies. Declare all imported inputs and returned outputs with their kinds.`,
 				},
 				{
 					type: "text",

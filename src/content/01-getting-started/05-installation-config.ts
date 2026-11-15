@@ -24,13 +24,18 @@ export default distroPage((d) => ({
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("These steps in one tool:")} ${code("system-setup")} asks for the keyboard layout, time zone, language, hostname, root password and a user, shows the commands ${code("recsetup")} would run, and applies them after you confirm. The install screen starts it from the configuration step. The commands below do the same by hand.`,
+					content: rich`${bold("Option 1, the helper app:")} ${code("system-setup")} asks for the keyboard layout, time zone, language, hostname, root password and a user, shows the commands ${code("recsetup")} would run, and applies them after you confirm. When it has applied them, go to ${pageLink("installation-boot")}. ${bold("Option 2, by hand:")} skip ${code("system-setup")} and use the commands in this page's steps. Either way the system is configured, not installed: it still needs its boot files.`,
 				},
 				{
 					type: "command",
 					language: "bash",
 					description: "Answer the questions, review and apply",
 					command: commands.systemSetup(),
+				},
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("system-setup")} lists these choices itself.`,
 				},
 				{
 					type: "command",
@@ -43,6 +48,11 @@ export default distroPage((d) => ({
 		{
 			title: guideStep(SLUG, "Set Timezone, Locale and Keymap"),
 			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("system-setup")} already set these.`,
+				},
 				{
 					type: "command",
 					language: "bash",
@@ -71,6 +81,11 @@ export default distroPage((d) => ({
 			title: guideStep(SLUG, "Set Hostname"),
 			content: [
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("system-setup")} already set the hostname.`,
+				},
+				{
 					type: "command",
 					language: "bash",
 					description: "Set hostname and its hosts-file mapping",
@@ -81,6 +96,11 @@ export default distroPage((d) => ({
 		{
 			title: guideStep(SLUG, "Set Root Password"),
 			content: [
+				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("system-setup")} already set the root password.`,
+				},
 				{
 					type: "text",
 					content:
@@ -98,6 +118,11 @@ export default distroPage((d) => ({
 			title: guideStep(SLUG, "Create User Account"),
 			content: [
 				{
+					type: "note",
+					variant: "warning",
+					content: rich`${bold("Skip this - only if doing it by hand.")} ${code("system-setup")} already created the user.`,
+				},
+				{
 					type: "command",
 					language: "bash",
 					description:
@@ -113,7 +138,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`Continue to ${pageLink("installation-boot")}.`,
+					content: rich`Continue to ${pageLink("installation-boot")}. It is required: the system is not installed until it has run.`,
 				},
 			],
 		},
