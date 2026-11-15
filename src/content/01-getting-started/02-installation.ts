@@ -7,7 +7,8 @@ import { DESKTOP_NAME, HARDWARE, intendedDifferences, PAGE_TITLES, pageLink } fr
 const COVERS = {
 	"installation-disk": "Boot, identify the disk, partition, format and mount it",
 	"installation-base": "Extract with recstrap, generate fstab, inspect the target",
-	"installation-config": "Install the default software through Recipe (some minutes), then timezone, locale, keymap, hostname, passwords, user account",
+	"installation-config":
+		"Install the default software through Recipe (some minutes), then timezone, locale, keymap, hostname, passwords, user account",
 	"installation-boot":
 		"Required after the helper apps: write the boot files and entries, verify, unmount, reboot",
 } as const;
