@@ -50,6 +50,15 @@ export default {
 			],
 		},
 		{
+			title: "Updating the System",
+			content: [
+				{
+					type: "text",
+					content: rich`Updates use the same path. They are written and have not been built or run yet. A release is signed and named ${code("1.0")}, ${code("1.1")} and so on. ${code("recab update")} downloads it, makes the other root a copy of the booted one, lets Recipe apply the release there and starts that root once. A daily check only shows a notice that a release exists; nothing is downloaded or installed until you ask. Mutable installations are updated by the Updater app instead, since they have no other root. Software you installed yourself keeps updating from the Recipe catalog.`,
+				},
+			],
+		},
+		{
 			title: "The Boot Default",
 			content: [
 				{

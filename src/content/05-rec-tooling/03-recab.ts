@@ -34,7 +34,8 @@ export default {
 					content: `recab status          # which root is booted, the other one, what boots next
 recab copy            # make the other root a copy of the booted root
 recab boot-other      # start the other root at the next boot, once
-recab boot-other --cancel`,
+recab boot-other --cancel
+recab update          # written, not run yet: download a release and apply it to the other root`,
 				},
 				{
 					type: "text",

@@ -62,7 +62,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`This extracts the complete base system: ${INIT_NAME[d.profile.init]}, the userland, kernel modules, ${network(d).daemon}, ${code(d.profile.privilege)}, the ${code("recipe")} package manager and, on A/B installations, ${code("recab")}. It checks the target first and the extracted system afterwards, before it reports success.`,
+					content: rich`This extracts the minimal base system: ${INIT_NAME[d.profile.init]}, the userland, kernel modules, ${code(d.profile.privilege)}, the ${code("recipe")} package manager and, on A/B installations, ${code("recab")}. The rest (${network(d).daemon}, the desktop, Firefox, audio, printing and so on) comes in the next part, installed through Recipe. It checks the target first and the extracted system afterwards, before it reports success.`,
 				},
 				{
 					type: "command",

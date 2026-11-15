@@ -8,7 +8,7 @@ import {
 	guideSteps,
 	guideTitle,
 } from "../../install";
-import { pageLink } from "../../pages";
+import { DESKTOP_NAME, network, pageLink } from "../../pages";
 
 const SLUG = "installation-config";
 const target = EXAMPLE_DISK.target;
@@ -16,7 +16,7 @@ const choice = { timezone: EXAMPLE_SETUP.timezone, locale: EXAMPLE_SETUP.locale 
 
 export default distroPage((d) => ({
 	title: guideTitle(SLUG),
-	intro: `Installation ${guideSteps(SLUG)}. Run these commands in the live shell, with the installed system mounted at ${target}. Recipe prepares the system defaults; recsetup applies your machine's choices using the setup program shipped in that system.`,
+	intro: rich`Installation ${guideSteps(SLUG)}. Run these commands in the live shell, with the installed system mounted at ${target}. The first ${code("recsetup apply")} on the release medium starts by installing the default software through Recipe, then applies your machine's choices using the setup program shipped in that system.`,
 	sections: [
 		{
 			title: guideStep(SLUG, "Inspect Available Choices"),
@@ -25,6 +25,11 @@ export default distroPage((d) => ({
 					type: "note",
 					variant: "info",
 					content: rich`${bold("Option 1, the helper app:")} ${code("system-setup")} asks for the keyboard layout, time zone, language, hostname, root password and a user, shows the commands ${code("recsetup")} would run, and applies them after you confirm. When it has applied them, go to ${pageLink("installation-boot")}. ${bold("Option 2, by hand:")} skip ${code("system-setup")} and use the commands in this page's steps. Either way the system is configured, not installed: it still needs its boot files.`,
+				},
+				{
+					type: "note",
+					variant: "info",
+					content: rich`${bold("Software first, and it takes some minutes.")} The base system holds only what boots the machine and runs Recipe. The first ${code("recsetup apply")} on the release medium installs the default software through ${code("recipe --system install")}: the desktop (${DESKTOP_NAME[d.profile.desktop]}), Firefox, audio, ${network(d).daemon}, Bluetooth, printing, the firewall, fonts and the rest. It reads them from a package cache on the medium, so no network is needed, and each one gets a Recipe receipt, so you can remove or replace it later in Recipe, the desktop included. Wait for it to finish.`,
 				},
 				{
 					type: "command",

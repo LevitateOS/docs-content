@@ -11,7 +11,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: `The desktop edition uses ${DESKTOP_NAME[d.profile.desktop]}. Open the applications menu with the icon at the bottom left. Recipe is the window for finding and managing software; Recab shows the two roots: the booted one, locked, and the other, unlocked; Recdirstat shows where disk space goes. The screenshots on the website show development previews with sample data.`,
+					content: `The desktop edition uses ${DESKTOP_NAME[d.profile.desktop]}. Open the applications menu with the icon at the bottom left. The desktop is software installed through Recipe, like the apps: Recipe lists it, and you can remove it or install a different desktop there. Removing the last desktop is allowed and leaves a text login. Recipe is the window for finding and managing software; Recab shows the two roots: the booted one, locked, and the other, unlocked; Recdirstat shows where disk space goes. The screenshots on the website show development previews with sample data.`,
 				},
 			],
 		},

@@ -7,7 +7,7 @@ import { DESKTOP_NAME, HARDWARE, intendedDifferences, PAGE_TITLES, pageLink } fr
 const COVERS = {
 	"installation-disk": "Boot, identify the disk, partition, format and mount it",
 	"installation-base": "Extract with recstrap, generate fstab, inspect the target",
-	"installation-config": "Timezone, locale, keymap, hostname, passwords, user account",
+	"installation-config": "Install the default software through Recipe (some minutes), then timezone, locale, keymap, hostname, passwords, user account",
 	"installation-boot":
 		"Required after the helper apps: write the boot files and entries, verify, unmount, reboot",
 } as const;
@@ -73,7 +73,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`${code(d.isoFile)} installs the same base system as every ISO, then its default software set: ${d.desktop.recipes.length} group recipes, ${DESKTOP_NAME[d.profile.desktop]} and its apps among them, which ${code("recsetup")}'s software step installs through Recipe, offline from the medium, each with a Recipe receipt, so you can remove or replace any of them later like any other software. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the packages the group recipes pin:`,
+					content: rich`${code(d.isoFile)} installs the same base system as every ISO, then its default software set: ${String(d.desktop.recipes.length)} group recipes, ${DESKTOP_NAME[d.profile.desktop]} and its apps among them, which ${code("recsetup")}'s software step installs through Recipe, offline from the medium, each with a Recipe receipt, so you can remove or replace any of them later like any other software. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the packages the group recipes pin:`,
 				},
 				{
 					type: "code",

@@ -40,7 +40,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`The system recipe starts ${network(d).daemon} at boot. Live-session autologin and shell overrides stay on the ISO.`,
+					content: rich`The network group recipe, installed with the default software, starts ${network(d).daemon} at boot. Live-session autologin and shell overrides stay on the ISO.`,
 				},
 				{
 					type: "command",
