@@ -67,8 +67,8 @@ export default {
 use recqemu::serial::Console;
 
 let spec = DomainSpec {
-    name: "levitate-live-boot".into(),
-    title: "Scenario VM levitate-live-boot".into(),
+    name: "levitate-test-live-ssh".into(),
+    title: "Scenario VM levitate-test-live-ssh".into(),
     uefi_code: recqemu::find_ovmf()?,
     uefi_vars: UefiVars::Fresh { template: recqemu::find_ovmf_vars()?, path: vars_path },
     disk: Some(disk),

@@ -7,7 +7,7 @@ export const DISTROS = [
 		desktop: {
 			displayManager: "sddm",
 			installScreen: "/usr/local/bin/install-ux",
-			isoFile: "acornos-x86_64-live-desktop.iso",
+			isoFile: "acornos-x86_64.iso",
 		},
 		id: "acorn",
 		installShell: "/bin/bash",
@@ -16,7 +16,7 @@ export const DISTROS = [
 		isoLabel: "ACORNOS",
 		kernel: {
 			localversion: "-acorn",
-			version: "6.18.62",
+			version: "6.18.63",
 		},
 		loginPrompt: "acornos login:",
 		look: {
@@ -78,7 +78,7 @@ export const DISTROS = [
 		desktop: {
 			displayManager: "sddm",
 			installScreen: "/usr/local/bin/install-ux",
-			isoFile: "levitateos-x86_64-live-desktop.iso",
+			isoFile: "levitateos-x86_64.iso",
 		},
 		id: "levitate",
 		installShell: "/bin/bash",
@@ -87,7 +87,7 @@ export const DISTROS = [
 		isoLabel: "LEVITATEOS",
 		kernel: {
 			localversion: "-levitate",
-			version: "7.3.3",
+			version: "7.3.4",
 		},
 		loginPrompt: "levitateos login:",
 		look: {

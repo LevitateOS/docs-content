@@ -38,7 +38,7 @@ export default distroPage((d) => ({
 					language: "bash",
 					content: `cargo xtask setup
 cargo xtask build kernel <distro> --prebuilt
-cargo xtask build live-tools <distro>`,
+cargo xtask build release <distro>`,
 				},
 				{
 					type: "text",

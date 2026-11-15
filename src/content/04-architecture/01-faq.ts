@@ -430,13 +430,16 @@ fn install(ctx) {
 									headers: ["Scenario", "Checks"],
 									rows: [
 										["build-preflight", "The build inputs and host prerequisites"],
-										["live-boot", "The ISO boots to the live system"],
-										["live-tools", "The install tools work in the live system"],
+										[
+											"test-live-ssh",
+											"The test ISO boots to the live system and takes an SSH login",
+										],
+										["test-install-base", "The install tools work in the test installer"],
 										[
 											"install",
 											"Partition, extract, configure and install the bootloader on a VM disk",
 										],
-										["installed-boot", "The installed disk boots"],
+										["test-installed-boot", "The installed disk boots"],
 										["automated-login", "Login on the installed system"],
 										["runtime", "The installed system's services and behavior at runtime"],
 										[

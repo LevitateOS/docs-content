@@ -58,17 +58,17 @@ export default distroPage((d) => ({
 			],
 		},
 		{
-			title: "From the Desktop ISO",
+			title: "After Installation: The Desktop",
 			content: [
 				{
 					type: "text",
-					content: rich`${code(d.desktop.isoFile)} installs the desktop system: the same base system with ${DESKTOP_NAME[d.profile.desktop]}, whose display manager (${code(d.desktop.displayManager)}) starts at boot once it is installed. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the desktop's locked packages:`,
+					content: rich`${code(d.isoFile)} installs the desktop system: the same base system with ${DESKTOP_NAME[d.profile.desktop]}, whose display manager (${code(d.desktop.displayManager)}) starts at boot once it is installed. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the desktop's locked packages:`,
 				},
 				{
 					type: "code",
 					language: "bash",
 					content: `cargo xtask build rootfs-source <distro> --desktop
-cargo xtask build live-desktop <distro>`,
+cargo xtask build release <distro>`,
 				},
 				{
 					type: "text",
