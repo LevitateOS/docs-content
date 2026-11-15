@@ -36,6 +36,10 @@ export default {
 					type: "text",
 					content: rich`Every section of a request is optional. The setup step asks for the time zone, locale, keymap, hostname and accounts, and the boot step asks for ${code("--boot")}, the machine id and services. Add ${code("--json")} for machine-readable output (errors go to stderr).`,
 				},
+				{
+					type: "text",
+					content: rich`On the release medium, which carries the default software set, every plan starts with the software step: ${code("recipe --system --root <target> --recipes-path /usr/lib/recsetup/default-set/recipes install <the default set>")}, which installs each group recipe through Recipe, offline from the medium's package cache, with a receipt, and then rebuilds the target's caches once. It comes before the accounts (so users join the groups the software brings) and before the boot step (so on A/B both roots get it). A test medium has no default set and installs the base system alone.`,
+				},
 			],
 		},
 		{

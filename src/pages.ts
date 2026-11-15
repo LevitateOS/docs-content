@@ -47,8 +47,8 @@ export const DESKTOP_NAME: Record<Profile["desktop"], string> = {
 	lxqt: "LXQt",
 };
 
-/** What each desktop's session runs on. AcornOS's X server is XLibre, built from source
- * (`display_server_recipe_script` in its distro.toml). */
+/** What each desktop's session runs on. AcornOS's X server is XLibre, built from pinned
+ * source (`display_server_recipe_script` in its distro.toml) and published as a prebuilt. */
 export const DISPLAY_SERVER_NAME: Record<Profile["desktop"], string> = {
 	plasma: "Wayland",
 	lxqt: "X11 (XLibre)",
@@ -113,7 +113,8 @@ export function services(d: DistroFacts) {
 
 /**
  * The network stack, live and installed: NetworkManager with wpa_supplicant on both
- * siblings. Only the service name differs, by init system.
+ * siblings, the `network` group recipe (on every live medium's overlay, and installed
+ * with the default software set). Only the service name differs, by init system.
  */
 export function network(d: DistroFacts) {
 	const daemon = d.profile.init === "systemd" ? "NetworkManager" : "networkmanager";

@@ -25,7 +25,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`Both collections use the engine in ${code("tools/recipe")}, the same API 2 declarations and the same lifecycle below. Their directory and consumer identify their purpose. A named package output selects CLI activation; the OS builder uses ${code("--no-activate")}. There is no second recipe format or engine. Apps bundled in a desktop system image are currently owned by that image and updated with it.`,
+					content: rich`Both collections use the engine in ${code("tools/recipe")}, the same API 2 declarations and the same lifecycle below. Their directory and consumer identify their purpose. A named package output selects CLI activation; the OS builder uses ${code("--no-activate")}. There is no second recipe format or engine. No image bundles apps: the desktop and its apps are group recipes in the public catalogue, installed through Recipe during the installation.`,
 				},
 				{
 					type: "text",

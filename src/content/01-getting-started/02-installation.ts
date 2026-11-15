@@ -73,7 +73,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`${code(d.isoFile)} installs the desktop system: the same base system with ${DESKTOP_NAME[d.profile.desktop]}, whose display manager (${code(d.desktop.displayManager)}) starts at boot once it is installed. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the desktop's locked packages:`,
+					content: rich`${code(d.isoFile)} installs the same base system as every ISO, then its default software set: ${d.desktop.recipes.length} group recipes, ${DESKTOP_NAME[d.profile.desktop]} and its apps among them, which ${code("recsetup")}'s software step installs through Recipe, offline from the medium, each with a Recipe receipt, so you can remove or replace any of them later like any other software. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the packages the group recipes pin:`,
 				},
 				{
 					type: "code",
@@ -83,7 +83,7 @@ cargo xtask build release <distro>`,
 				},
 				{
 					type: "text",
-					content: rich`It boots like the other ISOs: into the install screen on the first virtual console and the serial console, with no desktop yet, so every step of this guide is the same. ${code("recstrap")} extracts the desktop system, and after the reboot the display manager asks for the account you made with ${code("recsetup")}.`,
+					content: rich`It boots like the other ISOs: into the install screen on the first virtual console and the serial console, with no desktop, so every step of this guide is the same. ${code("recstrap")} extracts the base system; ${code("recsetup")} installs the default set into it first (its software step, before the accounts and the boot step), and after the reboot the display manager asks for the account you made with ${code("recsetup")}.`,
 				},
 			],
 		},
