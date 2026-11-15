@@ -1,133 +1,52 @@
 import type { DocsContent } from "../../types";
-import { rich, bold, code, link } from "../../rich-text";
+import { rich, code, link } from "../../rich-text";
 import { TOOL_HELP } from "../../tool-help";
 
 export default {
 	title: "recab",
 	intro:
-		"System updates and symmetric A/B continuation: prepare the next system, apply changes and updates through Recipe, trial-boot it, commit or fall back.",
+		"The two root filesystems of an A/B installation, root A and root B. The booted root is locked. The other root is unlocked, and changes are made there.",
 	sections: [
 		{
-			title: "Required Update Lifecycle",
+			title: "The Two Roots",
 			content: [
 				{
 					type: "list",
-					ordered: true,
 					items: [
-						"Installation populates A and B with equivalent personalized systems and matching boot artifacts. Both are bootable at first use; only partition references, boot paths and slot identity differ.",
-						"While committed A runs with an immutable system root, prepare writable B as its continuation and apply system change X through Recipe.",
-						"Discover and download a system update and apply it to that same prepared B. Preserve X or report a conflict; do not erase the preparation.",
-						"Finalize B and its matching kernel and initramfs, then trial-boot it. Commit a healthy result or return to A after a failed trial triggers a reboot.",
-						"For change Y while running committed B, bring inactive A up to B's current system using only differences, retain X and the update, then apply Y. Repeat in either direction.",
+						rich`The booted root is locked: read-only, with its block device read-only.`,
+						rich`The other root is unlocked: writable, mounted read-write at ${code("/run/recab/other")}. Changes are made there. Recipe writes system software into it.`,
+						rich`Boot the other root and the roles swap. Nothing else decides which is which.`,
+						rich`The boot default is the root that last finished starting. A root that does not finish starting is not booted again by default: the machine starts the previous root again.`,
 					],
 				},
 				{
 					type: "text",
-					content: rich`${code("recab")} owns this system update lifecycle. ${code("Recipe")} owns software acquisition, builds, installation, update and removal inside Ginux; recab coordinates those operations for the prepared system. Slot letters have identical capabilities.`,
+					content: rich`A mutable (single-root) installation has no A/B and no ${code("recab")}.`,
 				},
 			],
 		},
 		{
-			title: "Implementation Status",
+			title: "Using It",
 			content: [
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`The lifecycle is implemented through native filesystem and command checks; full boot/deployment validation remains outstanding. Installation now copies the personalized A into B, seals both and publishes equivalent generation-bound boot entries; ${code("stage")} uses the preserving release merge and finalizes when conflict-free. Generation identity, readiness and durable preparation sessions now exist. ${code("prepare")} now synchronizes the inactive ext4 filesystem incrementally in either direction, removes its boot entry and finishes ${code("prepared")}. Reopening preserves pending changes. Finalization now validates and seals either candidate, requires compatible candidate/fallback readers, reuses matching boot objects and publishes its entry last. Recipe install/update/remove now apply isolated payloads and generation-owned receipts to the preparation; configuration edits use a bounded temporary file. The builder and recab now share a release manifest binding identity, inventory, boot artifacts and compatibility. Import verifies the complete set without changing a preparation. Signed discovery/download now run through Recipe with pinned inputs, verified caching and retry. Release merging preserves X or reports structured conflicts, and resumes its captured plan after interruption. Staging accepts an existing preparation through this same engine. Trial assessment errors and bounded helper timeouts recover through generation/attempt-bound records. CLI and existing frontends now consume recab’s lifecycle operations and revision-bound argument vectors; installer completion verifies both roots. Full system builds, VM validation, safe legacy deployment and a production update origin remain separate work.`,
-				},
-				{
-					type: "text",
-					content: rich`The existing backend uses systemd-boot with systemd or OpenRC. ${code("set-next")} schedules a one-shot trial, the trial service commits a healthy boot or requests recovery after a failed one, and ${code("rollback")} selects the previous known-good system while it remains available. Hard hangs still require a watchdog. ${code("status --json")} reports the current boot state and action verdicts; schema 10 also reports update acquisition/selection, lifecycle, and pending/completed Recipe publications, preparation identity/revision/progress, synchronization/finalization write counters, boot seals and generation readiness. Incomplete candidates and mismatched boot artifacts cannot be scheduled. The operations catalog includes software/configuration changes, release acquisition/merging, conflict choices, recovery, finalization and boot selection. Global --machine-events emits boundary events on stderr; stdout stays the result.`,
-				},
-			],
-		},
-		{
-			title: "Prepared System Software",
-			content: [
-				{
-					type: "text",
-					content: rich`Root's ${code("recipe install")}, ${code("update")} and ${code("remove")} commands on immutable A/B installations delegate to recab. ${code("--system")} selects this explicitly. Recipe runs inside Ginux with isolated payload outputs; recab applies them only to the inactive preparation. Updates/removals refuse incompatible ownership and administrator edits. The running system stays unchanged until a finalized candidate is trial-booted.`,
-				},
 				{
 					type: "code",
 					language: "bash",
-					content: `recipe --system install service
-recipe --system installed
-recipe --system isinstalled service --prepared
-recab edit /etc/example.conf
-recab finalize
-recab set-next B      # A is running; use A when B is running
-reboot`,
+					content: `recab status          # which root is booted, the other one, what boots next
+recab copy            # make the other root a copy of the booted root
+recab boot-other      # start the other root at the next boot, once
+recab boot-other --cancel`,
 				},
 				{
 					type: "text",
-					content: rich`System packages and their receipts belong to the slot, under ${code("/usr/lib/recipe")}. ${code("installed")} distinguishes active and prepared selection; ${code("isinstalled")} defaults to the active system. An interrupted publication requires ${code("recab change recover")} or explicit discard before more edits/finalization. Independent ${code("--package-root")} profiles and ${code("--no-activate")} builders retain their own routes.`,
-				},
-			],
-		},
-		{
-			title: "Verified Release Inputs",
-			content: [
-				{
-					type: "text",
-					content: rich`Media and online payloads use one ${code("release.json")}, binding distro/profile, architecture, channel/sequence, intended system inventory and exact rootfs/kernel/initramfs hashes and sizes. The installed distribution key verifies detached Ed25519 signatures. With no configured key, unsigned local input requires explicit ${code("--trusted-local")}; that flag cannot bypass a configured key.`,
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: "recab release import /mnt/release/release.json --trusted-local",
+					content: rich`To change the system, write into ${code("/run/recab/other")} (Recipe does this), then run ${code("recab boot-other")} and reboot. If the other root finishes starting, it becomes the boot default and the root you came from is now the unlocked one. If it does not, the machine starts the previous root again.`,
 				},
 				{
 					type: "text",
-					content: rich`Import checks compatibility, actual EROFS metadata and matching kernel/modules/initramfs, then retains the exact verified bytes in a content-addressed cache. It leaves the running system, preparation X, ledger and boot entries unchanged. ${code("stage --manifest PATH")} and ${code("stage --from-media MEDIA")} use the same verifier and preserving merge. Online discovery/download, offline merging and structured conflicts are implemented.`,
-				},
-			],
-		},
-		{
-			title: "Discover and Download an Update",
-			content: [
-				{
-					type: "text",
-					content: rich`The image producer must configure the installed source, acquisition recipe and distribution public key. ${code("check")} verifies a signed index and release manifest. ${code("download")} uses Recipe inside Ginux, with only a request file and bounded access to that endpoint. Both commands leave the running system, prepared X, slot ledger and boot eligibility unchanged. Checked-in development variants have no production endpoint or key.`,
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `recab update check
-recab update download
-recab update status
-recab update download <release-id>   # retry that exact manifest
-recab update apply <release-id>      # offline merge; retains X or reports conflicts
-recab update conflicts
-recab update recover
-recab finalize`,
+					content: rich`To start over from the running system, run ${code("recab copy")}. It overwrites the other root with a copy of the booted root, boot files included. When the other root cannot be mounted or copied into, its filesystem is created anew. Anything written into the other root before is gone.`,
 				},
 				{
 					type: "text",
-					content: rich`Retry rehashes completed artifacts and restarts the incomplete artifact. Cached inputs work offline and are verified again. Apply compares original release O, prepared C and incoming N, preserving unchanged-side edits and deliberate removals. Conflicts and required Recipe reproduction block finalization. ${code("update resolve ID --choice local|release|edited --preparation ID --revision N")} records an explicit choice; edited input uses ${code("--file")}. Before writes start, ${code("update cancel")} retains X. After a partial merge, ${code("update recover")} resumes the captured plan. Accounts merge by fields and member presence; numeric-ID conflicts stop without remapping shared data. Artifact and process I/O counters are not SSD/SMART totals.`,
-				},
-			],
-		},
-		{
-			title: "Current Release Image Staging",
-			content: [
-				{
-					type: "text",
-					content: rich`This path verifies the media manifest and merges into the inactive preparation. Existing X participates in the merge; unresolved conflicts stop before release files are applied. Start with ${code("recab status")}; the example assumes A is running. When B is running, the trial target is A.`,
-				},
-				{
-					type: "code",
-					language: "bash",
-					content: `recab status
-recab stage --from-media /mnt/release  # add --trusted-local for unsigned local media
-recab set-next B      # example: A is running
-reboot
-# After a healthy trial, B is committed and A remains the rollback target.
-recab rollback       # select A for the next boot, while A still holds its system`,
-				},
-				{
-					type: "text",
-					content: rich`${code("stage")} uses the O/C/N merge and existing range writer, without formatting. Raw artifact paths require their corresponding manifest. A missing original baseline requires explicit verified ${code("update adopt-baseline --manifest OLD/release.json")}; personalized C is never invented as O. Staging refuses an uncommitted running system and a target selected for next boot. ${code("--change-flavour")} explicitly permits switching base/desktop flavour.`,
+					content: rich`${code("recab compare")} shows how the two roots differ. ${code("recab health")} shows how startup ended.`,
 				},
 			],
 		},
@@ -136,25 +55,12 @@ recab rollback       # select A for the next boot, while A still holds its syste
 			content: [
 				{
 					type: "text",
-					content: rich`Commands and options come from ${code("recab --help")}; the CLI and frontends expose the complete preparation/update/trial lifecycle:`,
+					content: rich`Commands and options come from ${code("recab --help")}:`,
 				},
 				{
 					type: "code",
 					language: "text",
 					content: TOOL_HELP.recab,
-				},
-			],
-		},
-		{
-			title: "Safety and Persistence",
-			content: [
-				{
-					type: "list",
-					items: [
-						rich`${bold("Protected fallback")}: never prepare over the fallback while the running trial is uncommitted. Starting a new preparation over the older system ends that older rollback; the committed active system remains protected.`,
-						rich`${bold("Generation readiness")}: incomplete preparation must not be trial-booted. Recab requires recorded generation readiness and matching boot artifacts; ESP-file presence alone is insufficient.`,
-						rich`${bold("Shared state")}: user data and caches can remain on ${code("/var")}; system selection and configuration belong to their generation. On immutable A/B installs, root's Recipe package commands target the inactive system; its system profile belongs to that slot. Boot rollback does not reverse all shared application data.`,
-					],
 				},
 			],
 		},
@@ -165,7 +71,7 @@ recab rollback       # select A for the next boot, while A still holds its syste
 					type: "list",
 					items: [
 						rich`${link("recpart", "/docs/recpart")} - Installation disk layout`,
-						rich`${link("Atomic Updates (A/B)", "/docs/atomic-updates")} - The system lifecycle and implementation limits`,
+						rich`${link("A/B Roots", "/docs/atomic-updates")} - The two roots and how a system change lands`,
 					],
 				},
 			],

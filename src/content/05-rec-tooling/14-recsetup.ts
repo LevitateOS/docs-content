@@ -13,7 +13,7 @@ export default {
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`Installation finishes with equivalent personalized systems in A and B. After personalization, ${code("recab init")} populates B, checks both inventories and matching boot payloads, seals both roots and publishes both entries. A starts committed/default; B is immediately bootable. Interrupted installation resumes the same generation, and completion requires verification of both systems. Old development installations cannot be upgraded by resetting their state; use compatible recovery media or a fresh installation.`,
+					content: rich`Installation finishes with root B as a copy of root A. After personalization, ${code("recab init")} copies root A to root B, writes both boot entries and makes A the boot default. Completion requires verification of both roots.`,
 				},
 			],
 		},
@@ -79,7 +79,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 					type: "command",
 					language: "bash",
 					description:
-						"Install systemd-boot and the A/B boot layout (use the slot devices recpart reported)",
+						"Install systemd-boot and the A/B boot layout (use the root devices recpart reported)",
 					command:
 						"recsetup apply --root /mnt --boot ab --slot-a /dev/nvme0n1p2 --slot-b /dev/nvme0n1p3 --machine-id",
 				},
@@ -168,7 +168,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 							"bootctl install --esp-path=/boot --no-variables",
 							"copy systemd-boot's EFI binary to EFI/BOOT and EFI/systemd",
 						],
-						["A/B entries", "recab init with both slots and the initramfs", "Same"],
+						["A/B entries", "recab init with both roots and the initramfs", "Same"],
 						[
 							"Mutable entry",
 							"kernel and initramfs on the ESP, one entry with root=PARTUUID",
@@ -210,7 +210,7 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 						],
 						[
 							"E030",
-							"The request is invalid: a bad hostname or user name, a missing slot device, unknown JSON fields",
+							"The request is invalid: a bad hostname or user name, a missing root device, unknown JSON fields",
 						],
 						[
 							"E031",
@@ -245,8 +245,8 @@ printf 'root:%s\\nyourname:%s\\n' "$RP" "$UP" | recsetup apply --root /mnt --tim
 					items: [
 						rich`${link("Configuration", "/docs/installation-config")} - Steps 10-14 by hand`,
 						rich`${link("Bootloader & Finish", "/docs/installation-boot")} - Steps 15-18 by hand`,
-						rich`${link("recpart", "/docs/recpart")} - Partitions, and the slot devices for ${code("--boot ab")}`,
-						rich`${link("recab", "/docs/recab")} - System updates, initial A/B population and continuation`,
+						rich`${link("recpart", "/docs/recpart")} - Partitions, and the root devices for ${code("--boot ab")}`,
+						rich`${link("recab", "/docs/recab")} - The two A/B roots`,
 					],
 				},
 			],

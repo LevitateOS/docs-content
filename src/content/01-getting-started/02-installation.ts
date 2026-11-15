@@ -25,7 +25,7 @@ export default distroPage((d) => ({
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("A/B by default:")} the disk gets two system slots and a ${code("/var")} state partition. Updates go to the inactive slot and are trial-booted before they are kept. ${bold("Mutable mode")}, one root changed in place, is an explicit opt-in. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`${bold("A/B by default:")} the disk gets two roots, A and B, and a ${code("/var")} state partition. The booted root is locked; changes are made in the other root. ${bold("Mutable mode")}, one root changed in place, is an explicit opt-in. See ${link("A/B Roots", "/docs/atomic-updates")}.`,
 				},
 			],
 		},
@@ -36,7 +36,7 @@ export default distroPage((d) => ({
 					type: "list",
 					items: [
 						rich`${bold("Boot")} - Boot the live ISO into the install screen: the install steps (${code("install-hub")}), with a shell one key away, beside this guide`,
-						rich`${bold("Partition")} - Create the default A/B layout with ${code("disk-plan")} or ${code("recpart")}: EFI, system slot A, system slot B and the ${code("/var")} state partition`,
+						rich`${bold("Partition")} - Create the default A/B layout with ${code("disk-plan")} or ${code("recpart")}: EFI, root A, root B and the ${code("/var")} state partition`,
 						rich`${bold("Extract")} - Use ${code("recstrap")} to extract the system (like pacstrap)`,
 						rich`${bold("Configure")} - Set time zone, locale, keymap, hostname and users with ${code("recsetup")}`,
 						rich`${bold("Boot loader")} - Install systemd-boot and the A/B boot entries with ${code("recsetup")}`,
@@ -74,11 +74,6 @@ cargo xtask build release <distro>`,
 					type: "text",
 					content: rich`It boots like the other ISOs: into the install screen on the first virtual console and the serial console, with no desktop yet, so every step of this guide is the same. ${code("recstrap")} extracts the desktop system, and after the reboot the display manager asks for the account you made with ${code("recsetup")}.`,
 				},
-				{
-					type: "note",
-					variant: "warning",
-					content: rich`${bold("Updates keep the flavour:")} ${code("recab stage")} refuses a base image on a desktop install, and a desktop image on a base install, since staging it would change the system. Stage the rootfs of the same kind of ISO, or pass ${code("--change-flavour")} to switch on purpose. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
-				},
 			],
 		},
 		{
@@ -87,7 +82,7 @@ cargo xtask build release <distro>`,
 				{
 					type: "text",
 					content:
-						"LevitateOS and AcornOS install and update the same way, with the same tools. They are meant to differ only in these:",
+						"LevitateOS and AcornOS install the same way, with the same tools. They are meant to differ only in these:",
 				},
 				{ type: "table", ...intendedDifferences() },
 			],

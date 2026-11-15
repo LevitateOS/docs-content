@@ -18,7 +18,7 @@ export default {
 							answer: [
 								{
 									type: "text",
-									content: rich`LevitateOS is a daily driver Linux distribution competing directly with Arch Linux. It borrows Arch's philosophy (you maintain your own packages on a minimal base) but takes its core system (glibc, systemd, coreutils, OpenSSH and the rest of a minimal base) pre-built from Fedora instead of compiling it, and it updates atomically: A/B slots by default, with a trial boot before each update is kept.`,
+									content: rich`LevitateOS is a daily driver Linux distribution competing directly with Arch Linux. It borrows Arch's philosophy (you maintain your own packages on a minimal base) but takes its core system (glibc, systemd, coreutils, OpenSSH and the rest of a minimal base) pre-built from Fedora instead of compiling it, and it keeps two root filesystems, A and B: the booted one is locked and changes are made in the other.`,
 								},
 								{
 									type: "table",
@@ -32,7 +32,7 @@ export default {
 											"Compiled from source",
 											"Core extracted from signed Fedora RPMs",
 										],
-										["Updates", "In place", "A/B slots, trial boot, rollback"],
+										["System changes", "In place", "Written into the other root, then booted"],
 										["Build Time", "Hours (compiling)", "Minutes (extracting)"],
 									],
 								},
@@ -115,7 +115,7 @@ export default {
 								},
 								{
 									type: "text",
-									content: rich`The scenarios boot the live ISO, install it, reboot into the installed system, log in and check it at runtime, and stage, trial-boot and roll back an A/B update, all in VMs. If something doesn't work, open an issue with specifics.`,
+									content: rich`The scenarios boot the live ISO, install it, reboot into the installed system, log in and check it at runtime, and boot the other A/B root, all in VMs. If something doesn't work, open an issue with specifics.`,
 								},
 							],
 						},
@@ -145,7 +145,7 @@ export default {
 								{
 									type: "text",
 									content:
-										"Fedora keeps the toolchain and libraries current, which matters for a desktop where users build new software, and the A/B slots make moving to each new Fedora release cheap to undo.",
+										"Fedora keeps the toolchain and libraries current, which matters for a desktop where users build new software, and the two A/B roots keep the previous working root bootable.",
 								},
 							],
 						},
@@ -194,7 +194,7 @@ export default {
 									items: [
 										rich`${bold("systemd-boot everywhere")} - no GRUB or isolinux`,
 										rich`${bold("Live ISO")}: Unified Kernel Images built by ${code("reciso")}, each one PE binary holding the kernel, initramfs and command line, which systemd-boot finds on its own`,
-										rich`${bold("Installed system")}: one generation-bound boot entry per slot, naming shared hash-addressed kernel/initramfs objects under ${code("/boot/recab/objects/")} and its root by ${code("root=PARTUUID=")}. ${code("recab")} seals the prepared generation before publishing its entry`,
+										rich`${bold("Installed system")}: one boot entry per root, A and B, each naming its own kernel and initramfs. The boot default is the root that last finished starting`,
 									],
 								},
 							],
@@ -211,7 +211,7 @@ export default {
 									type: "list",
 									items: [
 										rich`${bold("Clean boot stack")} - systemd-boot only, no GRUB or isolinux complexity`,
-										rich`${bold("A/B boot selection")} - recab picks the next slot through systemd-boot's EFI variables`,
+										rich`${bold("A/B boot selection")} - recab starts the other root once through systemd-boot`,
 										rich`${bold("Simpler code")} - One boot path to test and maintain`,
 									],
 								},
@@ -389,7 +389,7 @@ fn install(ctx) {
 								{
 									type: "text",
 									content:
-										"They run inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. LevitateOS defaults to A/B. System changes must be prepared in the inactive slot through recab and Recipe and trial-booted before commitment; incremental continuation and Recipe targeting of that slot are implemented. Release updates preserve prepared changes or report conflicts, and trial failures select the matching protected generation.",
+										"They run inside a Ginux domain with bounded memory, storage and time, network limited to declared NEEDS endpoints that callers may only narrow, and no view of the host's files beyond the inputs they are given. On an A/B installation the booted root is locked, so Recipe writes system changes into the other, unlocked root. If the other root does not finish starting, the machine starts the previous root again.",
 								},
 								{
 									type: "list",
@@ -403,7 +403,7 @@ fn install(ctx) {
 								{
 									type: "text",
 									content:
-										"This is the same trust model as Arch's PKGBUILD or Gentoo's ebuilds. The user is responsible for reviewing what they install. Isolation and A/B updates limit the damage, but they don't make untrusted recipes safe.",
+										"This is the same trust model as Arch's PKGBUILD or Gentoo's ebuilds. The user is responsible for reviewing what they install. Isolation and the two A/B roots limit the damage, but they don't make untrusted recipes safe.",
 								},
 							],
 						},
@@ -442,10 +442,7 @@ fn install(ctx) {
 										["test-installed-boot", "The installed disk boots"],
 										["automated-login", "Login on the installed system"],
 										["runtime", "The installed system's services and behavior at runtime"],
-										[
-											"ab-update",
-											"Stage the release into slot B, then trial boot, fallback, commit and rollback",
-										],
+										["ab-update", "Boot the other root and check that the roles swap"],
 									],
 									monospaceCol: 0,
 								},
@@ -533,7 +530,11 @@ fn install(ctx) {
 					headers: ["Decision", "Alternative", "Why Chosen"],
 					rows: [
 						["Fedora base", "Compile from source", "Minutes vs hours, maintained packages"],
-						["A/B slots", "Update in place", "Trial boot before commit, rollback"],
+						[
+							"A/B roots",
+							"Change in place",
+							"The booted root is locked; changes go into the other root",
+						],
 						["EROFS", "Large initramfs", "RAM savings, scalability, single source"],
 						["Rhai recipes", "S-expressions/YAML", "Real programming, infinite extensibility"],
 						[

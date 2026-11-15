@@ -51,19 +51,19 @@ export default distroPage((d) => ({
 								{
 									type: "command",
 									language: "bash",
-									description: "Mount slot A, the EFI partition and the state partition",
+									description: "Mount root A, the EFI partition and the state partition",
 									command: EXAMPLE_DISK.mounts.map((m) => `mount ${m.device} ${m.path}`),
 								},
 								{
 									type: "command",
 									language: "bash",
 									description:
-										"Check that both slot entries and slot A's kernel are on the EFI partition",
+										"Check that both root entries and root A's kernel are on the EFI partition",
 									command: [`ls ${target}/boot/loader/entries`, `ls ${target}/boot/${d.osId}-a`],
 								},
 								{
 									type: "text",
-									content: rich`You should see ${code(`${d.osId}-a.conf`)} and ${code(`${d.osId}-b.conf`)}, and ${code("vmlinuz")} and ${code("initramfs.img")} for slot A. Each entry's ${code("options")} line names its slot by ${code("root=PARTUUID=")}; compare it with ${code(`blkid -s PARTUUID ${EXAMPLE_DISK.slot_a}`)}.`,
+									content: rich`You should see ${code(`${d.osId}-a.conf`)} and ${code(`${d.osId}-b.conf`)}, and ${code("vmlinuz")} and ${code("initramfs.img")} for root A. Each entry's ${code("options")} line names its root by ${code("root=PARTUUID=")}; compare it with ${code(`blkid -s PARTUUID ${EXAMPLE_DISK.slot_a}`)}.`,
 								},
 								{
 									type: "command",
@@ -95,16 +95,16 @@ export default distroPage((d) => ({
 							],
 						},
 						{
-							question: "An update did not stay",
+							question: "The other root did not start",
 							answer: [
 								{
 									type: "text",
-									content: rich`A trial judged failed is not committed and requests a reboot into the known-good slot. Health-checker errors and bounded helper timeouts trigger generation-bound recovery; a hard hang still needs a watchdog or manual reboot. ${code("recab status")} shows the running and known-good slots and the last recorded trial. Fix the cause before retrying. ${code("stage")} uses the same preserving merge as ${code("update apply")}; unresolved conflicts keep the candidate unbootable. Old development installations are read-only to this release and need compatible recovery media or a fresh installation.`,
+									content: rich`The boot default is the root that last finished starting. When the other root does not finish starting, the next boot starts the previous root again. ${code("recab status")} shows which root is booted, which is the other and what boots next; ${code("recab health")} shows how startup ended. To start over from the running system, run ${code("recab copy")}: it overwrites the other root with a copy of the booted root.`,
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Show the slots and the last trial",
+									description: "Show the booted root, the other root and what boots next",
 									command: "recab status",
 								},
 							],

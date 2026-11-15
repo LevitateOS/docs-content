@@ -15,14 +15,14 @@ export default distroPage((d) => ({
 					items: [
 						rich`${bold("CPU:")} ${HARDWARE.cpu}`,
 						rich`${bold("RAM:")} ${HARDWARE.ram}`,
-						rich`${bold("Storage:")} ${HARDWARE.disk}. The default A/B layout uses 1 GB for EFI and 20 GB for each system slot, and gives the rest to ${code("/var")}`,
+						rich`${bold("Storage:")} ${HARDWARE.disk}. The default A/B layout uses 1 GB for EFI and 20 GB for each root, and gives the rest to ${code("/var")}`,
 						rich`${bold("Boot:")} UEFI. ${d.osName}'s boot files are unsigned, so Secure Boot must be disabled`,
 					],
 				},
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("A/B by default:")} the system lives in two root slots. An update is written to the inactive slot, trial-booted once, and kept only if that boot is healthy; you can roll back to the previous slot. ${bold("Mutable mode")}, one root changed in place, is an explicit opt-in without that safety net. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`${bold("A/B by default:")} the system lives in two roots, A and B. The booted root is locked; changes are made in the other root, and if it does not finish starting the machine starts the previous root again. ${bold("Mutable mode")}, one root changed in place, is an explicit opt-in with no recab and no A/B. See ${link("A/B Roots", "/docs/atomic-updates")}.`,
 				},
 			],
 		},

@@ -15,7 +15,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recstrap")} extracts the system's EROFS image from the live ISO to a mounted target directory. ${code("recab")} owns system updates and continuation; its current ${code("stage")} implementation uses recstrap for destructive release-image extraction. Incremental continuation is still missing.`,
+					content: rich`${code("recstrap")} extracts the system's EROFS image from the live ISO to a mounted target directory.`,
 				},
 				{
 					type: "text",

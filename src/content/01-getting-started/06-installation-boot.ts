@@ -50,18 +50,17 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`Use the slot A and B devices reported by ${code("recpart apply")}. Previewing with ${code("recsetup plan")} runs no installation commands.`,
+					content: rich`Use the root A and B devices reported by ${code("recpart apply")}. Previewing with ${code("recsetup plan")} runs no installation commands.`,
 				},
 				{
 					type: "command",
 					language: "bash",
-					description:
-						"Populate both personalized systems, seal their roots and publish both boot entries",
+					description: "Make root B a copy of root A and write both boot entries",
 					command: commands.boot(target, args(EXAMPLE_DISK)),
 				},
 				{
 					type: "text",
-					content: rich`${code("recsetup")} calls ${code("recab init")}, which copies the target's systemd-boot EFI binary and writes the boot layout. It copies the personalized A into B, checks their normalized equivalence, protects both root devices read-only, and publishes both entries with matching hash-named kernel/initramfs objects. A becomes committed/default; B is ready at first use without being recorded as a successful trial. Retry the same command after an interruption: completed settings and passwords are preserved, and a later live generation is never reset. Finish all service/network choices before this step. Add ${code('--options "console=ttyS0,115200n8"')} for a serial console.`,
+					content: rich`${code("recsetup")} calls ${code("recab init")}, which copies the target's systemd-boot EFI binary and writes the boot layout. It copies root A to root B, writes both boot entries and makes A the boot default. Retry the same command after an interruption: completed settings and passwords are preserved. Finish all service/network choices before this step. Add ${code('--options "console=ttyS0,115200n8"')} for a serial console.`,
 				},
 				{
 					type: "text",

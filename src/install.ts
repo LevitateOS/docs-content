@@ -242,10 +242,6 @@ export const commands = {
 			.sort((a, b) => b.path.length - a.path.length)
 			.map((mount) => `umount ${shellQuote(mount.path)}`),
 	reboot: () => "reboot",
-	/**
-	 * Merge and finalize the verified release from its mounted ISO.
-	 */
-	stage: (_d: Facts, iso = "/mnt") => `recab stage --manifest ${shellQuote(`${iso}/release.json`)}`,
 };
 
 /** A check the preflight step makes on the live system: `path` exists. */
@@ -292,7 +288,7 @@ export const STEP_INFO: { [S in InstallStepId]: { title: string; about: string }
 	},
 	boot: {
 		title: "Boot",
-		about: "For A/B, populate and seal both personalized systems, then publish their boot entries.",
+		about: "For A/B, make root B a copy of root A, then write both boot entries.",
 	},
 	finish: {
 		title: "Finish",

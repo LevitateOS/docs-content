@@ -20,7 +20,7 @@ const VARIANT_TEXT = {
 export default {
 	title: "Variants",
 	intro:
-		"LevitateOS is a shared build system with two OS variants. They share the recipe engine, the build pipeline and the install and update tools, but differ in their base, libc, init, administrator tool, desktop and kernel line.",
+		"LevitateOS is a shared build system with two OS variants. They share the recipe engine, the build pipeline and the install tools, but differ in their base, libc, init, administrator tool, desktop and kernel line.",
 	sections: [
 		{
 			title: "Variant Matrix",
@@ -41,7 +41,7 @@ export default {
 				{
 					type: "note",
 					variant: "info",
-					content: rich`Both variants use A/B by default. ${code("recab")} owns system updates and symmetric continuation; both initial personalized slots are bootable, and incremental preparation, Recipe changes, preserving release merges and trial recovery work in either direction. Full test-installed-boot validation and production update publishing remain outstanding. Mutable mode is an explicit opt-in. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}.`,
+					content: rich`Both variants use A/B by default. ${code("recab")} manages the two roots: the booted root is locked and changes are made in the other root. Mutable mode is an explicit opt-in. See ${link("A/B Roots", "/docs/atomic-updates")}.`,
 				},
 			],
 		},
@@ -62,7 +62,7 @@ export default {
 					items: [
 						rich`${bold("Install")} → ${link("Getting Started", "/docs/getting-started")}`,
 						rich`${bold("Packages")} → ${link("recipe CLI Reference", "/docs/cli-reference")}`,
-						rich`${bold("Update model")} → ${link("Atomic Updates (A/B)", "/docs/atomic-updates")}`,
+						rich`${bold("A/B roots")} → ${link("A/B Roots", "/docs/atomic-updates")}`,
 						rich`${bold("Build/test loop")} → ${code("cargo xtask --help")}, and ${code("architecture.md")} (repo root) for where each fact lives`,
 					],
 				},

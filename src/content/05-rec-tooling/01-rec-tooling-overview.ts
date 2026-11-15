@@ -10,7 +10,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`The install tools (${code("recpart")}, ${code("recstrap")}, ${code("recfstab")}, ${code("recsetup")}, ${code("recchroot")}) are the manual install path, and the backends of the install screen's step apps. ${code("recab")} manages A/B updates on the installed system. The rest build the boot artifacts and drive the test VMs.`,
+					content: rich`The install tools (${code("recpart")}, ${code("recstrap")}, ${code("recfstab")}, ${code("recsetup")}, ${code("recchroot")}) are the manual install path, and the backends of the install screen's step apps. ${code("recab")} manages the two roots of an A/B installation. The rest build the boot artifacts and drive the test VMs.`,
 				},
 			],
 		},
@@ -28,7 +28,7 @@ export default {
 						[
 							rich`${link("recab", "/docs/recab")}`,
 							"CLI",
-							"System updates and symmetric A/B continuation",
+							"The two A/B roots: locked booted root, unlocked other root",
 							"Installed system",
 						],
 						[
@@ -78,7 +78,7 @@ export default {
 							rich`${link("recstrap", "/docs/recstrap")}`,
 							"CLI",
 							"Extract the system image",
-							"Live ISO and installed system (used by recab stage)",
+							"Live ISO and installed system",
 						],
 					],
 					monospaceCol: 0,
@@ -95,7 +95,7 @@ export default {
 						rich`${bold("Partition backend")}: ${code("recpart")} (inspect/plan/apply and handoff only)`,
 						rich`${bold("Build pipeline")}: ${code("recinit")}, ${code("reciso")}`,
 						rich`${bold("Test VMs")}: ${code("recqemu")}, ${code("recshuttle")}`,
-						rich`${bold("System updates and continuation")}: ${code("recab")}, using Recipe for software operations in the prepared system`,
+						rich`${bold("A/B roots")}: ${code("recab")}; Recipe writes system software into the unlocked other root`,
 					],
 				},
 			],

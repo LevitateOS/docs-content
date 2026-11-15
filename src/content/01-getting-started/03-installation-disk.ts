@@ -13,7 +13,7 @@ import { network, pageLink } from "../../pages";
 const SLUG = "installation-disk";
 const disk = EXAMPLE_DISK.disk;
 const target = EXAMPLE_DISK.target;
-/** The example disk's partitions: EFI, slot A, slot B, state. */
+/** The example disk's partitions: EFI, root A, root B, state. */
 const part = (n: number) => `${disk}p${n}`;
 
 export default distroPage((d) => ({
@@ -121,8 +121,8 @@ export default distroPage((d) => ({
 					headers: ["Partition", "Size", "Filesystem (label)", "Mount"],
 					rows: [
 						[part(1), "1 GiB", "FAT (EFI)", "/boot"],
-						[part(2), "20 GiB", "ext4 (ROOT_A)", "/ (system slot A)"],
-						[part(3), "20 GiB", "ext4 (ROOT_B)", "not mounted (system slot B)"],
+						[part(2), "20 GiB", "ext4 (ROOT_A)", "/ (root A)"],
+						[part(3), "20 GiB", "ext4 (ROOT_B)", "not mounted (root B)"],
 						[part(4), "Remainder", "ext4 (STATE)", "/var"],
 					],
 					monospaceCol: 0,
@@ -136,12 +136,12 @@ export default distroPage((d) => ({
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("Why this layout:")} A and B are interchangeable system slots. Installation must populate both with equivalent personalized systems; updates and system changes continue the active system in the inactive slot. The current installer still leaves B unpopulated. ${code("/var")} holds shared persistent data, including homes in ${code("/var/home")}. See ${link("Atomic Updates (A/B)", "/docs/atomic-updates")} for the lifecycle and current gaps.`,
+					content: rich`${bold("Why this layout:")} A and B are the two roots. The booted root is locked and the other is unlocked, where changes are made; the installer makes root B a copy of root A. ${code("/var")} holds shared persistent data, including homes in ${code("/var/home")}. See ${link("A/B Roots", "/docs/atomic-updates")} for how a change lands.`,
 				},
 				{
 					type: "list",
 					items: [
-						rich`${bold("Sizes:")} ${code("--efi-size-mb")}, ${code("--root-a-size-mb")}, ${code("--root-b-size-mb")} and ${code("--state-size-mb")} change them; both slots must be the same size.`,
+						rich`${bold("Sizes:")} ${code("--efi-size-mb")}, ${code("--root-a-size-mb")}, ${code("--root-b-size-mb")} and ${code("--state-size-mb")} change them; both roots must be the same size.`,
 						rich`${bold("Mutable layout:")} ${code("--mode mutable")} creates only EFI and one root (label ROOT).`,
 						rich`${bold("Dual boot:")} don't erase the disk. Use ${code("disk-plan")}'s editor, or pass an explicit layout with ${code("--layout layout.json")}, to keep the existing EFI partition and Windows, shrink a partition to make room, and create the slots and state partition in the free space.`,
 					],
@@ -169,12 +169,12 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`recpart writes the partition table, formats each partition with its label, and mounts the new system: slot A at ${code(target)}, the EFI partition at ${code(`${target}/boot`)} and the state partition at ${code(`${target}/var`)}. Slot B stays unmounted. Its output ends with the install target and each mount.`,
+					content: rich`recpart writes the partition table, formats each partition with its label, and mounts the new system: root A at ${code(target)}, the EFI partition at ${code(`${target}/boot`)} and the state partition at ${code(`${target}/var`)}. Root B stays unmounted. Its output ends with the install target and each mount.`,
 				},
 				{
 					type: "note",
 					variant: "warning",
-					content: rich`${bold("Write down the slot devices:")} with the default layout, slot A is ${code(part(2))} and slot B ${code(part(3))}. ${guideStep("installation-boot", "Install the Boot Loader and Entries")} needs both. ${code("recpart apply --json")} reports them as ${code("slot_a_device")} and ${code("slot_b_device")}.`,
+					content: rich`${bold("Write down the root devices:")} with the default layout, root A is ${code(part(2))} and root B ${code(part(3))}. ${guideStep("installation-boot", "Install the Boot Loader and Entries")} needs both. ${code("recpart apply --json")} reports them as ${code("slot_a_device")} and ${code("slot_b_device")}.`,
 				},
 			],
 		},
@@ -189,7 +189,7 @@ export default distroPage((d) => ({
 				},
 				{
 					type: "text",
-					content: rich`You should see slot A on ${code(target)}, the EFI partition on ${code(`${target}/boot`)} and the state partition on ${code(`${target}/var`)}.`,
+					content: rich`You should see root A on ${code(target)}, the EFI partition on ${code(`${target}/boot`)} and the state partition on ${code(`${target}/var`)}.`,
 				},
 				{
 					type: "text",
@@ -207,7 +207,7 @@ export default distroPage((d) => ({
 				{
 					type: "command",
 					language: "bash",
-					description: "Write a GPT table: EFI, slot A, slot B (the same size) and state",
+					description: "Write a GPT table: EFI, root A, root B (the same size) and state",
 					command: `sfdisk ${disk} <<'EOF'
 label: gpt
 size=1GiB, type=U
@@ -230,7 +230,7 @@ EOF`,
 				{
 					type: "command",
 					language: "bash",
-					description: "Mount slot A, then the EFI and state partitions inside it",
+					description: "Mount root A, then the EFI and state partitions inside it",
 					command: [
 						`mount ${part(2)} ${target}`,
 						`mkdir -p ${target}/boot ${target}/var`,
@@ -240,7 +240,7 @@ EOF`,
 				},
 				{
 					type: "text",
-					content: "Leave slot B unmounted. It is the inactive slot that updates are written to.",
+					content: "Leave root B unmounted. The installer fills it as a copy of root A.",
 				},
 			],
 		},
