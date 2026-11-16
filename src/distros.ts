@@ -114,6 +114,7 @@ export const DISTROS = [
 			isoFile: "levitateos-x86_64.iso",
 			recipes: [
 				"plasma",
+				"login-screen",
 				"konsole",
 				"dolphin",
 				"kwrite",
