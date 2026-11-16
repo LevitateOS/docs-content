@@ -185,7 +185,10 @@ export default distroPage((d) => ({
 									type: "command",
 									language: "bash",
 									description: "Retry from scratch: clean up the program, then install again",
-									command: [`${admin(d)} recipe cleanup packagename`, `${admin(d)} recipe install packagename`],
+									command: [
+										`${admin(d)} recipe cleanup packagename`,
+										`${admin(d)} recipe install packagename`,
+									],
 								},
 							],
 						},

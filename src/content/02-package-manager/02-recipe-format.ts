@@ -87,17 +87,38 @@ const FILES = [
 					type: "table",
 					headers: ["Part", "Purpose"],
 					rows: [
-						["RECIPE_API", "The number 1. The first line of every recipe; the engine accepts nothing else."],
-						["NEEDS", "What the recipe may use: inputs, defines, outputs, network, limits. Required."],
-						["ABOUT", "What a front end shows: kind, category, details, homepage, license, adds, steps, keeps."],
+						[
+							"RECIPE_API",
+							"The number 1. The first line of every recipe; the engine accepts nothing else.",
+						],
+						[
+							"NEEDS",
+							"What the recipe may use: inputs, defines, outputs, network, limits. Required.",
+						],
+						[
+							"ABOUT",
+							"What a front end shows: kind, category, details, homepage, license, adds, steps, keeps.",
+						],
 						["PACKAGE", "name, version and description, as literal strings."],
-						["SOURCES", "What Recipe downloads before anything else: a url with its sha256, or a git repository with a full commit."],
+						[
+							"SOURCES",
+							"What Recipe downloads before anything else: a url with its sha256, or a git repository with a full commit.",
+						],
 						["FILES", "Which files of the sources go where in the output."],
-						["PACKAGES", "The distribution packages a group is made of; the pins file beside the recipe lists the exact ones."],
+						[
+							"PACKAGES",
+							"The distribution packages a group is made of; the pins file beside the recipe lists the exact ones.",
+						],
 						["ACCOUNTS", "Users and groups of a system output."],
-						["UPSTREAM", "Where the newest version can be found: a GitHub repository, or a latest() function."],
+						[
+							"UPSTREAM",
+							"Where the newest version can be found: a GitHub repository, or a latest() function.",
+						],
 						["RERUN", "true: run every time, never reuse a result."],
-						["deps, build_deps", "Literal lists of the recipes this one needs installed, or only while it builds."],
+						[
+							"deps, build_deps",
+							"Literal lists of the recipes this one needs installed, or only while it builds.",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -114,14 +135,26 @@ const FILES = [
 					type: "table",
 					headers: ["Constant", "Value"],
 					rows: [
-						["PREFIX", "Where the package output will live once activated; () with --no-activate, for a dependency and for other outputs."],
+						[
+							"PREFIX",
+							"Where the package output will live once activated; () with --no-activate, for a dependency and for other outputs.",
+						],
 						["JOBS", "How many jobs the user asked for, 1 to 16."],
-						["HOST_LIBC", '"glibc", "musl" or "unknown": the C library of the system the result is installed on.'],
+						[
+							"HOST_LIBC",
+							'"glibc", "musl" or "unknown": the C library of the system the result is installed on.',
+						],
 						["PACKAGE_FORMAT", '"rpm" or "apk" with PACKAGES; () without.'],
 						["INPUTS", "Each declared input's read-only path; () for an optional input not given."],
 						["DEFINES", "Each declared define's value, given or default."],
-						["DEPS", "Each dependency's output path; a map by output name for a dependency with several outputs."],
-						["WORK", "A private folder for build material, deleted after a successful run unless kept."],
+						[
+							"DEPS",
+							"Each dependency's output path; a map by output name for a dependency with several outputs.",
+						],
+						[
+							"WORK",
+							"A private folder for build material, deleted after a successful run unless kept.",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -139,9 +172,18 @@ const FILES = [
 					headers: ["Step", "What Recipe does"],
 					rows: [
 						["download", "Fetches the sources and pins for this system into the download store."],
-						["build", "Unpacks, places FILES, runs build or configure, runs verify and keeps the result."],
-						["install", "Activates a package output, writes a system output into the root, or publishes a producer's outputs."],
-						["cleanup", "Deletes the program's downloads, unpacked sources, build material and saved state."],
+						[
+							"build",
+							"Unpacks, places FILES, runs build or configure, runs verify and keeps the result.",
+						],
+						[
+							"install",
+							"Activates a package output, writes a system output into the root, or publishes a producer's outputs.",
+						],
+						[
+							"cleanup",
+							"Deletes the program's downloads, unpacked sources, build material and saved state.",
+						],
 					],
 					monospaceCol: 0,
 				},

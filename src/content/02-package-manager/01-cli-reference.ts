@@ -12,7 +12,10 @@ export default {
 					type: "table",
 					headers: ["Command", "Behavior"],
 					rows: [
-						["recipe download RECIPE", "The download step only: fetch the sources and pins into the download store."],
+						[
+							"recipe download RECIPE",
+							"The download step only: fetch the sources and pins into the download store.",
+						],
 						["recipe build RECIPE", "Download what is missing, then build. Does not install."],
 						[
 							"recipe install RECIPE",
@@ -26,8 +29,14 @@ export default {
 							"recipe remove PACKAGE",
 							"Remove the installed files using the receipt, then whatever is left of the program's downloads and build material. --keep removes only the installed program.",
 						],
-						["recipe cleanup [RECIPE]", "Delete a program's downloads and build material (every program's without a name); the installed program stays. --downloads or --build limits it; --logs deletes the diagnostic logs."],
-						["recipe state RECIPE", "Print the program's state: none, downloaded, built or installed."],
+						[
+							"recipe cleanup [RECIPE]",
+							"Delete a program's downloads and build material (every program's without a name); the installed program stays. --downloads or --build limits it; --logs deletes the diagnostic logs.",
+						],
+						[
+							"recipe state RECIPE",
+							"Print the program's state: none, downloaded, built or installed.",
+						],
 						[
 							"recipe installed",
 							"List active package receipts without executing recipes or starting Ginux.",
@@ -127,7 +136,10 @@ export default {
 							"--no-activate",
 							"Keep install/remove on the producer lifecycle; the OS builder passes this explicitly.",
 						],
-						["--keep / --no-keep", "Keep the downloads and build material after a successful install, remembered per program; --no-keep turns it off and deletes them at once."],
+						[
+							"--keep / --no-keep",
+							"Keep the downloads and build material after a successful install, remembered per program; --no-keep turns it off and deletes them at once.",
+						],
 						[
 							"--build-dir DIR",
 							"Logical build destination and lock; default a stable directory under the state directory.",
@@ -138,7 +150,10 @@ export default {
 							"Bind a declared input kind at /inputs/NAME; DEP::NAME binds a dependency input.",
 						],
 						["--json-output FILE", "Write the final result JSON to a file instead of stdout."],
-						["--define KEY=VALUE", "A define the recipe declares in NEEDS.defines; not a host filesystem import."],
+						[
+							"--define KEY=VALUE",
+							"A define the recipe declares in NEEDS.defines; not a host filesystem import.",
+						],
 						["--jobs N", "Requested jobs, 1–16, default 1."],
 						[
 							"--no-persist-state",

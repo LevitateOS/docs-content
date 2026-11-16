@@ -65,12 +65,27 @@ fn verify(out) {
 					type: "table",
 					headers: ["Helper", "Does"],
 					rows: [
-						["put(tree, path, text, mode)", "Write text at path in a system tree, with mode in the target metadata."],
+						[
+							"put(tree, path, text, mode)",
+							"Write text at path in a system tree, with mode in the target metadata.",
+						],
 						["put_link(tree, path, target)", "A symbolic link at path to target."],
-						["tree_text(tree, path)", "The text of a packaged file; fails naming the file when the packages no longer ship it."],
-						["enable_service(tree, unit, service)", "Enable a systemd unit on an rpm tree or an OpenRC service on an apk tree."],
-						["save(name, value) / saved(name)", "Keep a value across an interruption, and read it back."],
-						["checkpoint(name) / reached(name)", "Record a checkpoint, and tell whether this run was restored from it or a later one."],
+						[
+							"tree_text(tree, path)",
+							"The text of a packaged file; fails naming the file when the packages no longer ship it.",
+						],
+						[
+							"enable_service(tree, unit, service)",
+							"Enable a systemd unit on an rpm tree or an OpenRC service on an apk tree.",
+						],
+						[
+							"save(name, value) / saved(name)",
+							"Keep a value across an interruption, and read it back.",
+						],
+						[
+							"checkpoint(name) / reached(name)",
+							"Record a checkpoint, and tell whether this run was restored from it or a later one.",
+						],
 					],
 					monospaceCol: 0,
 				},
@@ -80,5 +95,5 @@ fn verify(out) {
 				},
 			],
 		},
-		],
+	],
 } satisfies DocsContent;
