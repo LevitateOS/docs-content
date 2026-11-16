@@ -3,18 +3,18 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "Helpers Overview",
-	intro: rich`Functions available in ${link("recipe scripts", "/docs/recipe-format")} with ${code("const RECIPE_API = 2;")} and a literal ${code("NEEDS")} declaration. Helpers take explicit paths and return explicit results; paths come from ${code("RUNTIME")} during setup and ${code("ctx.runtime")} in hooks.`,
+	intro: rich`Functions available in ${link("recipe scripts", "/docs/recipe-format")} with ${code("const RECIPE_API = 1;")} and a literal ${code("NEEDS")} declaration. Helpers take explicit paths and return explicit results; paths come from the arguments of ${code("build(src, out)")} and from the engine constants ${code("WORK")}, ${code("INPUTS")} and ${code("DEPS")}.`,
 	sections: [
 		{
 			title: "Where Helpers Run",
 			content: [
 				{
 					type: "text",
-					content: rich`A recipe that starts no program runs on the host, where helpers reach only the run's own folders (spelled with ${code("RUNTIME.paths")}) and the hosts in ${code("NEEDS.network")}. Any other recipe runs inside its Ginux domain, under its filesystem, task, memory and network limits, where paths refer to the domain's filesystem: ${code("/inputs")}, ${code("/work/build")}, ${code("/work/tools")}, ${code("/work/tmp")} and ${code("/out")}. Commands need their binaries in the selected image or in dependency tools. Network helpers need an endpoint declared in ${code("NEEDS.network")}. Caller endpoint/limit options only narrow that authority, including dependencies. Declare all imported inputs and returned outputs with their kinds.`,
+					content: rich`A recipe that starts no program runs on the host, where helpers reach only the run's own folders (${code("src")}, ${code("out")}, ${code("WORK")}, ${code("INPUTS")}) and the hosts in ${code("NEEDS.network")}. Any other recipe runs inside its Ginux domain, under its filesystem, task, memory and network limits, where paths refer to the domain's filesystem. Commands need their binaries in the selected image or in dependency tools. Network helpers need an endpoint declared in ${code("NEEDS.network")}. Caller endpoint/limit options only narrow that authority, including dependencies. Declare all imported inputs and returned outputs with their kinds.`,
 				},
 				{
 					type: "text",
-					content: rich`A helper that fails throws, and the error fails the phase unless the recipe handles it. Readiness checks report work with ${code("needs_work(ctx, reason)")}, never by throwing.`,
+					content: rich`A helper that fails throws, and the error fails the step unless the recipe handles it. ${code("verify")} only reads and starts no program.`,
 				},
 			],
 		},
@@ -25,41 +25,17 @@ export default {
 					type: "code",
 					language: "rhai",
 					filename: "helper-demo.rhai",
-					content: `const RECIPE_API = 2;
+					content: `const RECIPE_API = 1;
 const NEEDS = #{ outputs: #{ program: "file" } };
-let ctx = #{
-    name: "helper-demo",
-    version: "1.0",
-    program: join_path(RUNTIME.paths.output, "bin/hello"),
-    payload: "#!/bin/sh\\nprintf 'hello\\\\n'\\n",
-};
+const PACKAGE = #{ name: "helper-demo", version: "1.0", description: "Writes a small script" };
 
-fn is_acquired(ctx) { ready(ctx) }
-fn acquire(ctx) { ctx }
-fn is_built(ctx) { ready(ctx) }
-fn build(ctx) { ctx }
-
-fn is_installed(ctx) {
-    if !is_file(ctx.program) { return needs_work(ctx, "hello output is missing"); }
-    if read_file(ctx.program) != ctx.payload {
-        return needs_work(ctx, "hello output has different contents");
-    }
-    ctx.outputs.program = ctx.program;
-    ready(ctx)
+fn build(src, out) {
+    write_file(out, "#!/bin/sh\\nprintf 'hello\\\\n'\\n");
+    chmod(out, 0o755);
 }
 
-fn install(ctx) {
-    mkdir(dirname(ctx.program));
-    write_file(ctx.program, ctx.payload);
-    chmod(ctx.program, 0o755);
-    ctx.outputs.program = ctx.program;
-    ctx
-}
-
-fn remove(ctx) {
-    if is_file(ctx.program) { rm(ctx.program); }
-    ctx.outputs = #{};
-    ctx
+fn verify(out) {
+    if !is_file(out) { throw "the program was not written"; }
 }`,
 				},
 			],
@@ -83,26 +59,26 @@ fn remove(ctx) {
 			],
 		},
 		{
-			title: "Readiness Results",
+			title: "System Tree and Saved Values",
 			content: [
 				{
 					type: "table",
-					headers: ["Helper", "Returns", "Meaning"],
+					headers: ["Helper", "Does"],
 					rows: [
-						["ready(ctx)", "Map", "The check passes, with the updated context."],
-						[
-							"needs_work(ctx, reason)",
-							"Map",
-							"The phase must run; reason is a nonempty explanation.",
-						],
+						["put(tree, path, text, mode)", "Write text at path in a system tree, with mode in the target metadata."],
+						["put_link(tree, path, target)", "A symbolic link at path to target."],
+						["tree_text(tree, path)", "The text of a packaged file; fails naming the file when the packages no longer ship it."],
+						["enable_service(tree, unit, service)", "Enable a systemd unit on an rpm tree or an OpenRC service on an apk tree."],
+						["save(name, value) / saved(name)", "Keep a value across an interruption, and read it back."],
+						["checkpoint(name) / reached(name)", "Record a checkpoint, and tell whether this run was restored from it or a later one."],
 					],
 					monospaceCol: 0,
 				},
 				{
 					type: "text",
-					content: rich`The full list of registered helpers and signatures is the ${link("helper reference", "https://github.com/LevitateOS/recipe/blob/master/HELPERS_AUDIT.md")} (${code("man 7 recipe-helpers")}).`,
+					content: rich`The full list of registered helpers and signatures is ${code("man 7 recipe-helpers")}.`,
 				},
 			],
 		},
-	],
+		],
 } satisfies DocsContent;

@@ -16,7 +16,7 @@ export default {
 					type: "code",
 					language: "rhai",
 					content: `let path = env("PATH");
-exec_checked("make", [], #{ cwd: ctx.src, env: #{ CC: "clang", CFLAGS: "-O2" } });`,
+exec_checked("make", [], #{ cwd: src.source, env: #{ CC: "clang", CFLAGS: "-O2" } });`,
 				},
 			],
 		},
@@ -48,7 +48,7 @@ exec_checked("make", [], #{ cwd: ctx.src, env: #{ CC: "clang", CFLAGS: "-O2" } }
 					language: "rhai",
 					content: `log("Building kernel...");             // [recipe] message
 warn("Config changed, rebuilding");    // [recipe:warn] message
-debug("source: " + ctx.src);           // with the recipe's source position
+debug("source: " + src.source);           // with the recipe's source position
 print("plain line");                   // stderr as well`,
 				},
 			],

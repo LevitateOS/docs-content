@@ -4,23 +4,22 @@ import { rich, code } from "../../rich-text";
 export default {
 	title: "Acquire Helpers",
 	intro:
-		"Functions for downloading, checking out and verifying source materials. Every payload is pinned: downloads need a SHA256, Git checkouts a full commit id.",
+		"Functions for downloading, checking out and verifying source materials. Every payload is pinned: downloads need a "<sha256>", Git checkouts a full commit id.",
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`Source facts (URL, version, digest) belong in the recipe. Acquire into ${code("ctx.runtime.paths.build")} and let ${code("is_acquired")} check the real files. Every server a recipe contacts, including each redirect target, must be in ${code("NEEDS.network")}, for example ${code('["example.com:443"]')}. Caller ${code("--network-host")} can only narrow that declaration. These function fragments require a complete recipe with real publisher URLs/digests and declared outputs; example.com is a placeholder.`,
+					content: rich`Source facts (URL, version, digest) belong in the recipe. Declare them in ${code("SOURCES")} and Recipe downloads and unpacks them before ${code("build")} runs. These helpers are for a recipe that declares no ${code("SOURCES")} and has to download inside ${code("build")}, and they put what they fetch into ${code("WORK")}. Every server a recipe contacts, including each redirect target, must be in ${code("NEEDS.network")}, for example ${code('["example.com:443"]')}. Caller ${code("--network-host")} can only narrow that declaration. These fragments need a complete recipe with real publisher URLs and digests and declared outputs; example.com is a placeholder.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `fn acquire(ctx) {
-    let archive = join_path(ctx.runtime.paths.build, "foo.tar.gz");
-    download(ctx.url, archive, ctx.sha256);
-    extract(archive, ctx.runtime.paths.build);
-    ctx
+					content: `fn build(src, out) {
+    let archive = join_path(WORK, "foo.tar.gz");
+    download("https://example.com/foo.tar.gz", archive, "<sha256>");
+    extract(archive, WORK);
 }`,
 				},
 			],
@@ -37,8 +36,8 @@ export default {
 					language: "rhai",
 					content: `let iso = download(
     "https://example.com/large-file.tar.xz",
-    join_path(ctx.runtime.paths.build, "large-file.tar.xz"),
-    ctx.sha256,
+    join_path(WORK, "large-file.tar.xz"),
+    "<sha256>",
     true
 );`,
 				},
@@ -56,8 +55,8 @@ export default {
 					language: "rhai",
 					content: `let src = git_checkout(
     "https://github.com/neovim/neovim.git",
-    join_path(ctx.runtime.paths.build, "neovim"),
-    ctx.commit
+    join_path(WORK, "neovim"),
+    "<full commit id>"
 );`,
 				},
 			],
@@ -75,8 +74,8 @@ export default {
 					content: `let archive = github_download_release(
     "BurntSushi/ripgrep",
     "ripgrep-*-x86_64-unknown-linux-musl.tar.gz",
-    ctx.runtime.paths.build,
-    ctx.sha256
+    WORK,
+    "<sha256>"
 );`,
 				},
 			],
@@ -93,8 +92,8 @@ export default {
 					type: "code",
 					language: "rhai",
 					content: `verify_sha256(archive, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
-verify_sha512(archive, ctx.sha512);
-verify_blake3(archive, ctx.blake3);`,
+verify_sha512(archive, "<sha512>");
+verify_blake3(archive, "<blake3>");`,
 				},
 				{
 					type: "text",

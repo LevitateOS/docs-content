@@ -42,8 +42,8 @@ export default {
 					type: "code",
 					language: "rhai",
 					content: `exec_checked("cargo", ["build", "--release", "--locked", "--offline"], #{
-    cwd: "/inputs/source",
-    env: #{ CARGO_HOME: join_path(ctx.runtime.paths.build, "cargo") },
+    cwd: INPUTS.source,
+    env: #{ CARGO_HOME: join_path(WORK, "cargo") },
 });`,
 				},
 			],
@@ -59,7 +59,7 @@ export default {
 					type: "code",
 					language: "rhai",
 					content: `let version = trim(exec_output("rustc", ["--version"]));
-let files = exec_output("find", [ctx.src, "-name", "*.c"]);`,
+let files = exec_output("find", [src.source, "-name", "*.c"]);`,
 				},
 			],
 		},
@@ -74,7 +74,7 @@ let files = exec_output("find", [ctx.src, "-name", "*.c"]);`,
 				{
 					type: "code",
 					language: "rhai",
-					content: `if exec("make", ["check"], #{ cwd: ctx.src }) != 0 {
+					content: `if exec("make", ["check"], #{ cwd: src.source }) != 0 {
     warn("test suite failed");
 }`,
 				},
@@ -90,8 +90,8 @@ let files = exec_output("find", [ctx.src, "-name", "*.c"]);`,
 				{
 					type: "code",
 					language: "rhai",
-					content: `shell_in(ctx.src, "./configure --prefix=/usr CFLAGS='-O2 -g'");
-exec_checked("bash", ["-o", "pipefail", "-c", "rpm2archive - < pkg.rpm | tar -x"], #{ cwd: ctx.runtime.paths.build });`,
+					content: `shell_in(src.source, "./configure --prefix=/usr CFLAGS='-O2 -g'");
+exec_checked("bash", ["-o", "pipefail", "-c", "rpm2archive - < pkg.rpm | tar -x"], #{ cwd: WORK });`,
 				},
 			],
 		},
@@ -101,9 +101,9 @@ exec_checked("bash", ["-o", "pipefail", "-c", "rpm2archive - < pkg.rpm | tar -x"
 				{
 					type: "code",
 					language: "rhai",
-					content: `let commit = trim(shell_output_in(ctx.src, "git rev-parse HEAD"));
-if shell_status_in(ctx.src, "test -f Makefile") != 0 {
-    exec_checked("./configure", [], #{ cwd: ctx.src });
+					content: `let commit = trim(shell_output_in(src.source, "git rev-parse HEAD"));
+if shell_status_in(src.source, "test -f Makefile") != 0 {
+    exec_checked("./configure", [], #{ cwd: src.source });
 }`,
 				},
 			],

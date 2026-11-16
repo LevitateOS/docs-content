@@ -16,10 +16,10 @@ export default {
 				{
 					type: "code",
 					language: "rhai",
-					content: `if is_file(join_path(ctx.src, "configure")) {
-    exec_checked("./configure", ["--prefix=/usr"], #{ cwd: ctx.src });
+					content: `if is_file(join_path(src.source, "configure")) {
+    exec_checked("./configure", ["--prefix=" + PREFIX], #{ cwd: src.source });
 }
-if is_dir(join_path(ctx.runtime.paths.build, "vendor")) {
+if is_dir(join_path(WORK, "vendor")) {
     log("vendor directory present");
 }`,
 				},
@@ -39,9 +39,9 @@ if is_dir(join_path(ctx.runtime.paths.build, "vendor")) {
 				{
 					type: "code",
 					language: "rhai",
-					content: `mkdir(join_path(ctx.runtime.paths.output, "share/man/man1"));
-rm(join_path(ctx.runtime.paths.build, "*.tmp"));
-mv(join_path(ctx.src, "config.example"), join_path(ctx.src, "config.toml"));`,
+					content: `mkdir(join_path(out, "share/man/man1"));
+rm(join_path(WORK, "*.tmp"));
+mv(join_path(src.source, "config.example"), join_path(src.source, "config.toml"));`,
 				},
 			],
 		},
@@ -55,7 +55,7 @@ mv(join_path(ctx.src, "config.example"), join_path(ctx.src, "config.toml"));`,
 				{
 					type: "code",
 					language: "rhai",
-					content: `let bin = join_path(ctx.runtime.paths.output, "bin");
+					content: `let bin = join_path(out, "bin");
 ln("python3", join_path(bin, "python"));
 chmod(join_path(bin, "myapp"), 0o755);`,
 				},
@@ -83,8 +83,8 @@ chmod(join_path(bin, "myapp"), 0o755);`,
 				{
 					type: "code",
 					language: "rhai",
-					content: `let release = trim(read_file(join_path(ctx.src, "include/config/kernel.release")));
-append_line_if_missing(join_path(ctx.runtime.paths.output, "etc/shells"), "/bin/zsh");`,
+					content: `let release = trim(read_file(join_path(src.source, "include/config/kernel.release")));
+append_line_if_missing(join_path(out, "etc/shells"), "/bin/zsh");`,
 				},
 			],
 		},
@@ -98,7 +98,7 @@ append_line_if_missing(join_path(ctx.runtime.paths.output, "etc/shells"), "/bin/
 				{
 					type: "code",
 					language: "rhai",
-					content: `for file in glob_list(join_path(ctx.src, "src/*.c")) {
+					content: `for file in glob_list(join_path(src.source, "src/*.c")) {
     log("found " + file);
 }`,
 				},

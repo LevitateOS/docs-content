@@ -3,7 +3,7 @@ import { rich, code, link } from "../../rich-text";
 
 export default {
 	title: "Recipe Format",
-	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} scripts. A recipe that starts no program runs on the host, confined by Recipe; any other runs inside a configured Ginux domain. They own package facts and custom acquire/build/install behavior. Every executable recipe must declare ${code("const RECIPE_API = 2;")} and literal ${code("const NEEDS = #{...};")} for typed inputs, outputs and execution authority. An empty declaration has no inputs, outputs or network grants.`,
+	intro: rich`Recipes are ${link("Rhai", "https://rhai.rs")} files. A recipe states its facts in literal declarations and writes code only for what is unusual. Every recipe starts with ${code("const RECIPE_API = 1;")} and declares a literal ${code("const NEEDS = #{...};")} for typed inputs, outputs and execution authority. An empty declaration has no inputs, outputs or network grants. Recipe reads the declarations without running the recipe, downloads and unpacks the sources, places the files, records what is done, installs, removes and cleans up. A recipe that starts no program runs on the host, confined by Recipe; any other runs inside a configured Ginux domain.`,
 	sections: [
 		{
 			title: "Two Uses, One Format",
@@ -25,36 +25,11 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`Both collections use the engine in ${code("tools/recipe")}, the same API 2 declarations and the same lifecycle below. Their directory and consumer identify their purpose. A named package output selects CLI activation; the OS builder uses ${code("--no-activate")}. There is no second recipe format or engine. No image bundles apps: the desktop and its apps are group recipes in the public catalogue, installed through Recipe during the installation.`,
+					content: rich`Both collections use the engine in ${code("tools/recipe")} and the same API 1 declarations. Their directory and consumer identify their purpose. A named package output selects CLI activation; the OS builder uses ${code("--no-activate")}. There is no second recipe format or engine. No image bundles apps: the desktop and its apps are group recipes in the public catalogue, installed through Recipe during the installation.`,
 				},
 				{
 					type: "text",
-					content: rich`The ${code("install")} hook prepares files in the recipe's output tree. The OS builder consumes published files to assemble an image. For a named ${code("package")} directory output, the Recipe CLI copies the publication into an active software profile. Normal package removal deactivates files using the installed receipt; ${code("--no-activate")} selects the recipe's producer remove hook instead. Earlier publications remain intact.`,
-				},
-			],
-		},
-		{
-			title: "User Package Outputs",
-			content: [
-				{
-					type: "code",
-					language: "rhai",
-					content: `const RECIPE_API = 2;
-const NEEDS = #{ outputs: #{ "package": "directory" } };
-// After writing the package files, set this in install/is_installed:
-ctx.outputs["package"] = join_path(ctx.runtime.paths.output, "package");`,
-				},
-				{
-					type: "text",
-					content: rich`${code("package")} is a reserved Rhai word, so quote the map key and use bracket access. This is a named directory output in the existing API 2 contract. The snippet shows the output declaration and assignment; the recipe still needs its usual lifecycle hooks and ${code("ctx.name")} and ${code("ctx.version")} package metadata.`,
-				},
-				{
-					type: "list",
-					items: [
-						rich`Put executable regular files at ${code("bin/COMMAND")} and shared regular files under ${code("share/")}, relative to the package output directory. The ripgrep recipe supplies ${code("bin/rg")}, its man page and license files.`,
-						rich`Activation accepts directories and regular files only. Symlinks, special files, setuid/setgid permissions and arbitrary host paths are rejected; activation does not run host-side installation scripts.`,
-						rich`${code("recipe install")} activates this output after successful managed production. ${code("recipe update")} produces the selected catalog version for an already active package. ${code("recipe remove")} uses the installed receipt and does not execute the recipe's remove hook. Use ${code("--no-activate")} when only the producer lifecycle is wanted.`,
-					],
+					content: rich`A normal recipe has one output, and its body never names it. The output's name in ${code("NEEDS.outputs")} says what it is: ${code("package")} is a package activated in a profile, ${code("system")} is a tree written into a system root, ${code("tools")} is put on the PATH of a consumer, and any other name is a product the caller picks up. Normal package removal uses the installed receipt.`,
 				},
 			],
 		},
@@ -63,116 +38,120 @@ ctx.outputs["package"] = join_path(ctx.runtime.paths.output, "package");`,
 			content: [
 				{
 					type: "text",
-					content: rich`This recipe installs a small program into its output tree without downloading or compiling anything. Run it with ${code("recipe install ./hello.rhai --no-activate --build-dir ./hello-work")}.`,
+					content: rich`This is the ripgrep recipe. The ${code("SOURCES")} entry is downloaded and unpacked by Recipe, and ${code("FILES")} says which of its files go where in the package. The recipe has no code at all.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					filename: "hello.rhai",
-					content: `const RECIPE_API = 2;
-const NEEDS = #{ outputs: #{ program: "file" } };
-let ctx = #{
-    name: "hello",
-    version: "1.0",
-    program: join_path(RUNTIME.paths.output, "bin/hello"),
-    payload: "#!/bin/sh\\nprintf 'hello\\\\n'\\n",
+					filename: "ripgrep.rhai",
+					content: `const RECIPE_API = 1;
+const NEEDS = #{
+    outputs: #{ "package": "directory" },
+    network: ["github.com:443", "release-assets.githubusercontent.com:443"],
+    network_max_bytes: 8388608,
+    timeout_secs: 300,
 };
-
-fn is_acquired(ctx) { ready(ctx) }
-fn acquire(ctx) { ctx }
-fn is_built(ctx) { ready(ctx) }
-fn build(ctx) { ctx }
-
-fn is_installed(ctx) {
-    if !is_file(ctx.program) { return needs_work(ctx, "hello output is missing"); }
-    if read_file(ctx.program) != ctx.payload {
-        return needs_work(ctx, "hello output has different contents");
-    }
-    ctx.outputs.program = ctx.program;
-    ready(ctx)
-}
-
-fn install(ctx) {
-    mkdir(dirname(ctx.program));
-    write_file(ctx.program, ctx.payload);
-    chmod(ctx.program, 0o755);
-    ctx.outputs.program = ctx.program;
-    ctx
-}
-
-fn remove(ctx) {
-    if is_file(ctx.program) { rm(ctx.program); }
-    ctx.outputs = #{};
-    ctx
-}`,
+const ABOUT = #{
+    kind: "tool", category: "utilities",
+    details: "Searches the files under a folder for a text pattern, fast.",
+    homepage: "https://github.com/BurntSushi/ripgrep", license: "MIT OR Unlicense",
+    adds: #{ programs: ["rg"], menu: [] }, keeps: [],
+};
+const PACKAGE = #{ name: "ripgrep", version: "15.2.0", description: "Fast recursive text search with rg" };
+const UPSTREAM = #{ github: "BurntSushi/ripgrep" };
+const SOURCES = #{
+    release: #{
+        url: "https://github.com/BurntSushi/ripgrep/releases/download/15.2.0/ripgrep-15.2.0-x86_64-unknown-linux-musl.tar.gz",
+        sha256: "33e15bcf1624b25cdd2a55813a47a2f95dbe126268203e76aa6a585d1e7b149c",
+    },
+};
+// One source: paths are inside it; its single top folder is left out.
+const FILES = [
+    ["rg",          "bin/rg", 0o755],
+    ["doc/rg.1",    "share/man/man1/rg.1"],
+    ["COPYING",     "share/licenses/ripgrep/COPYING"],
+    ["LICENSE-MIT", "share/licenses/ripgrep/LICENSE-MIT"],
+    ["UNLICENSE",   "share/licenses/ripgrep/UNLICENSE"],
+];`,
 				},
 				{
 					type: "text",
-					content: rich`The final JSON's ${code("outputs.program")} is the published host path; inside hooks the same file is ${code("/out/bin/hello")}. This example is a producer: it publishes a single file and does not declare an activatable package tree.`,
+					content: rich`Run it with ${code("recipe install ./ripgrep.rhai --no-activate --build-dir ./ripgrep-work")} to publish the package output without activating it.`,
 				},
 			],
 		},
 		{
-			title: "Context and Runtime",
+			title: "Declarations",
 			content: [
 				{
 					type: "table",
-					headers: ["Field", "Purpose"],
+					headers: ["Part", "Purpose"],
 					rows: [
-						["RUNTIME / ctx.runtime", "Immutable invocation paths, target, operation and options."],
-						[
-							"ctx.name / ctx.version",
-							"Package facts initialized from the current recipe on every run.",
-						],
-						[
-							"ctx.state",
-							"The only restored namespace: resumable values paired with a filesystem checkpoint.",
-						],
-						["ctx.outputs", "Named files/directories selected for validated publication."],
-					],
-					monospaceCol: 0,
-				},
-				{
-					type: "table",
-					headers: ["Path", "Domain path", "Contents"],
-					rows: [
-						[
-							"runtime.paths.inputs",
-							"/inputs",
-							"Imported read-only inputs, one per --input NAME=PATH",
-						],
-						["runtime.paths.build", "/work/build", "Owned build and acquisition work"],
-						["runtime.paths.tools", "/work/tools", "Private snapshots of direct dependency tools"],
-						["runtime.paths.temp", "/work/tmp", "Owned scratch space"],
-						[
-							"runtime.paths.output / .target",
-							"/out",
-							"The selected output and installed-target tree",
-						],
-						["runtime.paths.recipe_dir", "(staged)", "The recipe's own directory"],
+						["RECIPE_API", "The number 1. The first line of every recipe; the engine accepts nothing else."],
+						["NEEDS", "What the recipe may use: inputs, defines, outputs, network, limits. Required."],
+						["ABOUT", "What a front end shows: kind, category, details, homepage, license, adds, steps, keeps."],
+						["PACKAGE", "name, version and description, as literal strings."],
+						["SOURCES", "What Recipe downloads before anything else: a url with its sha256, or a git repository with a full commit."],
+						["FILES", "Which files of the sources go where in the output."],
+						["PACKAGES", "The distribution packages a group is made of; the pins file beside the recipe lists the exact ones."],
+						["ACCOUNTS", "Users and groups of a system output."],
+						["UPSTREAM", "Where the newest version can be found: a GitHub repository, or a latest() function."],
+						["RERUN", "true: run every time, never reuse a result."],
+						["deps, build_deps", "Literal lists of the recipes this one needs installed, or only while it builds."],
 					],
 					monospaceCol: 0,
 				},
 				{
 					type: "text",
-					content: rich`${code("runtime.target.os")} and ${code(".arch")} name the execution target (Linux x86_64), ${code("runtime.operation")} the running command, and ${code("runtime.options")} the job count and force flags. A named ${code("target")} input seeds ${code("/out")} on fresh state. Recipe source files are never rewritten; put only genuinely resumable data in ${code("ctx.state")}.`,
+					content: rich`Declarations are literal data: no helper calls, no variables, no arithmetic. That is how ${code("recipe list")}, ${code("info")}, ${code("validate")} and the app can show them without running the recipe. A recipe may also define ${code("build(src, out)")}, ${code("configure(tree)")} (only with ${code("PACKAGES")}), ${code("verify(out)")}, ${code("latest()")} and ${code("cleanup(reason)")}. ${code("build")} gets the unpacked sources by name in ${code("src")} and the output folder in ${code("out")}. ${code("verify")} only reads the result and starts no program. Recipes that still use ${code("ctx")}, ${code("RUNTIME")} or the hooks ${code("acquire")}, ${code("install")}, ${code("remove")}, ${code("is_acquired")}, ${code("is_built")} and ${code("is_installed")} are refused with the line to change.`,
 				},
 			],
 		},
 		{
-			title: "Lifecycle and Readiness",
+			title: "Constants",
 			content: [
 				{
-					type: "text",
-					content: rich`Install checks ${code("is_installed")} first, then ${code("is_built")} and ${code("is_acquired")}, and runs only the phases that are needed: ${code("acquire")} → ${code("build")} → ${code("install")}. After each phase the executor runs its check again.`,
+					type: "table",
+					headers: ["Constant", "Value"],
+					rows: [
+						["PREFIX", "Where the package output will live once activated; () with --no-activate, for a dependency and for other outputs."],
+						["JOBS", "How many jobs the user asked for, 1 to 16."],
+						["HOST_LIBC", '"glibc", "musl" or "unknown": the C library of the system the result is installed on.'],
+						["PACKAGE_FORMAT", '"rpm" or "apk" with PACKAGES; () without.'],
+						["INPUTS", "Each declared input's read-only path; () for an optional input not given."],
+						["DEFINES", "Each declared define's value, given or default."],
+						["DEPS", "Each dependency's output path; a map by output name for a dependency with several outputs."],
+						["WORK", "A private folder for build material, deleted after a successful run unless kept."],
+					],
+					monospaceCol: 0,
 				},
 				{
-					type: "list",
-					items: [
-						rich`Checks return ${code("ready(ctx)")} or ${code('needs_work(ctx, "a concrete reason")')}. A check that throws is an error, not a request for work. Check the real files, not a saved boolean.`,
-						rich`${code("acquire(ctx)")}, ${code("build(ctx)")}, ${code("install(ctx)")} and ${code("remove(ctx)")} return the updated context. A missing check means work is needed; a missing required action fails.`,
-						rich`${code("cleanup(ctx, reason)")} is optional. Reasons are ${code("manual")} and ${code("auto.<phase>.<success|failure>")}.`,
+					type: "text",
+					content: rich`These are visible in every function the engine calls and in every function those call. A value computed at the top level is not; compute it inside the function.`,
+				},
+			],
+		},
+		{
+			title: "Steps and States",
+			content: [
+				{
+					type: "table",
+					headers: ["Step", "What Recipe does"],
+					rows: [
+						["download", "Fetches the sources and pins for this system into the download store."],
+						["build", "Unpacks, places FILES, runs build or configure, runs verify and keeps the result."],
+						["install", "Activates a package output, writes a system output into the root, or publishes a producer's outputs."],
+						["cleanup", "Deletes the program's downloads, unpacked sources, build material and saved state."],
 					],
+					monospaceCol: 0,
+				},
+				{
+					type: "text",
+					content: rich`${code("recipe install")} does every step still missing, then cleanup, unless the user chose to keep the material with ${code("--keep")}. Each step can also be run alone. A program is in one of four states, decided from Recipe's own records and not by running recipe code: ${code("none")}, ${code("downloaded")}, ${code("built")} and ${code("installed")}. ${code("recipe state NAME")} prints it.`,
+				},
+				{
+					type: "text",
+					content: rich`An interrupted ${code("build")} resumes from the newest checkpoint. A recipe saves values with ${code("save(name, value)")} and ${code("checkpoint(name)")}, and reads them back with ${code("saved(name)")} and ${code("reached(name)")}. Recipe keeps one checkpoint at most and deletes it when the install succeeds.`,
 				},
 			],
 		},
@@ -180,18 +159,8 @@ fn remove(ctx) {
 			title: "Verified Sources",
 			content: [
 				{
-					type: "code",
-					language: "rhai",
-					content: `fn acquire(ctx) {
-    let archive = join_path(ctx.runtime.paths.build, "source.tar.xz");
-    download(ctx.url, archive, ctx.sha256);
-    extract(archive, ctx.runtime.paths.build);
-    ctx
-}`,
-				},
-				{
 					type: "text",
-					content: rich`${code("download")} requires a full SHA256 and replaces the destination only after the bytes verify. ${code("git_checkout(url, dest, commit)")} requires an exact destination and a full commit id. Declare every contacted host, including redirects, in ${code("NEEDS.network")}. Networking is off for an empty declaration. Caller ${code("--network-host HOST:PORT")} restrictions can only narrow those grants across the graph. See ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
+					content: rich`Every ${code("SOURCES")} URL needs a full SHA256, and a Git source needs a full commit id. Recipe stores a download under its SHA256 and unpacks archives (${code("tar.gz")}, ${code("tar.xz")}, ${code("tar.bz2")}, ${code("tar.zst")}, ${code("zip")}) and ${code("rpm")} files natively, without scripts. Declare every contacted host, including redirects, in ${code("NEEDS.network")}; ${code("recipe validate")} says which one is missing. Caller ${code("--network-host HOST:PORT")} restrictions can only narrow those grants across the graph. A recipe without ${code("SOURCES")} may download inside ${code("build")} with the helpers in ${link("Acquire Helpers", "/docs/helpers-acquire")}.`,
 				},
 			],
 		},
@@ -202,13 +171,13 @@ fn remove(ctx) {
 					type: "code",
 					language: "rhai",
 					content: `//! extends: base.rhai
-const RECIPE_API = 2;
+const RECIPE_API = 1;
 let deps = ["runtime-tools"];
 let build_deps = ["compiler-tools"];`,
 				},
 				{
 					type: "text",
-					content: rich`${code("deps")} and ${code("build_deps")} are literal arrays, read before launch. Each dependency runs in its own instance with its own NEEDS and state. Validated direct products are snapshotted into the consumer; a directory output named ${code("tools")} populates its private ${code("/work/tools")} and ${code("PATH")}. Caller restrictions narrow every instance without lending parent grants. A child recipe can extend one base recipe: the base's setup runs first and the child's functions override the base's. Only one level of ${code("extends")} is supported.`,
+					content: rich`${code("deps")} and ${code("build_deps")} are literal arrays, read before launch. Each dependency runs in its own instance with its own NEEDS. A dependency's output reaches the consumer through ${code("DEPS")}; a directory output named ${code("tools")} is also put on the consumer's ${code("PATH")}. Caller restrictions narrow every instance without lending parent grants. A child recipe can extend one base recipe, which declares ${code("RECIPE_API")} too. Only one level of ${code("extends")} is supported.`,
 				},
 			],
 		},
@@ -217,7 +186,7 @@ let build_deps = ["compiler-tools"];`,
 			content: [
 				{
 					type: "text",
-					content: rich`Declare each input name and kind in ${code("NEEDS.inputs")}, then bind immutable inputs with ${code("--input NAME=PATH")} at ${code("/inputs/NAME")}. Dependencies use ${code("--input DEP::NAME=PATH")} and never implicitly inherit inputs. After successful execution and archive validation, the final JSON contains the published host paths in ${code("ctx.outputs")}. Consumers validate the names and kinds they need instead of guessing build paths. Declare every published name and kind in ${code("NEEDS.outputs")}; install and installed-cache reuse require the complete set, while present intermediate outputs are validated before checkpointing. Manual readiness requires matching cached dependency products and runs only their installed checks, never installation hooks. Explicit remove/cleanup uses the same checked cached dependencies and never installs them; unavailable products fail before the main hook. Imported inputs and earlier publications stay immutable.`,
+					content: rich`Declare each input name and kind in ${code("NEEDS.inputs")}, then bind immutable inputs with ${code("--input NAME=PATH")}. Dependencies use ${code("--input DEP::NAME=PATH")} and never implicitly inherit inputs. Genuine choices a caller makes are defines: declared in ${code("NEEDS.defines")} with a default (${code("()")} means required), given with ${code("--define NAME=VALUE")} and read as ${code("DEFINES.NAME")}. After a successful run the final JSON contains the published host paths in ${code("outputs")}. Declare every published name and kind in ${code("NEEDS.outputs")}. Consumers validate the names and kinds they need instead of guessing build paths.`,
 				},
 			],
 		},
@@ -227,9 +196,9 @@ let build_deps = ["compiler-tools"];`,
 				{
 					type: "list",
 					items: [
-						rich`${link("Writing recipes", "https://github.com/LevitateOS/recipe/blob/master/WRITING_RECIPES.md")} — lifecycle, state, inputs and outputs in full.`,
-						rich`${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")} — environment preparation, CLI, diagnostics and recovery.`,
-						rich`${link("Helper reference", "https://github.com/LevitateOS/recipe/blob/master/HELPERS_AUDIT.md")} — registered helper signatures.`,
+						rich`${link("Specification", "https://github.com/LevitateOS/recipe/blob/master/docs/recipe-format.md")} - the API 1 format in full.`,
+						rich`${link("Writing recipes", "https://github.com/LevitateOS/recipe/blob/master/WRITING_RECIPES.md")} - the author guide.`,
+						rich`${link("Recipe README", "https://github.com/LevitateOS/recipe/blob/master/README.md")} - environment preparation, CLI, diagnostics and recovery.`,
 					],
 				},
 			],

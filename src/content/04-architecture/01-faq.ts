@@ -292,35 +292,26 @@ let libs = get_all_dependencies(&ctx.rootfs, &bin_path)?;
 								},
 								{
 									type: "text",
-									content: rich`This complete offline recipe copies an explicitly supplied script. Save it as ${code("copy-program.rhai")}, supply your script file, and run ${code("recipe install ./copy-program.rhai --input script=./script.sh")}. The returned program path is the validated publication.`,
+									content: rich`This complete offline recipe copies an explicitly supplied script. Save it as ${code("copy-program.rhai")}, supply your script file, and run ${code("recipe install ./copy-program.rhai --input script=./script.sh --no-activate")}. The returned program path is the validated publication.`,
 								},
 								{
 									type: "code",
 									language: "rhai",
 									filename: "copy-program.rhai",
-									content: `const RECIPE_API = 2;
+									content: `const RECIPE_API = 1;
 const NEEDS = #{ inputs: #{ script: "file" }, outputs: #{ program: "file" } };
-let ctx = #{ name: "copy-program", program: join_path(RUNTIME.paths.output, "bin/program") };
-fn is_acquired(ctx) { ready(ctx) }
-fn is_built(ctx) { ready(ctx) }
-fn is_installed(ctx) {
-    if !is_file(ctx.program) { return needs_work(ctx, "program is missing"); }
-    if read_file(ctx.program) != read_file("/inputs/script") {
-        return needs_work(ctx, "program has different bytes");
-    }
-    ctx.outputs.program = ctx.program; ready(ctx)
-}
-fn install(ctx) {
-    mkdir(dirname(ctx.program)); copy_file("/inputs/script", ctx.program);
-    chmod(ctx.program, 0o755); ctx.outputs.program = ctx.program; ctx
+const PACKAGE = #{ name: "copy-program", description: "Copies a supplied script" };
+fn build(src, out) {
+    copy_file(INPUTS.script, out);
+    chmod(out, 0o755);
 }`,
 								},
 								{
 									type: "list",
 									items: [
-										rich`${bold("Real programming")} - Variables, conditionals, loops, functions`,
+										rich`${bold("Facts as data")} - Sources, files and packages are literal declarations; code is for what is unusual`,
 										rich`${bold("Infinite extensibility")} - Recipes define logic, not just data`,
-										rich`${bold("Minimal implementation")} - The executor provides helpers, runs the readiness checks and calls acquire(), build() and install()`,
+										rich`${bold("Minimal implementation")} - Recipe downloads, unpacks, places files, records what is done, installs and removes; the recipe supplies build() only when it has something to build`,
 										rich`${bold("Isolated")} - A recipe that starts programs runs inside an isolated Ginux domain. A recipe that starts none runs on the host, confined by Recipe to its own folders and declared network hosts`,
 									],
 								},
@@ -331,14 +322,14 @@ fn install(ctx) {
 							answer: [
 								{
 									type: "text",
-									content: rich`Recipe files are never rewritten. The only state a recipe carries between runs is ${code("ctx.state")}, saved by the coordinator together with a matching snapshot of the recipe's files under the state directory (${code("~/.local/state/recipe")} by default). State alone never proves work is done:`,
+									content: rich`Recipe files are never rewritten. Recipe decides what state a program is in (${code("none")}, ${code("downloaded")}, ${code("built")} or ${code("installed")}) from its own records, not by running recipe code: a download by its SHA-256 in the download store, a result by its identity and recorded file checksums, an installed program by its receipt. A recipe that must remember a value across an interruption uses ${code("save")} and ${code("checkpoint")}; the checkpoint lives under the state directory (${code("~/.local/state/recipe")} by default), one at most, and is deleted when the install succeeds.`,
 								},
 								{
 									type: "list",
 									items: [
-										rich`${bold("Readiness checks look at real files")} - ${code("is_installed")}, ${code("is_built")} and ${code("is_acquired")} inspect what is on disk`,
 										rich`${bold("Package facts come from the recipe")} - name, version and digests are read fresh on every run`,
-										rich`${bold("Outputs are published")} - a successful run returns the published paths in ${code("ctx.outputs")}`,
+										rich`${bold("Outputs are published")} - a successful run returns the published paths in ${code("outputs")}`,
+										rich`${bold("Material is temporary")} - after a successful install the downloads, unpacked sources, build material and saved state are deleted unless ${code("--keep")} was given`,
 									],
 								},
 							],
@@ -350,16 +341,14 @@ fn install(ctx) {
 									type: "code",
 									language: "text",
 									content: `recipe install foo
-├── is_installed(ctx)  ready? done, publish outputs
-├── is_built(ctx)      ready? skip to install
-├── is_acquired(ctx)   ready? skip to build
-├── acquire(ctx)       download, check out, verify
-├── build(ctx)         extract, configure, compile
-└── install(ctx)       place files in /out, select ctx.outputs`,
+├── download   fetch SOURCES and pins into the download store
+├── build      unpack, place FILES, run build() or configure(), verify()
+├── install    activate the package, write the system tree, or publish outputs
+└── cleanup    delete downloads, unpacked sources, build material, saved state`,
 								},
 								{
 									type: "text",
-									content: rich`Each check returns ${code("ready(ctx)")} or ${code("needs_work(ctx, reason)")}, and is run again after its phase. See ${link("Recipe Format", "/docs/recipe-format")}.`,
+									content: rich`${code("install")} runs every step still missing, in order, then cleanup unless the user chose to keep the material. Each step can also be run alone with ${code("recipe download")}, ${code("build")} and ${code("cleanup")}. See ${link("Recipe Format", "/docs/recipe-format")}.`,
 								},
 							],
 						},
@@ -370,8 +359,8 @@ fn install(ctx) {
 									type: "list",
 									items: [
 										rich`${bold("Literal declarations")}: ${code("let deps = [...]")} and ${code("let build_deps = [...]")}, read before launch without running the recipe`,
-										rich`${bold("Dependency order")}: dependencies install first, each with its own readiness checks`,
-										rich`${bold("Shared tools")}: dependency products land in ${code("/work/tools")} and their executables are on ${code("PATH")}`,
+										rich`${bold("Dependency order")}: dependencies install first, each running under its own NEEDS`,
+										rich`${bold("Shared tools")}: a dependency's output reaches the recipe through ${code("DEPS")}, and a ${code("tools")} output is put on ${code("PATH")}`,
 										rich`${bold("Inheritance")}: ${code("//! extends: base.rhai")} reuses one base recipe`,
 										rich`${bold("Verified sources")}: downloads need a SHA256, Git checkouts a full commit id`,
 									],

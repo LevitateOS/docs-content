@@ -169,27 +169,23 @@ export default distroPage((d) => ({
 							answer: [
 								{
 									type: "text",
-									content: rich`The error names the failing phase and the recipe's reason. Each phase's readiness check can be run on its own:`,
+									content: rich`Recipe reports the failure and names the failing step. See what it holds and which step is done:`,
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "See which phase still needs work",
-									command: [
-										`${admin(d)} recipe isacquired packagename`,
-										`${admin(d)} recipe isbuilt packagename`,
-										`${admin(d)} recipe isinstalled packagename`,
-									],
+									description: "See the state of the program",
+									command: `${admin(d)} recipe state packagename`,
 								},
 								{
 									type: "text",
-									content: rich`Inspect ${code("recipe explain packagename")}: downloads need every server and redirect target in the recipe's ${code("NEEDS.network")}. Caller ${code("--network-host")} and ${code("--no-network")} can only restrict it. Manual checks require matching cached dependency products; run install separately to prepare a missing dependency. The full log of every run is under ${code(`${RECIPE.state}/logs/`)}.`,
+									content: rich`Inspect ${code("recipe explain packagename")}: downloads need every server and redirect target in the recipe's ${code("NEEDS.network")}. Caller ${code("--network-host")} and ${code("--no-network")} can only restrict it. The full log of every run is under ${code(`${RECIPE.state}/logs/`)}.`,
 								},
 								{
 									type: "command",
 									language: "bash",
-									description: "Retry, redoing acquisition and build",
-									command: `${admin(d)} recipe install packagename --force-acquire`,
+									description: "Retry from scratch: clean up the program, then install again",
+									command: [`${admin(d)} recipe cleanup packagename`, `${admin(d)} recipe install packagename`],
 								},
 							],
 						},

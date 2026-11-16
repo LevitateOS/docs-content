@@ -28,9 +28,9 @@ export default {
 				{
 					type: "code",
 					language: "rhai",
-					content: `let archive = download(ctx.url, join_path(ctx.runtime.paths.build, "foo-1.0.tar.xz"), ctx.sha256);
-extract(archive, ctx.runtime.paths.build);
-// creates /work/build/foo-1.0/`,
+					content: `let archive = download("https://example.com/foo-1.0.tar.xz", join_path(WORK, "foo-1.0.tar.xz"), "<sha256>");
+extract(archive, WORK);
+// creates WORK/foo-1.0/`,
 				},
 			],
 		},
@@ -44,7 +44,7 @@ extract(archive, ctx.runtime.paths.build);
 				{
 					type: "code",
 					language: "rhai",
-					content: `extract_with_format(archive, ctx.runtime.paths.build, "tar.gz");`,
+					content: `extract_with_format(archive, WORK, "tar.gz");`,
 				},
 			],
 		},
@@ -82,7 +82,7 @@ extract(archive, ctx.runtime.paths.build);
 				{
 					type: "code",
 					language: "rhai",
-					content: `for rpm in glob_list(join_path("/inputs/rpms", "*.rpm")) {
+					content: `for rpm in glob_list(join_path(INPUTS.rpms, "*.rpm")) {
     target_extract_rpm(rpm, rootfs);
 }
 target_mode(rootfs, "etc/sudoers.d/10-wheel", 0o440);
@@ -100,10 +100,9 @@ target_finalize(rootfs);`,
 				{
 					type: "code",
 					language: "rhai",
-					content: `fn build(ctx) {
-    exec_checked("./configure", ["--prefix=/usr"], #{ cwd: ctx.src });
-    exec_checked("make", ["-j" + ctx.runtime.options.jobs], #{ cwd: ctx.src });
-    ctx
+					content: `fn build(src, out) {
+    exec_checked("./configure", ["--prefix=" + PREFIX], #{ cwd: src.source });
+    exec_checked("make", ["-j" + JOBS], #{ cwd: src.source });
 }`,
 				},
 				{

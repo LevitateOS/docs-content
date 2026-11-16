@@ -3,27 +3,24 @@ import { rich, code } from "../../rich-text";
 
 export default {
 	title: "Install Helpers",
-	intro: rich`Functions for placing files in the recipe's output tree (${code("ctx.runtime.paths.output")}, ${code("/out")}) and for using a package manager inside the domain.`,
+	intro: rich`Functions for placing files in the recipe's output (${code("out")}) and for using a package manager inside the domain. Most recipes need none of the copying helpers: ${code("FILES")} places files from the sources, and Recipe moves them into place.`,
 	sections: [
 		{
 			title: "Overview",
 			content: [
 				{
 					type: "text",
-					content: rich`${code("install(ctx)")} writes into ${code("/out")} and selects what it publishes in ${code("ctx.outputs")}. ${code("is_installed(ctx)")} checks the same files and selects the same outputs, so a reused installation is published again.`,
+					content: rich`${code("build(src, out)")} writes into ${code("out")}, the output folder, which already holds the files ${code("FILES")} placed. Recipe publishes the output and installs it.`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `fn install(ctx) {
-    let out = ctx.runtime.paths.output;
+					content: `fn build(src, out) {
     mkdir(join_path(out, "bin"));
-    copy_file(join_path(ctx.src, "myapp"), join_path(out, "bin/myapp"));
+    copy_file(join_path(src.source, "myapp"), join_path(out, "bin/myapp"));
     chmod(join_path(out, "bin/myapp"), 0o755);
     mkdir(join_path(out, "share/man/man1"));
-    copy_into_dir(join_path(ctx.src, "man/*.1"), join_path(out, "share/man/man1"));
-    ctx.outputs.program = join_path(out, "bin/myapp");
-    ctx
+    copy_into_dir(join_path(src.source, "man/*.1"), join_path(out, "share/man/man1"));
 }`,
 				},
 			],
@@ -62,13 +59,15 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`Build systems that install themselves take the output tree as their destination:`,
+					content: rich`Build systems that install themselves go through a staging folder, because ${code("out")} is the package folder itself:`,
 				},
 				{
 					type: "code",
 					language: "rhai",
-					content: `exec_checked("make", ["install", "DESTDIR=" + ctx.runtime.paths.output], #{ cwd: ctx.src });
-exec_checked("cmake", ["--install", "build", "--prefix", join_path(ctx.runtime.paths.output, "usr")], #{ cwd: ctx.src });`,
+					content: `let staged = join_path(WORK, "staged");
+exec_checked("make", ["install", "DESTDIR=" + staged], #{ cwd: src.source });
+rm(out);
+mv(staged + PREFIX, out);`,
 				},
 			],
 		},

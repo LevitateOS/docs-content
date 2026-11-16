@@ -11,7 +11,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`Build paths from the runtime's paths with ${code("join_path()")} instead of string concatenation, and keep them in ${code("ctx")} fields so every hook uses the same ones.`,
+					content: rich`Build paths from ${code("src")}, ${code("out")}, ${code("WORK")} and the other engine constants with ${code("join_path()")} instead of string concatenation.`,
 				},
 			],
 		},
@@ -25,10 +25,10 @@ export default {
 				{
 					type: "code",
 					language: "rhai",
-					content: `let src = join_path(ctx.runtime.paths.build, "foo-1.0");
-// "/work/build/foo-1.0"
-let program = join_path(ctx.runtime.paths.output, "bin/myapp");
-// "/out/bin/myapp"`,
+					content: `let dir = join_path(WORK, "foo-1.0");
+// WORK + "/foo-1.0"
+let program = join_path(out, "bin/myapp");
+// the output folder + "/bin/myapp"`,
 				},
 			],
 		},
@@ -65,11 +65,11 @@ basename("/work/build/foo.tar.gz");  // "foo.tar.gz"`,
 				{
 					type: "code",
 					language: "rhai",
-					content: `let release = trim(read_file(join_path(ctx.src, "VERSION")));
-if ends_with(ctx.url, ".zip") {
-    extract_with_format(ctx.archive, ctx.runtime.paths.build, "zip");
+					content: `let release = trim(read_file(join_path(src.source, "VERSION")));
+if ends_with(archive, ".zip") {
+    extract_with_format(archive, WORK, "zip");
 }
-let parts = split(ctx.version, ".");`,
+let parts = split(PACKAGE.version, ".");`,
 				},
 			],
 		},
@@ -79,14 +79,12 @@ let parts = split(ctx.version, ".");`,
 				{
 					type: "code",
 					language: "rhai",
-					content: `let ctx = #{
-    name: "foo",
-    version: "1.0",
-    archive: join_path(RUNTIME.paths.build, "foo-1.0.tar.gz"),
-    src: join_path(RUNTIME.paths.build, "foo-1.0"),
-    program: join_path(RUNTIME.paths.output, "bin/foo"),
-    manpage: join_path(RUNTIME.paths.output, "share/man/man1/foo.1"),
-};`,
+					content: `fn build(src, out) {
+    let archive = join_path(WORK, "foo-1.0.tar.gz");
+    let dir = join_path(WORK, "foo-1.0");
+    let program = join_path(out, "bin/foo");
+    let manpage = join_path(out, "share/man/man1/foo.1");
+}`,
 				},
 			],
 		},

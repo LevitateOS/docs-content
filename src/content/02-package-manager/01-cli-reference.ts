@@ -12,29 +12,32 @@ export default {
 					type: "table",
 					headers: ["Command", "Behavior"],
 					rows: [
+						["recipe download RECIPE", "The download step only: fetch the sources and pins into the download store."],
+						["recipe build RECIPE", "Download what is missing, then build. Does not install."],
 						[
 							"recipe install RECIPE",
-							"Run necessary acquire/build/install work, publish outputs and activate a declared package directory. --no-activate keeps producer-only behavior.",
-						],
-						[
-							"recipe isinstalled RECIPE",
-							"Check the active package receipt. With --no-activate, run the producer readiness check; work needed returns nonzero.",
+							"Run every missing step, publish outputs and activate a declared package directory, then clean up unless --keep. --no-activate keeps producer-only behavior.",
 						],
 						[
 							"recipe update PACKAGE",
-							"Produce and activate the selected catalog recipe for an already installed package.",
+							"Install the version the recipe as fetched names, replacing the installed one. Never edits a recipe.",
 						],
+						[
+							"recipe remove PACKAGE",
+							"Remove the installed files using the receipt, then whatever is left of the program's downloads and build material. --keep removes only the installed program.",
+						],
+						["recipe cleanup [RECIPE]", "Delete a program's downloads and build material (every program's without a name); the installed program stays. --downloads or --build limits it; --logs deletes the diagnostic logs."],
+						["recipe state RECIPE", "Print the program's state: none, downloaded, built or installed."],
 						[
 							"recipe installed",
 							"List active package receipts without executing recipes or starting Ginux.",
 						],
-						["recipe isbuilt RECIPE", "Run the custom build readiness check."],
-						["recipe isacquired RECIPE", "Run the custom source readiness check."],
 						[
-							"recipe remove RECIPE",
-							"Deactivate an installed package using its receipt, without recipe execution. --no-activate runs the producer remove hook.",
+							"recipe updates",
+							"Tell which installed programs have a different version in their recipe; --upstream also asks whether upstream has a newer one. Only tells; changes nothing.",
 						],
-						["recipe cleanup RECIPE", "Run optional cleanup with reason manual by default."],
+						["recipe storage", "Report what each program holds on disk."],
+						["recipe history", "List installs, updates, removals and releases."],
 						[
 							"recipe list",
 							"List recipe files and declared metadata, not installed applications; does not run setup.",
@@ -46,7 +49,7 @@ export default {
 						["recipe hash FILE", "Compute SHA256, SHA512 and BLAKE3."],
 						[
 							"recipe validate RECIPE",
-							"Validate declarations, dependency inputs and derived contracts without running hooks.",
+							"Validate declarations, dependency inputs and derived contracts without running the recipe.",
 						],
 						["recipe inspect RECIPE", "Inspect declared authority and typed inputs/outputs."],
 						[
@@ -71,15 +74,19 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`${code("recipe update ripgrep")} uses the currently selected recipe's pinned version and sources. It requires an active installation and does not discover an unpinned latest upstream release or change the catalog. After the catalog changes, run update to produce and activate that version. A failed production or activation keeps the old profile active.`,
+					content: rich`${code("recipe update ripgrep")} installs the version the recipe as fetched names, in place of the installed one. Recipe only tells that upstream has a newer version (${code("recipe updates --upstream")}); it never changes a recipe and never installs a version the recipe does not name. An update is asked for one program at a time.`,
 				},
 				{
 					type: "text",
-					content: rich`The active profile is ${code("<package-root>/profile")}; put ${code("<package-root>/profile/bin")} on ${code("PATH")}. Installation, update and removal switch complete profile generations. ${code("remove")} uses the active receipt, so a changed or missing recipe and unavailable Ginux runtime do not prevent removing an installed package. Old generations remain inactive on disk.`,
+					content: rich`After a successful install Recipe deletes the downloads, the unpacked source, the build material and the saved state. ${code("--keep")} on ${code("install")}, ${code("update")} or ${code("build")} keeps them, and the choice is remembered per program; ${code("--no-keep")} turns it off. ${code("recipe remove")} frees the program's space at once: there are no earlier versions to keep. When a step fails, Recipe reports the failure; what to do about it is the user's call.`,
 				},
 				{
 					type: "text",
-					content: rich`An image built by the current OS builder supplies ${code("/usr/libexec/recipe/ginux")} and ${code("/usr/share/recipe/runtime/rootfs.tar")} with its digest reference in ${code("root-reference")}. Explicit ${code("GINUX_BIN")}, ${code("GINUX_ROOTFS")} and ${code("GINUX_ROOT")} selections override those defaults. The native launcher needs root bootstrap privileges; receipt inspection and removal do not start it.`,
+					content: rich`The active profile is ${code("<package-root>/profile")}; put ${code("<package-root>/profile/bin")} on ${code("PATH")}. ${code("remove")} uses the active receipt, so a changed or missing recipe and unavailable Ginux runtime do not prevent removing an installed package.`,
+				},
+				{
+					type: "text",
+					content: rich`An image built by the current OS builder supplies ${code("/usr/libexec/recipe/ginux")} and ${code("/usr/share/recipe/runtime/rootfs.tar")} with its digest reference in ${code("root-reference")}. Explicit ${code("GINUX_BIN")}, ${code("GINUX_ROOTFS")} and ${code("GINUX_ROOT")} selections override those defaults. The native launcher needs root bootstrap privileges; receipt inspection and removal do not start it. ${code("recipe runtime remove")} deletes the cached build image; it is fetched again when a recipe needs it.`,
 				},
 			],
 		},
@@ -97,7 +104,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`The producer must declare source as a directory in NEEDS.inputs and its returned products in NEEDS.outputs. Inputs are imported read-only at ${code("/inputs/NAME")}. A named ${code("target")} input seeds owned ${code("/out")} for fresh state. Final JSON contains validated published host paths in ${code("ctx.outputs")}; diagnostics go to stderr. Use the same inputs, recipe and destination for producer readiness; matching cached dependencies are required, and their install hooks never run. Producer remove (${code("--no-activate")}) and cleanup use that cached-dependency rule and fail before the main hook if matching products are unavailable. Published products retain coordinator ownership. User packages are copied from a validated publication into a new active profile generation; the engine's prior publications remain unchanged.`,
+					content: rich`The producer must declare source as a directory in NEEDS.inputs and its returned products in NEEDS.outputs. Inputs are imported read-only and reach the recipe through ${code("INPUTS")}. A named ${code("target")} input seeds the output. Final JSON contains validated published host paths in ${code("outputs")}; diagnostics go to stderr. Published products retain coordinator ownership. User packages are activated from a validated publication in the active profile.`,
 				},
 			],
 		},
@@ -118,8 +125,9 @@ export default {
 						],
 						[
 							"--no-activate",
-							"Keep install/remove/isinstalled on the producer lifecycle; the OS builder passes this explicitly.",
+							"Keep install/remove on the producer lifecycle; the OS builder passes this explicitly.",
 						],
+						["--keep / --no-keep", "Keep the downloads and build material after a successful install, remembered per program; --no-keep turns it off and deletes them at once."],
 						[
 							"--build-dir DIR",
 							"Logical build destination and lock; default a stable directory under the state directory.",
@@ -129,13 +137,9 @@ export default {
 							"--input NAME=PATH",
 							"Bind a declared input kind at /inputs/NAME; DEP::NAME binds a dependency input.",
 						],
-						["--json-output FILE", "Write the final ctx JSON to a file instead of stdout."],
-						["--define KEY=VALUE", "Recipe-specific constant; not a host filesystem import."],
+						["--json-output FILE", "Write the final result JSON to a file instead of stdout."],
+						["--define KEY=VALUE", "A define the recipe declares in NEEDS.defines; not a host filesystem import."],
 						["--jobs N", "Requested jobs, 1–16, default 1."],
-						[
-							"--force-install / --force-build / --force-acquire",
-							"Rerun progressively more work for the main recipe.",
-						],
 						[
 							"--no-persist-state",
 							"Disable recovery while retaining managed execution/publication.",
@@ -163,7 +167,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`Contracts use versioned configured catalog 1002. Numeric TCP endpoints do not isolate HTTP identities; normal TLS verification remains required. Resolution selects and records a deterministic bounded address subset. CPU affinity exposes real eligible IDs, configured sysinfo is zero-filled, and poll/events have bounded waits without general signal-mask/restart semantics. See the ${link("supported runtime limits", "https://github.com/LevitateOS/recipe/blob/master/docs/runtime-limits.md")}. Only ${code("ctx.state")} and matching files are recovered. Diagnostics live under ${code("<state-root>/logs/<invocation-id>")}. Cancellation/deadline failures preserve the last complete checkpoint and cannot publish failed work.`,
+					content: rich`Contracts use versioned configured catalog 1002. Numeric TCP endpoints do not isolate HTTP identities; normal TLS verification remains required. Resolution selects and records a deterministic bounded address subset. CPU affinity exposes real eligible IDs, configured sysinfo is zero-filled, and poll/events have bounded waits without general signal-mask/restart semantics. See the ${link("supported runtime limits", "https://github.com/LevitateOS/recipe/blob/master/docs/runtime-limits.md")}. An interrupted build resumes from its newest checkpoint; to redo a step, clean it up and run it again. Diagnostics live under ${code("<state-root>/logs/<invocation-id>")}. Cancellation/deadline failures preserve the last complete checkpoint and cannot publish failed work.`,
 				},
 			],
 		},
@@ -172,7 +176,7 @@ export default {
 			content: [
 				{
 					type: "text",
-					content: rich`See the ${link("Recipe Format", "/docs/recipe-format")} and the ${link("author guide", "https://github.com/LevitateOS/recipe/blob/master/WRITING_RECIPES.md")} for the API 2 contract and a runnable example.`,
+					content: rich`See the ${link("Recipe Format", "/docs/recipe-format")} and the ${link("author guide", "https://github.com/LevitateOS/recipe/blob/master/WRITING_RECIPES.md")} for the API 1 contract and a runnable example.`,
 				},
 			],
 		},
