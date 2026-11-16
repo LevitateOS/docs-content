@@ -4,7 +4,7 @@ import { rich, code } from "../../rich-text";
 export default {
 	title: "Acquire Helpers",
 	intro:
-		"Functions for downloading, checking out and verifying source materials. Every payload is pinned: downloads need a "<sha256>", Git checkouts a full commit id.",
+		'Functions for downloading, checking out and verifying source materials. Every payload is pinned: downloads need a "<sha256>", Git checkouts a full commit id.',
 	sections: [
 		{
 			title: "Overview",
