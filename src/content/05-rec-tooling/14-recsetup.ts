@@ -38,7 +38,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`On the release medium, which carries the default software set, every plan starts with the software step: ${code("recipe --system --root <target> --recipes-path /usr/lib/recsetup/default-set/recipes install <the default set>")}, which installs each group recipe through Recipe, offline from the medium's package cache, with a receipt, and then rebuilds the target's caches once. It comes before the accounts (so users join the groups the software brings) and before the boot step (so on A/B both roots get it). A test medium has no default set and installs the base system alone.`,
+					content: rich`On the release medium, which carries the default software set, every plan starts with the software step: ${code("recipe --system --root <target> --recipes-path /usr/lib/recsetup/default-set/recipes install <the default set>")}, which installs each group recipe through Recipe, with a receipt, and then rebuilds the target's caches once. The medium carries the recipes and the list, not the packages: before that command the step runs ${code("recupdate fetch-parts")}, which downloads the release's category parts (the package files the recipes pin, one archive per category) over the network, checks them against the release's signed manifest and unpacks them into Recipe's package cache, so Recipe then installs from the cache. Without a network the step names the missing parts and their sizes, and ${code("--parts-from DIR")} reads them from a folder you downloaded earlier. It comes before the accounts (so users join the groups the software brings) and before the boot step (so on A/B both roots get it). A test medium has no default set and installs the base system alone.`,
 				},
 			],
 		},

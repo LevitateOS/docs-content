@@ -74,7 +74,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`${code(d.isoFile)} installs the same base system as every ISO, then its default software set: ${String(d.desktop.recipes.length)} group recipes, ${DESKTOP_NAME[d.profile.desktop]} and its apps among them, which ${code("recsetup")}'s software step installs through Recipe, offline from the medium, each with a Recipe receipt, so you can remove or replace any of them later like any other software. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the packages the group recipes pin:`,
+					content: rich`${code(d.isoFile)} installs the same base system as every ISO, then its default software set: ${String(d.desktop.recipes.length)} group recipes, ${DESKTOP_NAME[d.profile.desktop]} and its apps among them, which ${code("recsetup")}'s software step installs through Recipe, each with a Recipe receipt, from the release's category parts that it downloads during the installation (the live session needs a network for that, or a folder holding the parts), so you can remove or replace any of them later like any other software. It needs ${HARDWARE.ram}. Build it from a checkout like the other ISOs (see ${pageLink("getting-started")} for <distro>); the first command downloads the packages the group recipes pin:`,
 				},
 				{
 					type: "code",

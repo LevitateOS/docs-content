@@ -29,7 +29,7 @@ export default distroPage((d) => ({
 				{
 					type: "note",
 					variant: "info",
-					content: rich`${bold("Software first, and it takes some minutes.")} The base system holds only what boots the machine and runs Recipe. The first ${code("recsetup apply")} on the release medium installs the default software through ${code("recipe --system install")}: the desktop (${DESKTOP_NAME[d.profile.desktop]}), Firefox, audio, ${network(d).daemon}, Bluetooth, printing, the firewall, fonts and the rest. It reads them from a package cache on the medium, so no network is needed, and each one gets a Recipe receipt, so you can remove or replace it later in Recipe, the desktop included. Wait for it to finish.`,
+					content: rich`${bold("Software first, and it takes some minutes.")} The base system holds only what boots the machine and runs Recipe. The first ${code("recsetup apply")} on the release medium installs the default software through ${code("recipe --system install")}: the desktop (${DESKTOP_NAME[d.profile.desktop]}), Firefox, audio, ${network(d).daemon}, Bluetooth, printing, the firewall, fonts and the rest. It first downloads the release's category parts (the package files, one archive per category) into the package cache, so the live session needs a network, or a folder holding the parts you downloaded earlier, and then installs from that cache. Each one gets a Recipe receipt, so you can remove or replace it later in Recipe, the desktop included. Wait for it to finish.`,
 				},
 				{
 					type: "command",
