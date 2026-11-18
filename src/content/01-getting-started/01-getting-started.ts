@@ -31,7 +31,7 @@ export default distroPage((d) => ({
 			content: [
 				{
 					type: "text",
-					content: rich`${d.osName} is not released yet, so there is no download; see ${link("Download", "/download")} for its status. It will ship as an x86_64 live ISO that boots into the install environment. Today you build the ISO from the public source, in a checkout of the repository:`,
+					content: rich`${d.osName} is an x86_64 live ISO that boots into the install environment. The ${link("Download", "/download")} page has the released version, its checksum and its known limits, or you can build the ISO from the public source, in a checkout of the repository:`,
 				},
 				{
 					type: "code",
@@ -42,7 +42,7 @@ cargo xtask build release <distro>`,
 				},
 				{
 					type: "text",
-					content: rich`Use the variant's id as <distro> (${DISTROS.map((distro) => distro.id).join(" or ")}). The last command prints the path of the ISO it built; ${code("cargo xtask --help")} lists every build. A release will publish a ${code(`${d.isoFile}.sha512`)} checksum beside the ISO, checked with ${code("sha512sum -c")}.`,
+					content: rich`Use the variant's id as <distro> (${DISTROS.map((distro) => distro.id).join(" or ")}). The last command prints the path of the ISO it built; ${code("cargo xtask --help")} lists every build. A release publishes a ${code(`${d.isoFile}.sha512`)} checksum beside the ISO, checked with ${code("sha512sum -c")}.`,
 				},
 			],
 		},
