@@ -95,7 +95,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`An image built by the current OS builder supplies ${code("/usr/libexec/recipe/ginux")} and ${code("/usr/share/recipe/runtime/rootfs.tar")} with its digest reference in ${code("root-reference")}. Explicit ${code("GINUX_BIN")}, ${code("GINUX_ROOTFS")} and ${code("GINUX_ROOT")} selections override those defaults. The native launcher needs root bootstrap privileges; receipt inspection and removal do not start it. ${code("recipe runtime remove")} deletes the cached build image; it is fetched again when a recipe needs it.`,
+					content: rich`An image built by the current OS builder supplies ${code("/usr/libexec/recipe/ginux")} and ${code("/usr/share/recipe/runtime/compiler.oci.tar")} (an OCI image layout) with its digest reference in ${code("root-reference")}. ${code("RECIPE_GINUX")}, ${code("RECIPE_IMAGE")} and ${code("RECIPE_IMAGE_LAYOUT")} override those defaults; the old ${code("GINUX_BIN")}, ${code("GINUX_ROOT")} and ${code("GINUX_ROOTFS")} are refused. Running a recipe in a Ginux instance needs root or the ${code("recipe-ginux")} sudoers rule; receipt inspection and removal do not start one. ${code("recipe runtime remove")} deletes the cached build image; it is fetched again when a recipe needs it.`,
 				},
 			],
 		},
@@ -182,7 +182,7 @@ export default {
 				},
 				{
 					type: "text",
-					content: rich`Contracts use versioned configured catalog 1002. Numeric TCP endpoints do not isolate HTTP identities; normal TLS verification remains required. Resolution selects and records a deterministic bounded address subset. CPU affinity exposes real eligible IDs, configured sysinfo is zero-filled, and poll/events have bounded waits without general signal-mask/restart semantics. See the ${link("supported runtime limits", "https://github.com/LevitateOS/recipe/blob/master/docs/runtime-limits.md")}. An interrupted build resumes from its newest checkpoint; to redo a step, clean it up and run it again. Diagnostics live under ${code("<state-root>/logs/<invocation-id>")}. Cancellation/deadline failures preserve the last complete checkpoint and cannot publish failed work.`,
+					content: rich`Contracts use configured catalog 2. Numeric TCP endpoints do not isolate HTTP identities; normal TLS verification remains required. Resolution selects and records a deterministic bounded address subset. CPU affinity exposes real eligible IDs, configured sysinfo is zero-filled, and poll/events have bounded waits without general signal-mask/restart semantics. See the ${link("supported runtime limits", "https://github.com/LevitateOS/recipe/blob/master/docs/runtime-limits.md")}. An interrupted step starts again from its beginning; finished steps keep their results. Diagnostics live under ${code("<state-root>/logs/<invocation-id>")}. Cancellation and deadline failures cannot publish failed work.`,
 				},
 			],
 		},
